@@ -35,15 +35,15 @@ export const fetchCategoryById = async (id: string): Promise<Loai | null> => {
 };
 export const fetchAllCategories = async (): Promise<Loai[]> => {
   try {
-    const res = await fetch("http://localhost:5000/api/category", { cache: "no-store" });
+    const res = await fetch("http://localhost:5000/api/categories", { cache: "no-store" });
     if (!res.ok) return [];
     const json = await res.json();
     if (!Array.isArray(json.data)) return [];
 
     // Thêm kiểu cho cat, sửa id → _id
-    return json.data.map((cat: { _id: string; ten_loai: string }) => ({
-      ...cat,
+    return json.data.map((cat: { _id: string; name: string }) => ({
       _id: cat._id ?? "", // chắc chắn _id có giá trị
+      ten_loai: cat.name,
     }));
   } catch (err) {
     console.error("Fetch all categories error:", err);
