@@ -6,6 +6,7 @@ import Link from "next/link";
 import ProductCard from "./ProductCard";
 import { Product, Category } from "../lib/api";
 import { useCart } from "../context/CartContext";
+import "../../app/product-detail.css";
 
 interface ProductDetailClientProps {
   product: Product;
@@ -22,6 +23,10 @@ export default function ProductDetailClient({
 }: ProductDetailClientProps) {
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
+  // tab control for description/usage section
+  const [activeTab, setActiveTab] = useState<'info' | 'usage'>('info');
+  // rating filter for review section ('all' or 1..5)
+  const [activeFilter, setActiveFilter] = useState<'all' | 1 | 2 | 3 | 4 | 5>('all');
 
   const decreaseQty = () => {
     if (quantity > 1) setQuantity(quantity - 1);
@@ -108,49 +113,102 @@ export default function ProductDetailClient({
                   )}
                 </div>
 
-                {/* Số lượng */}
+                {/* Số lượng + nút trong cùng hàng */}
                 <div className="product-quantity">
                   <label>Số lượng:</label>
-                  <div className="quantity-controls">
-                    <button className="qty-btn" onClick={decreaseQty}>–</button>
-                    <input
-                      type="text"
-                      value={quantity}
-                      readOnly
-                      className="qty-input"
-                    />
-                    <button className="qty-btn" onClick={increaseQty}>+</button>
+                  <div className="qty-add-group">
+                    <div className="quantity-controls">
+                      <button className="qty-btn" onClick={decreaseQty}>–</button>
+                      <input
+                        type="text"
+                        value={quantity}
+                        readOnly
+                        className="qty-input"
+                      />
+                      <button className="qty-btn" onClick={increaseQty}>+</button>
+                    </div>
+                    <button className="add-to-cart-btn" onClick={handleAddToCart}>
+                      Thêm vào giỏ hàng ({quantity})
+                    </button>
                   </div>
                 </div>
 
-                <button className="add-to-cart-btn" onClick={handleAddToCart}>
-                  Thêm vào giỏ hàng ({quantity})
-                </button>
-
-                <div className="promotion-tag">
-                  <div className="promo-icon">%</div>
-                  <div>
-                    <div className="promo-text">
-                      Ưu đãi đặc biệt khi mua online!
-                    </div>
-                    <div className="promo-note">
-                      Gọi hotline để được tư vấn miễn phí
-                    </div>
-                  </div>
-                </div>
-
-                <div className="product-notice">
+                {/* thông báo mua số lượng lớn */}
+                <div className="bulk-order-note">
                   <p>
-                    Hotline: <strong>1900 1234</strong> | Zalo:{" "}
-                    <strong>0909 999 999</strong>
+                    Nếu bạn muốn mua hàng với số lượng lớn, xin vui lòng liên hệ Hotline: 
+                    <a href="tel:19006686900">19006686900</a> hoặc Zalo: 
+                    <a href="https://zalo.me/0969822511">0969822511</a>. Aura Beauty chân thành cảm ơn bạn!
                   </p>
                 </div>
+
+                {/* mã giảm giá */}
+                <div className="discount-code-box">
+                  <div className="icon-percent">%</div>
+                  <span>Mã giảm giá <small>(Không áp dụng đồng thời)</small></span>
+                </div>
+
+                {/* thông tin vận chuyển */}
+                <div className="shipping-info">
+                  <div className="ship-col">
+                    <h4>Phí Ship</h4>
+                    <p>Nội thành Hà Nội - 20.000đ</p>
+                    <p>Các tỉnh còn lại - 25.000đ</p>
+                  </div>
+                  <div className="ship-col">
+                    <h4>Thời gian ship dự kiến</h4>
+                    <p>Hà Nội, TP.HCM: 1 - 2 ngày</p>
+                    <p>Các tỉnh còn lại: 2 - 5 ngày</p>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
         </div>
       </div>
+{/* Thông tin sản phẩm / hướng dẫn sử dụng */}
+<div className="product-info-section">
+  <div className="product-container">
+    <div className="product-info-card">
 
+      <div className="product-info-tabs">
+        <div
+          className={`tab ${activeTab === "info" ? "active" : ""}`}
+          onClick={() => setActiveTab("info")}
+        >
+          THÔNG TIN SẢN PHẨM
+        </div>
+
+        <div
+          className={`tab ${activeTab === "usage" ? "active" : ""}`}
+          onClick={() => setActiveTab("usage")}
+        >
+          HƯỚNG DẪN SỬ DỤNG
+        </div>
+      </div>
+
+      <div className="tab-content">
+        {activeTab === "info" ? (
+          <>
+            <button className="view-details-btn">
+              Xem chi tiết
+            </button>
+
+            <p className="product-description-text">
+              {product.mo_ta || "Không có mô tả."}
+            </p>
+          </>
+        ) : (
+          <p className="product-description-text">
+            Chưa có hướng dẫn sử dụng.
+          </p>
+        )}
+      </div>
+
+    </div>
+  </div>
+</div>
       {/* Sản phẩm liên quan */}
       {relatedProducts.length > 0 && (
         <div className="related-products-section">
@@ -167,14 +225,46 @@ export default function ProductDetailClient({
         </div>
       )}
 
-      <div
-        className="product-container"
-        style={{ textAlign: "center", padding: "50px 0" }}
-      >
-        <Link href="/" className="btn-detail">
-          Quay về trang chủ
-        </Link>
+      {/* Review summary section */}
+      <div className="review-section">
+        <div className="product-container">
+          <h2 className="section-title">ĐÁNH GIÁ TỪ KHÁCH HÀNG ĐÃ MUA</h2>
+          <div className="review-card">
+            <div className="rating-overall">
+              <div className="rating-number">0.0</div>
+              <div className="stars">
+                ☆☆☆☆☆
+              </div>
+              <div className="rating-note">Theo 0 đánh giá</div>
+            </div>
+            <div className="rating-breakdown">
+              {[5,4,3,2,1].map(n => (
+                <div className="breakdown-row" key={n}>
+                  <div className="stars-count">{n} <span className="star">★</span></div>
+                  <div className="bar"><div className="fill" style={{ width: "0%" }} /></div>
+                  <div className="count">(0)</div>
+                </div>
+              ))}
+            </div>
+            <button className="write-review-btn">VIẾT ĐÁNH GIÁ ✏️</button>
+          </div>
+          <div className="review-filters">
+            <button
+              className={`filter ${activeFilter === 'all' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('all')}
+            >Tất cả</button>
+            {[5,4,3,2,1].map(n => (
+              <button
+                key={n}
+                className={`filter ${activeFilter === n ? 'active' : ''}`}
+                onClick={() => setActiveFilter(n as 1|2|3|4|5)}
+              >{n} ⭐</button>
+            ))}
+          </div>
+        </div>
       </div>
+
+
     </>
   );
 }
