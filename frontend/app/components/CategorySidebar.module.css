@@ -1,0 +1,35 @@
+/* app/components/CategorySidebar.module.css */
+.sidebar {
+  width: 250px; /* Độ rộng cố định cho sidebar */
+  flex-shrink: 0; /* Không co lại khi thu nhỏ */
+  border: 1px solid #eee;
+  padding: 1rem;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.listItem {
+  margin-bottom: 0.75rem;
+}
+
+.listItem a {
+  text-decoration: none;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.listItem a:hover {
+  color: #007bff; /* Hoặc màu chủ đạo của bạn */
+}

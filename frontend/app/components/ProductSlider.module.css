@@ -1,0 +1,103 @@
+/* app/components/ProductSlider.module.css – ĐÃ SỬA XONG, HIỆN ĐỦ 4 CARD ĐẸP LUNG LINH */
+
+.cardSection {
+  margin-top: 60px;
+  padding: 0 20px;
+}
+
+.cardHeader {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.cardHeader h2 {
+  font-size: 28px;
+  font-weight: bold;
+  color: #3d640f;
+  margin: 0;
+}
+
+.sliderContainer {
+  max-width: 1240px;
+  margin: 0 auto;
+  position: relative;
+  padding: 0 50px; /* Để chỗ cho nút prev/next */
+}
+
+.sliderWrapper {
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.sliderTrack {
+  display: flex;
+  transition: transform 0.4s ease;
+  gap: 20px; /* Khoảng cách giữa các card */
+}
+
+.sliderItem {
+  flex: 0 0 calc(25% - 15px); /* Chính xác 25% - khoảng cách */
+  box-sizing: border-box;
+}
+
+/* Nút prev/next */
+.sliderButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.sliderContainer:hover .sliderButton {
+  opacity: 1;
+}
+
+.sliderButton:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.prev { left: 10px; }
+.next { right: 10px; }
+/* Thêm vào cuối file ProductSlider.module.css */
+.dotsContainer {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #ddd;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.activeDot {
+  background-color: #d35400;
+  transform: scale(1.2);
+}
+
+.dot:hover {
+  background-color: #d35400;
+}

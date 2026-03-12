@@ -1,0 +1,70 @@
+/* ===============================
+   PRODUCTS – ADMIN DASHBOARD 2025
+   =============================== */
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  color: #e5e7eb;
+}
+
+/* ===== Header ===== */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+/* ===== Button ===== */
+.btnPrimary {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 6px;
+  border: 1px solid rgba(59,130,246,.4);
+  background: rgba(59,130,246,.15);
+  color: #bfdbfe;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .15s ease, border .15s ease;
+}
+
+.btnPrimary:hover {
+  background: rgba(59,130,246,.3);
+  border-color: #3b82f6;
+}
+
+/* ===== Table Wrapper ===== */
+.tableWrapper {
+  background: rgba(15,23,42,.7);
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.35);
+  overflow-x: auto;
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 768px) {
+  .container {
+    padding: 14px;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .btnPrimary {
+    width: 100%;
+  }
+}

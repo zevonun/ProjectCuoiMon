@@ -1,0 +1,100 @@
+/* app/components/ProductCard.module.css – ĐÃ CHỈNH ĐẸP NHƯ SHOPEE */
+.product {
+  box-sizing: border-box;
+  text-align: center;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #eee;
+  transition: all 0.3s ease;
+  width: 100%;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+}
+
+.product:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  border-color: #d35400;
+}
+
+.productImage {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  background-color: #fff;
+  border-radius: 8px;
+}
+
+.cardItemContent {
+  padding: 12px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: space-between;
+}
+
+.cardItemContent h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+  height: 40px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.cardItemContent h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cardItemContent h3 a:hover {
+  color: #d35400;
+}
+
+.priceProduct {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.newPrice {
+  font-size: 16px;
+  font-weight: bold;
+  color: #d35400;
+}
+
+.oldPrice {
+  font-size: 13px;
+  color: #999;
+  text-decoration: line-through;
+}
+
+/* Thêm hiệu ứng cho thẻ quà tặng nếu có */
+.product::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #e74c3c;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  z-index: 10;
+}
+
+.product:has(img[src*="qua-tang"])::before {
+  content: "QUÀ TẶNG";
+}

@@ -1,0 +1,47 @@
+.navbar {
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 1rem 0;
+}
+
+.navContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.navLinks {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.navLinks a {
+  color: var(--text-light);
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.navLinks a:hover {
+  color: var(--primary-color);
+}
+
+.mainContent {
+  padding-top: 130px;
+  padding-bottom: 2rem;
+  min-height: 70vh; /* Giúp đẩy footer xuống nếu trang quá ngắn */
+}
+
+/* Style cho Footer (có thể giữ lại vì globals.css không có) */
+.footer {
+  background-color: #f9fafb;
+  margin-top: 3rem;
+  padding: 2rem 0;
+  text-align: center;
+  color: var(--text-light); /* Dùng biến từ globals.css */
+}

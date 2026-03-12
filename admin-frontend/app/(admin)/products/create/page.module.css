@@ -1,0 +1,105 @@
+/* ===============================
+   ADMIN FORM – DARK 2025
+   =============================== */
+
+.container {
+  padding: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+  color: #e5e7eb;
+}
+
+/* ===== Title ===== */
+.title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #f8fafc;
+}
+
+/* ===== Primary Button ===== */
+.btnPrimary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #ffffff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.btnPrimary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(59,130,246,.35);
+}
+
+/* ===== Form Wrapper ===== */
+.formWrapper {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #1e293b;
+  box-shadow: 0 10px 25px rgba(0,0,0,.4);
+}
+
+/* ===== Label ===== */
+.formWrapper label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+/* ===== Inputs ===== */
+.formWrapper input,
+.formWrapper textarea,
+.formWrapper select {
+  width: 100%;
+  padding: 9px 12px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+  background: rgba(2, 6, 23, 0.9);
+  color: #e5e7eb;
+  font-size: 14px;
+  transition: border .15s ease, box-shadow .15s ease;
+}
+
+.formWrapper textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+/* ===== Focus ===== */
+.formWrapper input:focus,
+.formWrapper textarea:focus,
+.formWrapper select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59,130,246,.25);
+}
+
+/* ===== Placeholder ===== */
+.formWrapper input::placeholder,
+.formWrapper textarea::placeholder {
+  color: #64748b;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+
+  .btnPrimary {
+    width: 100%;
+  }
+}

@@ -1,0 +1,90 @@
+/* components/ImageUpload.module.css */
+
+.uploadZone {
+  border: 2px dashed #2d3a52;
+  border-radius: 12px;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  background-color: #0f172a;
+}
+
+.uploadZone:hover {
+  border-color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.uploadZoneDragging {
+  border-color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.08);
+}
+
+.uploadZoneUploading {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.uploadLabel {
+  display: block;
+  cursor: pointer;
+}
+
+.uploadIcon {
+  width: 56px;
+  height: 56px;
+  color: #475569;
+  margin: 0 auto 1rem;
+  display: block;
+}
+
+.uploadText {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-bottom: 0.3rem;
+}
+
+.uploadHint {
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+/* Preview */
+.previewWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.previewImage {
+  max-height: 240px;
+  max-width: 100%;
+  border-radius: 8px;
+  object-fit: contain;
+  border: 1px solid #2d3a52;
+}
+
+.removeBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.removeBtn:hover {
+  background-color: #dc2626;
+}
