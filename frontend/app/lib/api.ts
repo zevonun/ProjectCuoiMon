@@ -5,6 +5,7 @@ export interface Product {
   gia: number;
   gia_km?: number | null;
   hinh: string;
+  mo_ta?: string;   
   categoryId?: string;
   brandId?: string | null;
   sale?: number;
