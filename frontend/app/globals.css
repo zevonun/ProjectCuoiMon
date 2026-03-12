@@ -55,10 +55,9 @@ a {
 
 .header-top-left {
   align-items: center;
-  flex: 0 0 auto;
+  flex: 1;
   max-width: 150px;
   max-height: 80px;
-  margin-right: -10px;
 }
 
 .header-top-left img {
