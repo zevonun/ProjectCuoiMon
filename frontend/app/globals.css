@@ -1,5 +1,6 @@
 :root {
-  --primary-color: #ec4899; /* Màu hồng */
+  --primary-color: #ec4899;
+  /* Màu hồng */
   --text-dark: #333;
   --text-light: #666;
   --container-width: 1100px;
@@ -7,7 +8,7 @@
 
 body {
   color: var(--text-dark);
-  
+
 }
 
 a {
@@ -30,13 +31,11 @@ a {
 }
 
 .header {
-  background-image: repeating-linear-gradient(
-    45deg,
-    #3e6807,
-    #4a7305 10px,
-    #3e6807 10px,
-    #3e6807 10px
-  );
+  background-image: repeating-linear-gradient(45deg,
+      #3e6807,
+      #4a7305 10px,
+      #3e6807 10px,
+      #3e6807 10px);
   color: white;
   position: fixed;
   top: 0;
@@ -57,10 +56,15 @@ a {
 .header-top-left {
   align-items: center;
   flex: 1;
+  max-width: 150px;
+  max-height: 80px;
 }
 
 .header-top-left img {
   height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
 }
 
 .header-top-main {
@@ -331,8 +335,9 @@ a {
 /* slide */
 /* === FIX LỖI KÍCH THƯỚC BANNER (SLIDESHOW) === */
 .slideshow-container {
-  height: 70vh; /* Giữ nguyên chiều cao 70% màn hình */
-  
+  height: 70vh;
+  /* Giữ nguyên chiều cao 70% màn hình */
+
   /* Thêm các thuộc tính sau để "phá" container */
   width: 100vw;
   position: relative;
@@ -340,10 +345,11 @@ a {
   right: 50%;
   margin-left: -50vw;
   margin-right: -50vw;
-  
+
   /* Thuộc tính cũ */
   overflow: hidden;
 }
+
 /* === KẾT THÚC FIX === */
 
 .mySlides {
@@ -418,13 +424,11 @@ a {
   height: auto;
   overflow: hidden;
   box-shadow: 0 1px 7px #3e6807;
-  background-image: repeating-linear-gradient(
-    45deg,
-    #3e6807,
-    #4a7305 10px,
-    #3e6807 10px,
-    #3e6807 10px
-  );
+  background-image: repeating-linear-gradient(45deg,
+      #3e6807,
+      #4a7305 10px,
+      #3e6807 10px,
+      #3e6807 10px);
   justify-content: center;
   align-items: center;
   padding: 10px 0;
@@ -908,6 +912,7 @@ a {
   bottom: -22%;
   left: 30px;
 }
+
 .home-resources-item-2 .home-product:nth-child(4) img {
   position: absolute;
   bottom: -10%;
@@ -935,41 +940,48 @@ a {
    để không đụng tới class .cart-link của "Hệ thống cửa hàng"
 */
 .cart-icon-link {
-  position: relative; /* Rất quan trọng: làm "mốc" cho phần tử con */
-  display: inline-block; /* Thêm để bọc icon vừa vặn */
+  position: relative;
+  /* Rất quan trọng: làm "mốc" cho phần tử con */
+  display: inline-block;
+  /* Thêm để bọc icon vừa vặn */
   /* Thêm một chút đệm nếu icon quá sát */
-  padding: 5px; 
+  padding: 5px;
 }
 
 /* 2. Định vị vòng tròn số lượng (con) "nổi" lên trên
 */
 .cart-item-count {
-  position: absolute; /* Quan trọng: "thả nổi" phần tử này */
-  
+  position: absolute;
+  /* Quan trọng: "thả nổi" phần tử này */
+
   /* Đặt vị trí ở góc trên bên phải của "mốc" */
-  top: -8px;   /* Đẩy lên trên (giá trị âm) */
-  right: -8px; /* Đẩy qua phải (giá trị âm) */
-  
+  top: -8px;
+  /* Đẩy lên trên (giá trị âm) */
+  right: -8px;
+  /* Đẩy qua phải (giá trị âm) */
+
   /* --- Phần làm đẹp cho vòng tròn --- */
-  background-color: #d71a21; /* Màu đỏ chủ đạo của bạn */
+  background-color: #d71a21;
+  /* Màu đỏ chủ đạo của bạn */
   color: white;
-  border-radius: 50%; /* Làm nó tròn hoàn hảo */
-  
+  border-radius: 50%;
+  /* Làm nó tròn hoàn hảo */
+
   /* Đặt kích thước cố định */
-  width: 22px;          
-  height: 22px;         
-  
+  width: 22px;
+  height: 22px;
+
   /* Căn chữ (số) vào chính giữa vòng tròn */
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   font-size: 12px;
   font-weight: 600;
-  
+
   /* Thêm viền trắng nhỏ để nổi bật trên nền icon */
-  border: 2px solid white; 
-  
+  border: 2px solid white;
+
   /* Đảm bảo nó không bị ảnh hưởng bởi con trỏ */
-  pointer-events: none; 
+  pointer-events: none;
 }

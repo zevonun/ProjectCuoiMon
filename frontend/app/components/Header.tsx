@@ -1,10 +1,10 @@
 // app/components/Header.tsx
-"use client"; 
+"use client";
 
 import Link from 'next/link';
 import Image from 'next/image';
 // SỬA 1: Thêm 'useContext', 'useEffect'
-import React, { useState, useContext, useEffect } from 'react'; 
+import React, { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext'; // Import Context
 import { useCart } from '../context/CartContext'; // SỬA 1.1: Import useCart
 import UserMenu from './UserMenu'; // Import UserMenu
@@ -54,7 +54,7 @@ export default function Header() {
     const loadData = async () => {
       try {
         setLoading(true);
-        
+
         // Fetch all products
         const fetchedProducts = await fetchProducts('http://localhost:5000/api/products');
         setProducts(fetchedProducts);
@@ -110,9 +110,9 @@ export default function Header() {
 
   // Hàm render tab menu bên trái (để tránh lặp code)
   const renderSubMenuItem = (title: string, tabId: string) => (
-    <li 
+    <li
       key={tabId}
-      onMouseEnter={() => setActiveSubMenu(tabId)} 
+      onMouseEnter={() => setActiveSubMenu(tabId)}
       className={activeSubMenu === tabId ? 'active' : ''}
     >
       <Link href="#">{title}</Link>
@@ -138,9 +138,9 @@ export default function Header() {
   const renderProductsByCategory = (categoryName: string) => {
     // Normalize category name to find matching category ID
     const normalizedName = categoryName.toLowerCase().trim();
-    
+
     // Tìm category có name matching
-    const matchedCategory = categories.find(cat => 
+    const matchedCategory = categories.find(cat =>
       cat.name.toLowerCase() === normalizedName ||
       cat.name.toLowerCase().includes(normalizedName) ||
       normalizedName.includes(cat.name.toLowerCase())
@@ -152,7 +152,7 @@ export default function Header() {
 
     // Filter products theo categoryId
     const categoryProducts = products.filter(p => p.categoryId === matchedCategory._id);
-    
+
     if (categoryProducts.length === 0) {
       return <p style={{ padding: '10px', color: '#999' }}>Chưa có sản phẩm</p>;
     }
@@ -165,13 +165,13 @@ export default function Header() {
       <div className="header-top">
         <div className="header-top-left">
           <Link href="/">
-            <Image 
-              src="/img/logo.png" 
-              alt="Logo" 
-              width={200} 
-              height={60}
-              priority={true} // Giúp logo tải nhanh hơn
-              style={{ height: 'auto', width: 'auto' }} 
+            <Image
+              src="/img/Logo.png"
+              alt="Logo"
+              width={120}
+              height={50}
+              priority={true}
+              style={{ objectFit: 'contain' }}
             />
           </Link>
         </div>
@@ -198,11 +198,11 @@ export default function Header() {
               <i className="fas fa-home"></i>
               <span>Hệ thống cửa hàng</span>
             </Link>
-          </div>  
+          </div>
           <div className="cart">
             <Link href="/profile"><i className="fas fa-heart"></i></Link>
           </div>
-          
+
           {/* --- KHU VỰC ĐÃ ĐƯỢC SỬA LỖI --- */}
           {/* 'isLoggedIn' và 'user' bây giờ đã được định nghĩa */}
           {isLoggedIn && user ? (
@@ -217,7 +217,7 @@ export default function Header() {
             </div>
           )}
           {/* --- KẾT THÚC SỬA LỖI --- */}
-          
+
           <div className="cart">
             {/* SỬA LỖI XUNG ĐỘT CSS:
               Đổi className từ "cart-link" thành "cart-icon-link"
@@ -231,12 +231,12 @@ export default function Header() {
           </div>
         </div>
       </div>
-      
+
       {/* 2. HEADER BOTTOM (Giữ nguyên toàn bộ mega menu của bạn) */}
       <div className="header-bottom">
         <ul className="pure-list" id="pure-list">
-          
-        {/* ----- MỤC 1: SALE ----- */}
+
+          {/* ----- MỤC 1: SALE ----- */}
           <li className="title-san-pham" onMouseEnter={() => handleMenuEnter('sale')}>
             <Link href="/products/sale">Sale</Link>
             <div className="pure-item" style={{ display: activeMenu === 'sale' ? 'flex' : 'none' }}>
@@ -250,11 +250,11 @@ export default function Header() {
                   {renderSubMenuItem('Black Green Day', 'right-5')}
                 </ul>
               </div>
-              
+
               <div className="pure-item-right right-1" style={{ display: activeSubMenu === 'right-1' ? 'grid' : 'none' }}>
                 {renderProductsByCategory('Combo chăm sóc da')}
               </div>
-              
+
               <div className="pure-item-right right-2" style={{ display: activeSubMenu === 'right-2' ? 'grid' : 'none' }}>
                 {renderProductsByCategory('Combo chăm sóc tóc')}
               </div>
@@ -270,7 +270,7 @@ export default function Header() {
               </div>
             </div>
           </li>
-          
+
           {/* ----- MỤC 2: TRANG ĐIỂM ----- */}
           <li className="title-san-pham" onMouseEnter={() => handleMenuEnter('trangdiem')}>
             <Link href="/products/trang-diem">Trang Điểm</Link>
@@ -298,34 +298,34 @@ export default function Header() {
           {/* ----- MỤC 3: DA ----- */}
           <li className="title-san-pham" onMouseEnter={() => handleMenuEnter('da')}>
             <Link href="/products/da">Da</Link>
-             <div className="pure-item" style={{ display: activeMenu === 'da' ? 'flex' : 'none' }}>
-                {/* ... (Nội dung mega menu) ... */}
-                <div className="pure-item-left">
-                  <ul className="pure-list-item">
-                    {renderSubMenuItem('Tẩy trang - rửa mặt', 'right-1')}
-                    {renderSubMenuItem('Toner - xịt khoáng', 'right-2')}
-                    {renderSubMenuItem('Dưỡng da', 'right-3')}
-                    {renderSubMenuItem('Kem chống nắng', 'right-4')}
-                  </ul>
-                </div>
+            <div className="pure-item" style={{ display: activeMenu === 'da' ? 'flex' : 'none' }}>
+              {/* ... (Nội dung mega menu) ... */}
+              <div className="pure-item-left">
+                <ul className="pure-list-item">
+                  {renderSubMenuItem('Tẩy trang - rửa mặt', 'right-1')}
+                  {renderSubMenuItem('Toner - xịt khoáng', 'right-2')}
+                  {renderSubMenuItem('Dưỡng da', 'right-3')}
+                  {renderSubMenuItem('Kem chống nắng', 'right-4')}
+                </ul>
+              </div>
 
-                <div className="pure-item-right right-1" style={{ display: activeSubMenu === 'right-1' ? 'grid' : 'none' }}>
-                  {renderProductsByCategory('Tẩy trang - rửa mặt')}
-                </div>
-                <div className="pure-item-right right-2" style={{ display: activeSubMenu === 'right-2' ? 'grid' : 'none' }}>
-                  {renderProductsByCategory('Toner - xịt khoáng')}
-                </div>
-                <div className="pure-item-right right-3" style={{ display: activeSubMenu === 'right-3' ? 'grid' : 'none' }}>
-                  {renderProductsByCategory('Dưỡng da')}
-                </div>
-                <div className="pure-item-right right-4" style={{ display: activeSubMenu === 'right-4' ? 'grid' : 'none' }}>
-                  {renderProductsByCategory('Kem chống nắng')}
-                </div>
+              <div className="pure-item-right right-1" style={{ display: activeSubMenu === 'right-1' ? 'grid' : 'none' }}>
+                {renderProductsByCategory('Tẩy trang - rửa mặt')}
+              </div>
+              <div className="pure-item-right right-2" style={{ display: activeSubMenu === 'right-2' ? 'grid' : 'none' }}>
+                {renderProductsByCategory('Toner - xịt khoáng')}
+              </div>
+              <div className="pure-item-right right-3" style={{ display: activeSubMenu === 'right-3' ? 'grid' : 'none' }}>
+                {renderProductsByCategory('Dưỡng da')}
+              </div>
+              <div className="pure-item-right right-4" style={{ display: activeSubMenu === 'right-4' ? 'grid' : 'none' }}>
+                {renderProductsByCategory('Kem chống nắng')}
+              </div>
             </div>
           </li>
-          
+
           {/* (Các mục menu còn lại giữ nguyên...) */}
-          
+
           <li className="title-san-pham" onMouseEnter={() => handleMenuEnter('toc')}>
             <Link href="/products/toc">Tóc</Link>
             {/* ... */}
@@ -364,12 +364,12 @@ export default function Header() {
           <li className="title-san-pham">
             <Link href="/about">Về Aura Beauty</Link>
           </li>
-          
+
           <li className="title-san-pham" onMouseEnter={() => handleMenuEnter('khac')}>
             <Link href="/products/khac">Khác</Link>
             {/* ... */}
           </li>
-          
+
         </ul>
       </div>
     </div>

@@ -56,8 +56,6 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
         />
-        {/* DUY NHẤT 1 DÒNG NÀY LÀ ĐỦ */}
-        <link rel="stylesheet" href="/css/product-details.css" />
       </head>
 
       <body className={inter.className}>
