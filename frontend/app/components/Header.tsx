@@ -10,6 +10,26 @@ import { useCart } from '../context/CartContext'; // SỬA 1.1: Import useCart
 import UserMenu from './UserMenu'; // Import UserMenu
 import { fetchProducts, Product } from '../lib/api'; // Import fetchProducts và Product type
 
+// Mapping từ slug/name sang displayName cho menu
+const CATEGORY_MAPPING: Record<string, string> = {
+  'trang-diem': 'Trang Điểm',
+  'da': 'Da',
+  'toc': 'Tóc',
+  'lam-dep-duong-uong': 'Làm Đẹp Đường Uống',
+  'co-the': 'Cơ Thể',
+  'em-be': 'Em Bé',
+  'huong-thom': 'Hương Thơm',
+  'qua-tang': 'Quà Tặng',
+  'bo-san-pham': 'Bộ Sản Phẩm',
+  'khac': 'Khác',
+};
+
+export interface CategoryData {
+  _id: string;
+  name: string;
+  slug?: string;
+}
+
 export default function Header() {
   // State để quản lý menu nào đang được hover
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -19,7 +39,8 @@ export default function Header() {
 
   // State để lưu products và grouping theo category
   const [products, setProducts] = useState<Product[]>([]);
-  const [productsByCategory, setProductsByCategory] = useState<Record<string, Product[]>>({});
+  const [categories, setCategories] = useState<CategoryData[]>([]);
+  const [categoryIdMap, setCategoryIdMap] = useState<Record<string, string>>({}); // Map slug -> categoryId
   const [loading, setLoading] = useState(true);
 
   // SỬA 2: Lấy giá trị từ AuthContext
@@ -28,32 +49,44 @@ export default function Header() {
   // SỬA 2.1: Lấy itemCount từ CartContext
   const { itemCount } = useCart();
 
-  // Gọi API lấy sản phẩm khi component mount
+  // Gọi API lấy sản phẩm và categories khi component mount
   useEffect(() => {
-    const loadProducts = async () => {
+    const loadData = async () => {
       try {
         setLoading(true);
+        
+        // Fetch all products
         const fetchedProducts = await fetchProducts('http://localhost:5000/api/products');
         setProducts(fetchedProducts);
 
-        // Group products by category
-        const grouped: Record<string, Product[]> = {};
-        fetchedProducts.forEach((product) => {
-          const categoryId = product.categoryId || 'uncategorized';
-          if (!grouped[categoryId]) {
-            grouped[categoryId] = [];
-          }
-          grouped[categoryId].push(product);
-        });
-        setProductsByCategory(grouped);
+        // Fetch all categories
+        const response = await fetch('http://localhost:5000/api/categories', { cache: 'no-store' });
+        if (response.ok) {
+          const json = await response.json();
+          const fetchedCategories = Array.isArray(json.data) ? json.data : [];
+          setCategories(fetchedCategories);
+
+          // Build mapping từ category name sang _id
+          const mapping: Record<string, string> = {};
+          fetchedCategories.forEach((cat: CategoryData) => {
+            // Normalize name to slug (lowercase, replace spaces with dash)
+            const slug = cat.name.toLowerCase()
+              .replace(/\s+/g, '-')
+              .replace(/[^\w-]/g, '');
+            mapping[slug] = cat._id;
+            // Also map by exact name
+            mapping[cat.name.toLowerCase()] = cat._id;
+          });
+          setCategoryIdMap(mapping);
+        }
       } catch (error) {
-        console.error('Error loading products:', error);
+        console.error('Error loading data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    loadProducts();
+    loadData();
   }, []);
 
   // SỬA 3: Thêm một kiểm tra an toàn (rất quan trọng)
@@ -101,10 +134,30 @@ export default function Header() {
     </div>
   );
 
-  // Hàm render danh sách sản phẩm theo category
-  const renderProductsByCategory = (categoryId: string) => {
-    const categoryProducts = productsByCategory[categoryId] || [];
-    return categoryProducts.slice(0, 4).map(product => renderProductItem(product));
+  // Hàm render danh sách sản phẩm theo category name (từ submenu item)
+  const renderProductsByCategory = (categoryName: string) => {
+    // Normalize category name to find matching category ID
+    const normalizedName = categoryName.toLowerCase().trim();
+    
+    // Tìm category có name matching
+    const matchedCategory = categories.find(cat => 
+      cat.name.toLowerCase() === normalizedName ||
+      cat.name.toLowerCase().includes(normalizedName) ||
+      normalizedName.includes(cat.name.toLowerCase())
+    );
+
+    if (!matchedCategory) {
+      return <p style={{ padding: '10px', color: '#999' }}>Chưa có sản phẩm</p>;
+    }
+
+    // Filter products theo categoryId
+    const categoryProducts = products.filter(p => p.categoryId === matchedCategory._id);
+    
+    if (categoryProducts.length === 0) {
+      return <p style={{ padding: '10px', color: '#999' }}>Chưa có sản phẩm</p>;
+    }
+
+    return categoryProducts.slice(0, 4).map((product: Product) => renderProductItem(product));
   };
 
   return (
@@ -199,21 +252,21 @@ export default function Header() {
               </div>
               
               <div className="pure-item-right right-1" style={{ display: activeSubMenu === 'right-1' ? 'grid' : 'none' }}>
-                {renderProductsByCategory('combo-cham-soc-da')}
+                {renderProductsByCategory('Combo chăm sóc da')}
               </div>
               
               <div className="pure-item-right right-2" style={{ display: activeSubMenu === 'right-2' ? 'grid' : 'none' }}>
-                {renderProductsByCategory('combo-cham-soc-toc')}
+                {renderProductsByCategory('Combo chăm sóc tóc')}
               </div>
 
               <div className="pure-item-right right-3" style={{ display: activeSubMenu === 'right-3' ? 'grid' : 'none' }}>
-                {renderProductsByCategory('combo-cham-soc-moi')}
+                {renderProductsByCategory('Combo chăm sóc môi')}
               </div>
               <div className="pure-item-right right-4" style={{ display: activeSubMenu === 'right-4' ? 'grid' : 'none' }}>
-                {renderProductsByCategory('combo-khac')}
+                {renderProductsByCategory('Combo khác')}
               </div>
               <div className="pure-item-right right-5" style={{ display: activeSubMenu === 'right-5' ? 'grid' : 'none' }}>
-                {renderProductsByCategory('black-green-day')}
+                {renderProductsByCategory('Black Green Day')}
               </div>
             </div>
           </li>
@@ -234,10 +287,10 @@ export default function Header() {
               </div>
 
               <div className="pure-item-right right-1" style={{ display: activeSubMenu === 'right-1' ? 'grid' : 'none' }}>
-                {renderProductsByCategory('son-duong-moi')}
+                {renderProductsByCategory('Son dưỡng môi')}
               </div>
               <div className="pure-item-right right-2" style={{ display: activeSubMenu === 'right-2' ? 'grid' : 'none' }}>
-                {renderProductsByCategory('son-mau')}
+                {renderProductsByCategory('Son màu')}
               </div>
             </div>
           </li>
@@ -254,6 +307,19 @@ export default function Header() {
                     {renderSubMenuItem('Dưỡng da', 'right-3')}
                     {renderSubMenuItem('Kem chống nắng', 'right-4')}
                   </ul>
+                </div>
+
+                <div className="pure-item-right right-1" style={{ display: activeSubMenu === 'right-1' ? 'grid' : 'none' }}>
+                  {renderProductsByCategory('Tẩy trang - rửa mặt')}
+                </div>
+                <div className="pure-item-right right-2" style={{ display: activeSubMenu === 'right-2' ? 'grid' : 'none' }}>
+                  {renderProductsByCategory('Toner - xịt khoáng')}
+                </div>
+                <div className="pure-item-right right-3" style={{ display: activeSubMenu === 'right-3' ? 'grid' : 'none' }}>
+                  {renderProductsByCategory('Dưỡng da')}
+                </div>
+                <div className="pure-item-right right-4" style={{ display: activeSubMenu === 'right-4' ? 'grid' : 'none' }}>
+                  {renderProductsByCategory('Kem chống nắng')}
                 </div>
             </div>
           </li>
