@@ -5,6 +5,7 @@ export interface Product {
   gia: number;
   gia_km?: number | null;
   hinh: string;
+  mo_ta?: string;   
   categoryId?: string;
   brandId?: string | null;
   sale?: number;
@@ -20,13 +21,15 @@ export interface Category {
 const normalizeProduct = (raw: unknown): Product => {
   const p = raw as Record<string, unknown>;
 
+  const categoryId = (p.categoryId ?? p.id_loai ?? "") as string;
+
   return {
     _id: (p._id ?? p.id ?? "").toString(),
     ten_sp: (p.ten_sp as string) ?? (p.name as string) ?? "Chưa có tên",
     gia: Number(p.gia ?? p.price ?? 0),
     gia_km: p.gia_km != null ? Number(p.gia_km) : null,
     hinh: (p.hinh as string) ?? (p.image as string) ?? "/img/no-image.jpg",
-    categoryId: (p.categoryId ?? p.id_loai ?? p.categoryId) as string | undefined,
+    categoryId: categoryId || undefined,
     brandId: (p.brandId as string) ?? null,
     sale: p.sale != null ? Number(p.sale) : 0,
   };

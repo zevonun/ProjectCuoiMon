@@ -6,10 +6,20 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { authAPI, User, LoginData, RegisterData } from '../lib/auth.api';
 
 // ==================== INTERFACES ====================
+export interface CustomerInfo {
+  fullName: string;
+  phone: string;
+  email: string;
+  address: string;
+  province: string;
+  notes?: string;
+}
+
 interface AuthContextType {
   user: User | null;
   isLoggedIn: boolean;
   isLoading: boolean;
+  customerInfo: CustomerInfo | null;
 
   // ── OTP state ──
   pendingEmail: string | null;
@@ -24,6 +34,7 @@ interface AuthContextType {
   cancelOtp: () => void;
   logout: () => Promise<void>;
   updateUser: (userData: Partial<User>) => void;
+  updateCustomerInfo: (info: CustomerInfo) => void;
 }
 
 // ==================== CONTEXT ====================
@@ -33,6 +44,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
 
   // ── OTP states ──
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
@@ -80,6 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // ── Normal init: đọc từ localStorage ──
         const token = localStorage.getItem('access_token');
         const storedUser = localStorage.getItem('user');
+        const storedCustomerInfo = localStorage.getItem('customerInfo');
 
         if (token && storedUser) {
           try {
@@ -91,6 +104,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
             localStorage.removeItem('user');
+          }
+        }
+
+        // ── Load saved customer info ──
+        if (storedCustomerInfo) {
+          try {
+            const info = JSON.parse(storedCustomerInfo);
+            setCustomerInfo(info);
+            console.log('✅ Restored customer info from localStorage');
+          } catch (error) {
+            console.error('❌ Invalid stored customer info:', error);
+            localStorage.removeItem('customerInfo');
           }
         }
       } catch (error) {
@@ -264,11 +289,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // ==================== UPDATE CUSTOMER INFO ====================
+  const updateCustomerInfo = (info: CustomerInfo): void => {
+    setCustomerInfo(info);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('customerInfo', JSON.stringify(info));
+    }
+  };
+
   // ==================== CONTEXT VALUE ====================
   const value: AuthContextType = {
     user,
     isLoggedIn: !!user,
     isLoading,
+    customerInfo,
     pendingEmail,
     otpPurpose,
     pendingRegisterData,
@@ -279,6 +313,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     cancelOtp,
     logout,
     updateUser,
+    updateCustomerInfo,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
