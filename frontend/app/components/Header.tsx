@@ -168,8 +168,8 @@ export default function Header() {
             <Image
               src="/img/Logo.png"
               alt="Logo"
-              width={280}
-              height={90}
+              width={120}
+              height={50}
               priority={true}
               style={{ objectFit: 'contain' }}
             />
