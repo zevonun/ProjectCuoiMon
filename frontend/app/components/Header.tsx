@@ -3,11 +3,12 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-// SỬA 1: Thêm 'useContext'
-import React, { useState, useContext } from 'react'; 
+// SỬA 1: Thêm 'useContext', 'useEffect'
+import React, { useState, useContext, useEffect } from 'react'; 
 import { AuthContext } from '../context/AuthContext'; // Import Context
 import { useCart } from '../context/CartContext'; // SỬA 1.1: Import useCart
 import UserMenu from './UserMenu'; // Import UserMenu
+import { fetchProducts, Product } from '../lib/api'; // Import fetchProducts và Product type
 
 export default function Header() {
   // State để quản lý menu nào đang được hover
@@ -16,11 +17,44 @@ export default function Header() {
   // State để quản lý sub-menu nào đang được hover (ví dụ: 'right-1', 'right-2')
   const [activeSubMenu, setActiveSubMenu] = useState<string | null>('right-1'); // Mặc định hiện mục 1
 
+  // State để lưu products và grouping theo category
+  const [products, setProducts] = useState<Product[]>([]);
+  const [productsByCategory, setProductsByCategory] = useState<Record<string, Product[]>>({});
+  const [loading, setLoading] = useState(true);
+
   // SỬA 2: Lấy giá trị từ AuthContext
   const authContext = useContext(AuthContext);
 
   // SỬA 2.1: Lấy itemCount từ CartContext
   const { itemCount } = useCart();
+
+  // Gọi API lấy sản phẩm khi component mount
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        const fetchedProducts = await fetchProducts('http://localhost:5000/api/products');
+        setProducts(fetchedProducts);
+
+        // Group products by category
+        const grouped: Record<string, Product[]> = {};
+        fetchedProducts.forEach((product) => {
+          const categoryId = product.categoryId || 'uncategorized';
+          if (!grouped[categoryId]) {
+            grouped[categoryId] = [];
+          }
+          grouped[categoryId].push(product);
+        });
+        setProductsByCategory(grouped);
+      } catch (error) {
+        console.error('Error loading products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
 
   // SỬA 3: Thêm một kiểm tra an toàn (rất quan trọng)
   // Nếu context chưa được tải, không render gì cả để tránh lỗi
@@ -41,23 +75,10 @@ export default function Header() {
     setActiveMenu(null);
   };
 
-  // Hàm render nội dung sản phẩm bên phải (để tránh lặp code)
-  const renderProductItem = (imgSrc: string, title: string, price: string, oldPrice: string) => (
-    <div className="pure-item-right-content-skin">
-      <Link href="/product-details"> {/* Sửa link sau */}
-        <Image src={imgSrc} alt={title} width={200} height={200} style={{ width: '100%', height: 'auto' }} />
-      </Link>
-      <Link href="/product-details"><p>{title}</p></Link>
-      <div className="pure-item-price-info">
-        <span className="price">{price}</span>
-        <span className="old-price">{oldPrice}</span>
-      </div>
-    </div>
-  );
-
   // Hàm render tab menu bên trái (để tránh lặp code)
   const renderSubMenuItem = (title: string, tabId: string) => (
     <li 
+      key={tabId}
       onMouseEnter={() => setActiveSubMenu(tabId)} 
       className={activeSubMenu === tabId ? 'active' : ''}
     >
@@ -65,6 +86,26 @@ export default function Header() {
       <i className="fas fa-greater-than"></i>
     </li>
   );
+
+  // Hàm render nội dung sản phẩm bên phải từ API
+  const renderProductItem = (product: Product) => (
+    <div key={product._id} className="pure-item-right-content-skin">
+      <Link href={`/product/${product._id}`}>
+        <Image src={product.hinh} alt={product.ten_sp} width={200} height={200} style={{ width: '100%', height: 'auto' }} />
+      </Link>
+      <Link href={`/product/${product._id}`}><p>{product.ten_sp}</p></Link>
+      <div className="pure-item-price-info">
+        <span className="price">{product.gia_km ? `${product.gia_km.toLocaleString()}đ` : `${product.gia.toLocaleString()}đ`}</span>
+        {product.gia_km && <span className="old-price">{product.gia.toLocaleString()}đ</span>}
+      </div>
+    </div>
+  );
+
+  // Hàm render danh sách sản phẩm theo category
+  const renderProductsByCategory = (categoryId: string) => {
+    const categoryProducts = productsByCategory[categoryId] || [];
+    return categoryProducts.slice(0, 4).map(product => renderProductItem(product));
+  };
 
   return (
     <div className="header" id="navbar" onMouseLeave={handleMenuLeave}>
@@ -158,21 +199,21 @@ export default function Header() {
               </div>
               
               <div className="pure-item-right right-1" style={{ display: activeSubMenu === 'right-1' ? 'grid' : 'none' }}>
-                {renderProductItem("/img/combo-cham-soc-da-1.webp", "Combo Kem Dưỡng Ẩm, Serum...", "1.200.000đ", "1.500.000đ")}
+                {renderProductsByCategory('combo-cham-soc-da')}
               </div>
               
               <div className="pure-item-right right-2" style={{ display: activeSubMenu === 'right-2' ? 'grid' : 'none' }}>
-                {/* {renderProductItem("/img/combo-cham-soc-toc.webp", "Combo Gội xả thảo dược Tóc Mây", "1.200.000đ", "1.500.000đ")} */}
+                {renderProductsByCategory('combo-cham-soc-toc')}
               </div>
 
               <div className="pure-item-right right-3" style={{ display: activeSubMenu === 'right-3' ? 'grid' : 'none' }}>
-                {renderProductItem("/img/Combo-cham-soc-moi.webp", "Combo Chăm sóc môi", "1.200.000đ", "1.500.000đ")}
+                {renderProductsByCategory('combo-cham-soc-moi')}
               </div>
               <div className="pure-item-right right-4" style={{ display: activeSubMenu === 'right-4' ? 'grid' : 'none' }}>
-                {renderProductItem("/img/combo-khac.webp", "Combo Khác", "1.200.000đ", "1.500.000đ")}
+                {renderProductsByCategory('combo-khac')}
               </div>
               <div className="pure-item-right right-5" style={{ display: activeSubMenu === 'right-5' ? 'grid' : 'none' }}>
-                {renderProductItem("/img/Combo-balack.webp", "Combo Black Green Day", "1.200.000đ", "1.500.000đ")}
+                {renderProductsByCategory('black-green-day')}
               </div>
             </div>
           </li>
@@ -193,10 +234,10 @@ export default function Header() {
               </div>
 
               <div className="pure-item-right right-1" style={{ display: activeSubMenu === 'right-1' ? 'grid' : 'none' }}>
-                {renderProductItem("/img/son-duong-moi.webp", "Son dưỡng môi Cỏ Mềm", "200.000đ", "250.000đ")}
+                {renderProductsByCategory('son-duong-moi')}
               </div>
               <div className="pure-item-right right-2" style={{ display: activeSubMenu === 'right-2' ? 'grid' : 'none' }}>
-                {renderProductItem("/img/son-mau.webp", "Son màu Lụa", "300.000đ", "350.000đ")}
+                {renderProductsByCategory('son-mau')}
               </div>
             </div>
           </li>
