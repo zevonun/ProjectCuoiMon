@@ -54,16 +54,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // ── ✅ Đọc params từ Google OAuth callback redirect ──
         const googleLoginFlag = searchParams.get('google_login');
         if (googleLoginFlag === 'success') {
-          const token        = searchParams.get('token');
+          const token = searchParams.get('token');
           const refreshToken = searchParams.get('refreshToken');
-          const userJson     = searchParams.get('user');
+          const userJson = searchParams.get('user');
 
           if (token && refreshToken && userJson) {
             try {
               const userData = JSON.parse(userJson);
-              localStorage.setItem('access_token',  token);
+              localStorage.setItem('access_token', token);
               localStorage.setItem('refresh_token', refreshToken);
-              localStorage.setItem('user',          userJson);
+              localStorage.setItem('user', userJson);
               setUser(userData);
               console.log('✅ Google login restored:', userData.name);
 
@@ -78,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         // ── Normal init: đọc từ localStorage ──
-        const token      = localStorage.getItem('access_token');
+        const token = localStorage.getItem('access_token');
         const storedUser = localStorage.getItem('user');
 
         if (token && storedUser) {
@@ -294,3 +294,4 @@ export function useAuth(): AuthContextType {
 }
 
 export { AuthContext };
+export type { User };

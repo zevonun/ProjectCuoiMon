@@ -5,6 +5,9 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose = require('mongoose');
 var cors = require('cors');
+var session = require('express-session');
+var passport = require('passport');
+require('./middleware/passport'); // ✅ Load Passport config
 
 var indexRouter = require('./routes/index');
 
@@ -62,6 +65,23 @@ app.use(cors({
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+/* ================= SESSION ================= */
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    sameSite: 'lax',
+    maxAge: 1000 * 60 * 60 * 24 // 24 hours
+  }
+}));
+
+/* ================= PASSPORT ================= */
+app.use(passport.initialize());
+app.use(passport.session());
 
 /* ================= SECURITY ================= */
 const { apiLimiter } = require('./middleware/rateLimit');

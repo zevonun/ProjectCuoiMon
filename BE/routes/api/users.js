@@ -10,6 +10,7 @@ const TokenBlacklist = require('../../models/tokenBlacklist');
 const Otp = require('../../models/otp');
 const { sendOtpEmail } = require('../../services/emailService');
 const { generateOtp, hashOtp, verifyOtp } = require('../../utils/otpUtils');
+const passport = require('passport');
 
 const { googleLogin } = require('../../controllers/googleAuthController');
 
@@ -364,5 +365,64 @@ router.post('/admin-login', async (req, res) => {
 });
 
 router.post('/google-login', googleLogin);
+
+// ──────────────────────────────────────────────────────────
+// GET /api/users/auth/google
+// Redirect to Google login page
+// ──────────────────────────────────────────────────────────
+router.get('/auth/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+// ──────────────────────────────────────────────────────────
+// GET /api/users/auth/google/callback
+// Google OAuth callback - Cấp JWT token
+// ──────────────────────────────────────────────────────────
+router.get('/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  async (req, res) => {
+    try {
+      const user = req.user;
+
+      // ── Cấp JWT ──
+      const token = signAccessToken(user);
+      const refreshToken = signRefreshToken(user);
+
+      user.refreshToken = refreshToken;
+      await user.save();
+
+      // ──  Redirect với token (hoặc có thể trả JSON) ──
+      // Cách 1: Redirect with token in URL (không an toàn cho production)
+      // Cách 2: Trả về HTML page chứa token
+      const frontendURL = 'http://localhost:3000'; // hoặc biến env
+
+      const { password: _, ...userSafe } = user.toObject();
+
+      // Tạo HTML page với script redirect
+      const html = `
+        <html>
+          <head><title>Google Login</title></head>
+          <body>
+            <script>
+              const data = {
+                user: ${JSON.stringify(userSafe)},
+                token: '${token}',
+                refreshToken: '${refreshToken}'
+              };
+              localStorage.setItem('auth', JSON.stringify(data));
+              window.location.href = '${frontendURL}/?auth=success';
+            </script>
+            <p>Redirecting...</p>
+          </body>
+        </html>
+      `;
+
+      res.send(html);
+    } catch (error) {
+      console.error('Google callback error:', error);
+      res.status(500).json({ error: 'Lỗi đăng nhập Google' });
+    }
+  }
+);
 
 module.exports = router;

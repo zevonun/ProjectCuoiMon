@@ -29,6 +29,7 @@ export interface User {
   phone?: string;
   address?: string;
   role?: 'user' | 'admin';
+  image?: string; // Avatar từ OAuth (Google, etc.)
 }
 
 export interface LoginData {

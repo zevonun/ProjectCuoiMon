@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
   images: {
@@ -11,6 +12,9 @@ const nextConfig: NextConfig = {
       },
     ],
     unoptimized: true, // QUAN TRỌNG: tránh lỗi private ip
+  },
+  turbopack: {
+    root: path.join(process.cwd(), "."), // Đặt Turbopack workspace root đúng
   },
 };
 
