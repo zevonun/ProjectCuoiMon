@@ -10,12 +10,14 @@ const Category = require('../models/category');
 
 // Helper format product
 const formatProduct = (p) => ({
+  _id: p._id.toString(),
   id: p._id.toString(),
   ten_sp: p.name || p.ten_sp || 'Chưa có tên',
   gia: p.price || p.gia || 0,
   gia_km: p.sale || p.gia_km || null,
   hinh: p.image || p.hinh || '/img/no-image.jpg',
-  id_loai: p.categoryId || p.id_loai,
+  categoryId: (p.categoryId || p.id_loai)?.toString?.() || p.categoryId || p.id_loai,
+  id_loai: (p.categoryId || p.id_loai)?.toString?.() || p.categoryId || p.id_loai, // keep for backward compat
   mo_ta: p.description || p.mo_ta,
   ngay: p.ngay || p.createdAt || new Date().toISOString(),
 });
