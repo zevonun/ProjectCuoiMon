@@ -6,6 +6,7 @@ import styles from './layout.module.css';
 import Header from './components/Header';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { OrderProvider } from './context/OrderContext';
 
 const inter = Inter({ 
   subsets: ['latin', 'vietnamese'], 
@@ -61,11 +62,13 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <CartProvider>
-            <Header />
-            <main className={`container ${styles.mainContent}`}>
-              {children}
-            </main>
-            <Footer />
+            <OrderProvider>
+              <Header />
+              <main className={`container ${styles.mainContent}`}>
+                {children}
+              </main>
+              <Footer />
+            </OrderProvider>
           </CartProvider>
         </AuthProvider>
       </body>
