@@ -2,17 +2,17 @@ const express = require('express');
 const router = express.Router();
 
 const categoriesController = require('../../controllers/categories');
-
 const { verifyToken } = require('../../middleware/authen');
 const { isAdmin } = require('../../middleware/isAdmin');
 
-// ✅ BẮT BUỘC ĐĂNG NHẬP + ADMIN
-router.use(verifyToken, isAdmin);
+// ── Public routes ──
+router.get('/', categoriesController.getAllCategories);
+router.get('/name/:name', categoriesController.getCategoryByName); // phải đặt trước /:id
+router.get('/:id', categoriesController.getCategoryById);
 
-// ✅ ADMIN CRUD CATEGORY
-router.post('/', categoriesController.createCategory);
-router.put('/:id', categoriesController.updateCategory);
-router.patch('/:id', categoriesController.updateCategory);
-router.delete('/:id', categoriesController.deleteCategory);
+// ✅ Write routes yêu cầu verifyToken + isAdmin
+router.post('/', verifyToken, isAdmin, categoriesController.createCategoryForAPI);
+router.put('/:id', verifyToken, isAdmin, categoriesController.updateCategory);
+router.delete('/:id', verifyToken, isAdmin, categoriesController.deleteCategory);
 
 module.exports = router;
