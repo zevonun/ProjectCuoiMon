@@ -57,10 +57,10 @@ export const fetchProductById = async (id: string): Promise<Product | null> => {
   try {
     // THỬ TẤT CẢ CÁC KHẢ NĂNG MÀ DỰ ÁN VN HAY DÙNG
     const urls = [
-      `http://localhost:5000/api/products/${id}`,
+      `http://localhost:5000/api/product/${id}`,
       `http://localhost:5000/api/product/${id}`,
       `http://localhost:5000/api/product/id/${id}`,
-      `http://localhost:5000/api/products/id/${id}`,
+      `http://localhost:5000/api/product/id/${id}`,
     ];
 
     for (const url of urls) {
@@ -108,7 +108,7 @@ export const fetchRelatedProducts = async (
 ): Promise<Product[]> => {
   try {
     const res = await fetch(
-      `http://localhost:5000/api/products/related?productId=${productId}&categoryId=${categoryId}`,
+      `http://localhost:5000/api/product/related?productId=${productId}&categoryId=${categoryId}`,
       { cache: "no-store" }
     );
     if (!res.ok) return [];
