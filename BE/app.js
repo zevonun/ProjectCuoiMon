@@ -103,6 +103,7 @@ app.use('/api/users', apiUsersRouter);
 
 app.use('/admin/products', adminProductsRouter);
 app.use('/api/product', apiProductsRouter);   // giữ nguyên path để không break frontend
+app.use('/api/products', apiProductsRouter); 
 
 app.use('/admin/categories', adminCategoriesRouter);
 app.use('/api/categories', apiCategoriesRouter);
