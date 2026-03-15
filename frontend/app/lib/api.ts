@@ -19,6 +19,14 @@ export interface Category {
   slug?: string;
 }
 
+// Helper resolve ảnh: tự thêm API_URL nếu là đường dẫn tương đối
+const resolveImage = (raw: unknown): string => {
+  const hinh = (raw as string) || '';
+  if (!hinh) return '/img/no-image.jpg';
+  if (hinh.startsWith('http')) return hinh;
+  return `${API_URL}${hinh.startsWith('/') ? '' : '/'}${hinh}`;
+};
+
 // Helper chuẩn hóa dữ liệu
 const normalizeProduct = (raw: unknown): Product => {
   const p = raw as Record<string, unknown>;
@@ -29,7 +37,7 @@ const normalizeProduct = (raw: unknown): Product => {
     ten_sp: ((p.ten_sp ?? p.name ?? 'Chưa có tên') as string),
     gia: Number(p.gia ?? p.price ?? 0),
     gia_km: p.gia_km != null ? Number(p.gia_km) : null,
-    hinh: ((p.hinh ?? p.image ?? '/img/no-image.jpg') as string),
+    hinh: resolveImage(p.hinh ?? p.image),
     categoryId: categoryId || undefined,
     brandId: (p.brandId as string) ?? null,
     sale: p.sale != null ? Number(p.sale) : 0,

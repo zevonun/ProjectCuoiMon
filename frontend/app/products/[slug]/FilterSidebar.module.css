@@ -1,0 +1,96 @@
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  align-self: flex-start;
+  position: sticky;
+  top: 80px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  font-weight: 700;
+  font-size: 15px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #222;
+}
+
+.filterIcon {
+  font-size: 16px;
+}
+
+.section {
+  padding: 16px;
+}
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #222;
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  cursor: pointer;
+  color: #555;
+  transition: color 0.15s;
+}
+
+.radioLabel:hover {
+  color: #ee4d2d;
+}
+
+.radio {
+  accent-color: #ee4d2d;
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
+.divider {
+  height: 1px;
+  background: #f0f0f0;
+  margin: 0 16px;
+}
+
+.resultCount {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #666;
+}
+
+.resultCount strong {
+  color: #ee4d2d;
+}
+
+.resetBtn {
+  width: calc(100% - 32px);
+  margin: 0 16px 16px;
+  background: #fff;
+  color: #ee4d2d;
+  border: 1px solid #ee4d2d;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+}
+
+.resetBtn:hover {
+  background: #fff5f3;
+}

@@ -4,7 +4,7 @@ import Link from "next/link";
 import styles from "./ProductCard.module.css";
 import { Product } from "../lib/api";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 interface ProductCardProps {
   product: Product;

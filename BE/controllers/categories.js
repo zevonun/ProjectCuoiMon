@@ -6,8 +6,9 @@ const Product = require('../models/product');
 
 // ✅ TRẢ VỀ _id CHUẨN CHO FRONTEND (KHÔNG DÙNG id NỮA)
 const formatCategory = (c) => ({
-  _id: c._id.toString(),      // ✅ GIỮ ĐÚNG TÊN _id
-  name: c.name,
+  _id:      c._id.toString(),
+  name:     c.name,
+  slug:     c.slug || '',
   parentId: c.parentId ? c.parentId.toString() : null,
 });
 
