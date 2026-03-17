@@ -17,6 +17,12 @@ export default function CartPage() {
     updateQuantity,
     totalPrice,
     itemCount,
+    selectedItems,
+    toggleSelectItem,
+    selectAllItems,
+    deselectAllItems,
+    selectedPrice,
+    selectedCount,
   } = useCart();
 
   if (itemCount === 0) {
@@ -41,9 +47,20 @@ export default function CartPage() {
         {/* Danh sách sản phẩm */}
         <div className="cart-items">
           {cartItems.map((item) => {
-            const p = item.product; // Dễ đọc hơn
+            const p = item.product;
+            const isSelected = selectedItems.has(p._id);
             return (
               <div className="cart-item" key={p._id}>
+                {/* Checkbox */}
+                <div className="cart-item-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => toggleSelectItem(p._id)}
+                    id={`select-${p._id}`}
+                  />
+                </div>
+
                 {/* Ảnh + Tên */}
                 <div className="cart-product-info">
                   <Image
@@ -59,7 +76,7 @@ export default function CartPage() {
                     </Link>
                     {p.gia_km && p.gia_km < p.gia && (
                       <div className="price-old">
-                        {formatCurrency(p.gia_km)}
+                        {formatCurrency(p.gia)}
                       </div>
                     )}
                   </div>
@@ -119,9 +136,26 @@ export default function CartPage() {
         {/* Tóm tắt đơn hàng */}
         <div className="cart-summary">
           <h2>Tóm tắt đơn hàng</h2>
+          
+          {/* Checkbox select all */}
+          <div className="select-all-section" style={{ marginBottom: "20px", paddingBottom: "15px", borderBottom: "1px solid #eee" }}>
+            <label style={{ display: "flex", alignItems: "center", cursor: "pointer", gap: "10px" }}>
+              <input
+                type="checkbox"
+                checked={selectedItems.size > 0 && selectedItems.size === cartItems.length}
+                onChange={(e) => e.target.checked ? selectAllItems() : deselectAllItems()}
+              />
+              <span>
+                {selectedItems.size === 0 
+                  ? "Chọn tất cả" 
+                  : `Đã chọn ${selectedItems.size} sản phẩm`}
+              </span>
+            </label>
+          </div>
+
           <div className="summary-row">
-            <span>Tạm tính ({itemCount} sản phẩm):</span>
-            <strong>{formatCurrency(totalPrice)}</strong>
+            <span>Tạm tính ({selectedCount} mặt hàng được chọn):</span>
+            <strong>{formatCurrency(selectedPrice)}</strong>
           </div>
           <div className="summary-row">
             <span>Phí vận chuyển:</span>
@@ -129,11 +163,19 @@ export default function CartPage() {
           </div>
           <div className="summary-total">
             <span>Tổng cộng:</span>
-            <span className="total-price-final">{formatCurrency(totalPrice)}</span>
+            <span className="total-price-final">{formatCurrency(selectedPrice)}</span>
           </div>
 
-          <Link href="/checkout" className="btn-checkout">
-            Tiến hành thanh toán
+          <Link 
+            href={selectedItems.size === 0 ? "#" : "/checkout"} 
+            className={`btn-checkout ${selectedItems.size === 0 ? "disabled" : ""}`}
+            onClick={(e) => {
+              if (selectedItems.size === 0) {
+                e.preventDefault();
+              }
+            }}
+          >
+            {selectedItems.size === 0 ? "Vui lòng chọn sản phẩm" : "Tiến hành thanh toán"}
           </Link>
 
           <Link href="/" className="btn-continue-shopping-small">
