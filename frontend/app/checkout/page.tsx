@@ -26,7 +26,7 @@ export default function CheckoutPage() {
   const router = useRouter();
 
   // Use contexts
-  const { cartItems, clearCart } = useCart();
+  const { cartItems, clearCart, selectedItems } = useCart();
   const { user, customerInfo: authCustomerInfo, updateCustomerInfo, isLoggedIn } = useAuth();
   const { createOrder, setIsLoading: setOrderLoading, isLoading: orderLoading } = useOrder();
 
@@ -48,19 +48,21 @@ export default function CheckoutPage() {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Sync cart from CartContext
+  // Sync cart from CartContext (only selected items)
   useEffect(() => {
-    const checkoutCart = cartItems.map(item => ({
-      id: item.product._id,
-      name: item.product.ten_sp,
-      price: item.product.gia_km && item.product.gia_km < item.product.gia 
-        ? item.product.gia_km 
-        : item.product.gia,
-      quantity: item.quantity,
-      image: item.product.hinh || '/img/placeholder.png',
-    }));
+    const checkoutCart = cartItems
+      .filter(item => selectedItems.has(item.product._id))
+      .map(item => ({
+        id: item.product._id,
+        name: item.product.ten_sp,
+        price: item.product.gia_km && item.product.gia_km < item.product.gia 
+          ? item.product.gia_km 
+          : item.product.gia,
+        quantity: item.quantity,
+        image: item.product.hinh || '/img/placeholder.png',
+      }));
     setCart(checkoutCart);
-  }, [cartItems]);
+  }, [cartItems, selectedItems]);
 
   const handleCustomerInfoChange = (
     info: CustomerInfo,

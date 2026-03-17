@@ -3,44 +3,27 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
-interface Banner {
-  _id: string;
-  image: string;
-  title?: string;
-  link?: string;
-  active?: boolean;
-}
+const LOCAL_BANNERS = [
+  {
+    id: 1,
+    image: "/img/banner/banner-1.webp",
+    title: "Banner 1",
+  },
+  {
+    id: 2,
+    image: "/img/banner/banner-2.webp",
+    title: "Banner 2",
+  },
+  {
+    id: 3,
+    image: "/img/banner/banner-3.webp",
+    title: "Banner 3",
+  },
+];
 
 export default function HomeBanner() {
-  const [banners, setBanners] = useState<Banner[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
-
-  // ✅ LOAD BANNER – KHÔNG CÒN CẢNH BÁO REACT
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchBanners = async () => {
-      try {
-        const res = await fetch("http://localhost:5000/api/banners");
-        const data = await res.json();
-
-        if (isMounted && data.success) {
-          const activeBanners = data.data.filter(
-            (b: Banner) => b.active !== false
-          );
-          setBanners(activeBanners);
-        }
-      } catch (err) {
-        console.error("Lỗi load banner:", err);
-      }
-    };
-
-    fetchBanners();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const banners = LOCAL_BANNERS;
 
   // ✅ NEXT / PREV
   const plusSlides = (n: number) => {
@@ -52,27 +35,23 @@ export default function HomeBanner() {
     });
   };
 
-  // ✅ AUTO SLIDE
+  // ✅ AUTO SLIDE - 2.5 GIÂY
   useEffect(() => {
-    if (!banners.length) return;
-
     const timer = setInterval(() => {
       setCurrentSlide((prev) =>
         prev === banners.length - 1 ? 0 : prev + 1
       );
-    }, 3000);
+    }, 2500);
 
     return () => clearInterval(timer);
   }, [banners]);
-
-  if (!banners.length) return null;
 
   return (
     <section>
       <div className="slideshow-container">
         {banners.map((banner, index) => (
           <div
-            key={banner._id}
+            key={banner.id}
             className="mySlides"
             style={{ display: index === currentSlide ? "block" : "none" }}
           >
