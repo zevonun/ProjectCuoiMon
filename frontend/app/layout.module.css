@@ -1,227 +1,47 @@
-/* ===== FOOTER ===== */
-.footer {
-  background: #f8f8f8;
-  margin-top: 40px;
-  font-family: var(--font-open-sans);
-  color: #333;
+.navbar {
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 1rem 0;
 }
 
-/* CONTAINER */
-.footer-container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 40px 20px;
-}
-
-/* ===== TOP ===== */
-.footer-top {
+.navContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 20px;
-  border-bottom: 1px solid #e5e5e5;
-  padding-bottom: 25px;
 }
 
-.footer-left {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.footer-left .logo {
-  width: 140px;
-}
-
-.footer-left p {
-  font-size: 13px;
-  letter-spacing: 1px;
-  color: #777;
-}
-
-/* SUBSCRIBE */
-.footer-subscribe {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.footer-subscribe input {
-  padding: 10px 14px;
-  border: 1px solid #ddd;
-  outline: none;
-  width: 260px;
-  border-radius: 6px;
-  font-size: 14px;
-}
-
-.footer-subscribe input:focus {
-  border-color: #3cb46e;
-}
-
-.footer-subscribe button {
-  padding: 10px 18px;
-  border: none;
-  background: #3cb46e;
-  color: white;
-  font-weight: 600;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.footer-subscribe button:hover {
-  background: #2fa15d;
-}
-
-/* ===== GRID ===== */
-.footer-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 30px;
-  margin-top: 30px;
-}
-
-/* TITLE */
-.footer-grid h4 {
-  font-size: 14px;
-  margin-bottom: 12px;
+.logo {
+  font-size: 1.75rem;
   font-weight: 700;
+  color: var(--primary-color);
 }
 
-/* LINK TEXT */
-.footer-grid p {
-  font-size: 13px;
-  color: #555;
-  margin: 6px 0;
-  transition: 0.2s;
-}
-
-.footer-grid p:hover {
-  color: #3cb46e;
-  cursor: pointer;
-}
-
-/* ===== CONTACT ===== */
-.footer-contact a {
-  display: block;
-  font-size: 13px;
-  color: #333;
-  margin-bottom: 6px;
-}
-
-.footer-contact a:hover {
-  color: #3cb46e;
-}
-
-/* STORE BUTTON */
-.store-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid #3cb46e;
-  padding: 8px 12px;
-  border-radius: 6px;
-  color: #3cb46e;
-  font-size: 13px;
-  margin-bottom: 10px;
-  transition: 0.3s;
-}
-
-.store-btn:hover {
-  background: #3cb46e;
-  color: white;
-}
-
-/* SOCIAL */
-.social {
+.navLinks {
   display: flex;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 1.5rem;
 }
 
-.social a {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: #eee;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #555;
-  transition: 0.3s;
+.navLinks a {
+  color: var(--text-light);
+  font-weight: 500;
+  transition: color 0.2s;
 }
 
-.social a:hover {
-  background: #3cb46e;
-  color: white;
+.navLinks a:hover {
+  color: var(--primary-color);
 }
 
-/* ===== COMPANY ===== */
-.footer-company {
-  margin-top: 30px;
-  font-size: 13px;
-  color: #666;
+.mainContent {
+  padding-top: 130px;
+  padding-bottom: 2rem;
+  min-height: 70vh; /* Giúp đẩy footer xuống nếu trang quá ngắn */
 }
 
-.footer-company h4 {
-  margin-bottom: 8px;
-  font-size: 14px;
-}
-
-/* ===== BADGE ===== */
-.footer-badge {
-  margin-top: 20px;
-  display: flex;
-  gap: 15px;
-}
-
-.footer-badge img {
-  height: 40px;
-  object-fit: contain;
-}
-
-/* ===== BOTTOM ===== */
-.footer-bottom {
+/* Style cho Footer (có thể giữ lại vì globals.css không có) */
+.footer {
+  background-color: #f9fafb;
+  margin-top: 3rem;
+  padding: 2rem 0;
   text-align: center;
-  font-size: 12px;
-  color: #888;
-  padding: 12px;
-  border-top: 1px solid #e5e5e5;
-  background: #f1f1f1;
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 992px) {
-  .footer-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .footer-top {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .footer-subscribe {
-    width: 100%;
-  }
-
-  .footer-subscribe input {
-    width: 100%;
-  }
-}
-
-@media (max-width: 600px) {
-  .footer-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .footer-subscribe {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .footer-subscribe button {
-    width: 100%;
-  }
+  color: var(--text-light); /* Dùng biến từ globals.css */
 }
