@@ -122,6 +122,10 @@ app.use('/admin/vouchers', adminVouchersRouter);
 
 app.use('/api/otp', otpRouter);
 
+// ✅ ĐẶT Ở ĐÂY (TRƯỚC 404)
+const chatRoute = require('./routes/chat-temp');
+app.use('/api/chat', chatRoute);
+
 /* ── Database ── */
 mongoose.connect(process.env.MONGODB_URI) // ✅ Đọc từ .env
   .then(() => {
