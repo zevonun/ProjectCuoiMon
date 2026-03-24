@@ -8,6 +8,7 @@ import Header from './components/Header';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { OrderProvider } from './context/OrderContext';
+import Chatbot from './components/chatbot';
 
 const inter = Inter({
   subsets: ['latin', 'vietnamese'],
@@ -58,23 +59,27 @@ export default function RootLayout({
         />
       </head>
 
-      <body className={inter.className}>
-        <Suspense fallback={<div>Loading...</div>}>
-          <AuthProvider>
-            <CartProvider>
-              <OrderProvider>
-                <Header />
+     <body className={inter.className}>
+  <Suspense fallback={<div>Loading...</div>}>
+    <AuthProvider>
+      <CartProvider>
+        <OrderProvider>
+          <Header />
 
-                <main className={`container ${styles.mainContent}`}>
-                  {children}
-                </main>
+          <main className={`container ${styles.mainContent}`}>
+            {children}
+          </main>
 
-                <Footer />
-              </OrderProvider>
-            </CartProvider>
-          </AuthProvider>
-        </Suspense>
-      </body>
+          <Footer />
+
+          {/* ✅ CHATBOT */}
+          <Chatbot />
+
+        </OrderProvider>
+      </CartProvider>
+    </AuthProvider>
+  </Suspense>
+</body>
     </html>
   );
 }
