@@ -108,7 +108,7 @@ app.use('/api/products', apiProductsRouter);
 app.use('/admin/categories', adminCategoriesRouter);
 app.use('/api/categories', apiCategoriesRouter);
 
-app.use('/orders', ordersRouter);
+app.use('/api/orders', ordersRouter);
 app.use('/orderDetails', orderDetailsRouter);
 app.use('/api/upload', uploadRouter);
 

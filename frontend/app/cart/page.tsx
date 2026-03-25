@@ -15,7 +15,6 @@ export default function CartPage() {
     cartItems,
     removeFromCart,
     updateQuantity,
-    totalPrice,
     itemCount,
     selectedItems,
     toggleSelectItem,
@@ -46,6 +45,23 @@ export default function CartPage() {
       <div className="cart-content">
         {/* Danh sách sản phẩm */}
         <div className="cart-items">
+          {/* Header Row */}
+          <div className="cart-header">
+            <div className="header-checkbox">
+              <input
+                type="checkbox"
+                checked={selectedItems.size > 0 && selectedItems.size === cartItems.length}
+                onChange={(e) => e.target.checked ? selectAllItems() : deselectAllItems()}
+                className="header-checkbox-input"
+              />
+            </div>
+            <div className="header-product">Sản Phẩm</div>
+            <div className="header-price">Đơn Giá</div>
+            <div className="header-quantity">Số Lượng</div>
+            <div className="header-total">Thành Tiền</div>
+            <div className="header-action">Thao Tác</div>
+          </div>
+
           {cartItems.map((item) => {
             const p = item.product;
             const isSelected = selectedItems.has(p._id);
@@ -58,6 +74,7 @@ export default function CartPage() {
                     checked={isSelected}
                     onChange={() => toggleSelectItem(p._id)}
                     id={`select-${p._id}`}
+                    className="item-checkbox"
                   />
                 </div>
 
@@ -74,11 +91,6 @@ export default function CartPage() {
                     <Link href={`/product/${p._id}`} className="product-name">
                       {p.ten_sp}
                     </Link>
-                    {p.gia_km && p.gia_km < p.gia && (
-                      <div className="price-old">
-                        {formatCurrency(p.gia)}
-                      </div>
-                    )}
                   </div>
                 </div>
 
@@ -137,29 +149,9 @@ export default function CartPage() {
         <div className="cart-summary">
           <h2>Tóm tắt đơn hàng</h2>
           
-          {/* Checkbox select all */}
-          <div className="select-all-section" style={{ marginBottom: "20px", paddingBottom: "15px", borderBottom: "1px solid #eee" }}>
-            <label style={{ display: "flex", alignItems: "center", cursor: "pointer", gap: "10px" }}>
-              <input
-                type="checkbox"
-                checked={selectedItems.size > 0 && selectedItems.size === cartItems.length}
-                onChange={(e) => e.target.checked ? selectAllItems() : deselectAllItems()}
-              />
-              <span>
-                {selectedItems.size === 0 
-                  ? "Chọn tất cả" 
-                  : `Đã chọn ${selectedItems.size} sản phẩm`}
-              </span>
-            </label>
-          </div>
-
           <div className="summary-row">
             <span>Tạm tính ({selectedCount} mặt hàng được chọn):</span>
             <strong>{formatCurrency(selectedPrice)}</strong>
-          </div>
-          <div className="summary-row">
-            <span>Phí vận chuyển:</span>
-            <span>Miễn phí / Tính khi thanh toán</span>
           </div>
           <div className="summary-total">
             <span>Tổng cộng:</span>

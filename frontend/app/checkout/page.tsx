@@ -9,7 +9,6 @@ import { PaymentMethod } from './components/PaymentMethod';
 import {
   CartItem,
   CustomerInfo,
-  FormErrors,
   PaymentMethod as PaymentMethodType,
   Order,
 } from './types';
@@ -28,22 +27,19 @@ export default function CheckoutPage() {
   // Use contexts
   const { cartItems, clearCart, selectedItems } = useCart();
   const { user, customerInfo: authCustomerInfo, updateCustomerInfo, isLoggedIn } = useAuth();
-  const { createOrder, setIsLoading: setOrderLoading, isLoading: orderLoading } = useOrder();
+  const { createOrder, setIsLoading: setOrderLoading, isLoading: orderLoading, setCurrentOrder } = useOrder();
 
   // Local states
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [customerInfo, setCustomerInfo] = useState<CustomerInfo>(
-    authCustomerInfo || {
-      fullName: user?.name || '',
-      phone: user?.phone || '',
-      email: user?.email || '',
-      address: '',
-      province: '',
-      notes: '',
-    }
-  );
+  const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
+    fullName: authCustomerInfo?.fullName || user?.name || '',
+    phone: authCustomerInfo?.phone || user?.phone || '',
+    email: authCustomerInfo?.email || user?.email || '',
+    address: authCustomerInfo?.address || '',
+    province: authCustomerInfo?.province || '',
+    notes: authCustomerInfo?.notes || '',
+  });
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>('COD');
-  const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(orderLoading);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -65,12 +61,10 @@ export default function CheckoutPage() {
   }, [cartItems, selectedItems]);
 
   const handleCustomerInfoChange = (
-    info: CustomerInfo,
-    validationErrors: FormErrors
+    info: CustomerInfo
   ) => {
     setCustomerInfo(info);
     updateCustomerInfo(info);
-    setErrors(validationErrors);
     // Clear error message when user starts editing
     if (errorMessage) setErrorMessage('');
   };
@@ -98,7 +92,6 @@ export default function CheckoutPage() {
     // Validate customer info
     const validationErrors = validateCustomerInfo(customerInfo);
     if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
       setErrorMessage('Vui lòng điền đầy đủ thông tin');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
@@ -136,7 +129,7 @@ export default function CheckoutPage() {
         userId: user._id,
         customerInfo,
         products: cart.map(item => ({
-          productId: item.id,
+          productId: String(item.id),
           quantity: item.quantity,
           price: item.price,
         })),
@@ -151,6 +144,15 @@ export default function CheckoutPage() {
         throw new Error(response.message || 'Tạo đơn hàng thất bại');
       }
 
+      // ✅ Update currentOrder with backend response data
+      if (response.data) {
+        setCurrentOrder({
+          ...order,
+          createdAt: new Date(),
+          status: 'pending',
+        });
+      }
+
       // Handle different payment methods
       switch (paymentMethod) {
         case 'MOMO':
@@ -160,8 +162,8 @@ export default function CheckoutPage() {
           // TODO: Implement MoMo integration
           setTimeout(() => {
             clearCart();
-            router.push('/');
-          }, 3000);
+            router.push('/order-success');
+          }, 2000);
           break;
         case 'VNPAY':
           // Redirect to VNPay payment gateway
@@ -170,18 +172,18 @@ export default function CheckoutPage() {
           // TODO: Implement VNPay integration
           setTimeout(() => {
             clearCart();
-            router.push('/');
-          }, 3000);
+            router.push('/order-success');
+          }, 2000);
           break;
         default:
           // COD - order processing
-          setSuccessMessage('Đặt hàng thành công! Chúng tôi sẽ liên hệ bạn sớm.');
+          setSuccessMessage('Đặt hàng thành công! Chuyển hướng...');
           
-          // Clear cart and redirect
+          // Clear cart and redirect to order success page
           clearCart();
           setTimeout(() => {
-            router.push('/');
-          }, 3000);
+            router.push('/order-success');
+          }, 1000);
       }
     } catch (error) {
       console.error('Checkout error:', error);

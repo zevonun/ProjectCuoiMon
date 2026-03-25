@@ -36,15 +36,57 @@
 @media (min-width: 992px) {
   .cart-content { flex-direction: row; align-items: flex-start; gap: 32px; }
 }
-.cart-items { flex: 3; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #eee; }
-.cart-summary { flex: 1; background: #f8f9fa; padding: 20px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); position: sticky; top: 90px; height: fit-content; border: 1px solid #eee; }
+.cart-items { flex: 4; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #eee; }
+.cart-summary { flex: 1.8; background: #f8f9fa; padding: 20px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); position: sticky; top: 20px; height: fit-content; border: 1px solid #eee; z-index: 10; }
 
 /* Sản phẩm */
-.cart-item { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; padding: 16px; border-bottom: 1px solid #f0f0f0; align-items: center; }
+.cart-item { display: grid; grid-template-columns: 0.5fr 3.2fr 1fr 1.4fr 1.1fr 0.6fr; gap: 20px; padding: 20px 16px; border-bottom: 1px solid #f0f0f0; align-items: center; }
 .cart-item:last-child { border-bottom: none; }
-@media (min-width: 768px) {
-  .cart-item { grid-template-columns: 3.2fr 1fr 1.4fr 1.1fr 0.6fr; gap: 20px; padding: 20px 16px; }
+@media (max-width: 767px) {
+  .cart-item { grid-template-columns: 1fr 1fr; gap: 12px 16px; padding: 16px; }
 }
+
+/* Header Row - Shopee Style */
+.cart-header {
+  display: grid;
+  grid-template-columns: 0.5fr 3.2fr 1fr 1.4fr 1.1fr 0.6fr;
+  gap: 20px;
+  padding: 16px;
+  background: #f5f5f5;
+  border-bottom: 2px solid #eee;
+  align-items: center;
+  font-weight: 700;
+  color: #333;
+  font-size: 14px;
+}
+@media (max-width: 767px) {
+  .cart-header { display: none; }
+}
+
+.header-checkbox { text-align: center; }
+.header-product { text-align: left; }
+.header-price { text-align: right; }
+.header-quantity { text-align: center; }
+.header-total { text-align: right; }
+.header-action { text-align: center; }
+
+.header-checkbox-input {
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  accent-color: #ff6b35;
+}
+
+/* Grid columns cho cart-item desktop */
+@media (min-width: 768px) {
+  .cart-item-checkbox { text-align: center; grid-column: 1 / 2; }
+  .cart-product-info { grid-column: 2 / 3; gap: 12px; }
+  .cart-item-price { text-align: right; grid-column: 3 / 4; }
+  .cart-item-quantity { text-align: center; grid-column: 4 / 5; }
+  .cart-item-total-price { text-align: right; grid-column: 5 / 6; }
+  .cart-item-remove { text-align: center; grid-column: 6 / 7; }
+}
+
 .cart-product-info { display: flex; align-items: center; gap: 12px; grid-column: 1 / -1; }
 @media (min-width: 768px) { .cart-product-info { grid-column: auto; } }
 .cart-product-info img { width: 72px; height: 72px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
@@ -192,28 +234,33 @@
 
 /* Điều chỉnh lại layout giỏ hàng trên mobile để nút xóa không bị lẻ ra */
 @media (max-width: 767px) {
-    /* Đẩy nút xóa vào cùng hàng với Ảnh + Tên trên mobile */
-    .cart-item { grid-template-columns: 1fr auto; gap: 12px 16px; }
-    .cart-product-info { grid-column: 1 / 2; }
-    .cart-item-remove { grid-column: 2 / 3; grid-row: 1 / 2; align-self: center; }
-    .cart-item-price, .cart-item-quantity, .cart-item-total-price { grid-column: auto / span 1; }
-    .cart-item-price, .cart-item-total-price { text-align: left; }
-    .cart-item-total-price { font-size: 16px; font-weight: 700; }
-    .cart-item-quantity { text-align: left; }
+    .cart-header { display: none; }
     
-    /* Cân bằng lại thông tin hàng trên mobile */
-    .cart-item { 
-      grid-template-columns: 1fr 1fr; 
+    .cart-item {
+      grid-template-columns: 1fr 1fr;
       grid-template-areas: 
-        "info remove"
-        "price price"
-        "qty total";
-      gap: 8px 16px; 
+        "checkbox remove"
+        "info info"
+        "price total"
+        "qty qty";
+      gap: 8px 16px;
+      padding: 16px;
     }
+    
+    .cart-item-checkbox { grid-area: checkbox; align-self: start; }
     .cart-product-info { grid-area: info; }
-    .cart-item-remove { grid-area: remove; justify-self: end; }
-    .cart-item-price { grid-area: price; font-size: 14px; color: #555; font-weight: 500;}
+    .cart-item-remove { grid-area: remove; justify-self: end; align-self: start; }
+    .cart-item-price { grid-area: price; font-size: 14px; color: #555; font-weight: 500; text-align: left; }
     .cart-item-quantity { grid-area: qty; }
-    .cart-item-total-price { grid-area: total; text-align: right; }
+    .cart-item-total-price { grid-area: total; font-size: 16px; font-weight: 700; text-align: right; }
     .quantity-controls-cart { margin-top: 4px; }
+}
+
+/* Checkbox Styling - Làm to checkbox */
+.cart-item-checkbox input[type="checkbox"],
+.select-all-section input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  accent-color: #ff6b35;
 }

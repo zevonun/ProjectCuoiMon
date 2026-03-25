@@ -1,44 +1,71 @@
 const mongoose = require('mongoose');
 
+// ✅ Xóa index cũ nếu tồn tại
 const orderSchema = new mongoose.Schema(
   {
+    orderId: {
+      type: String,
+      unique: true,
+      sparse: true,
+      default: null
+    },
+
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true
     },
 
-    items: [
+    // Thông tin khách hàng
+    customerInfo: {
+      fullName: { type: String, required: true },
+      phone: { type: String, required: true },
+      email: { type: String, required: true },
+      address: { type: String, required: true },
+      province: { type: String, required: true }
+    },
+
+    // Sản phẩm
+    products: [
       {
-        productId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Product',
-          required: true
-        },
-        quantity: {
-          type: Number,
-          required: true
-        },
-        price: {
-          type: Number,
-          required: true
-        }
+        productId: { type: String, required: true },
+        quantity: { type: Number, required: true },
+        price: { type: Number, required: true }
       }
     ],
 
-    totalAmount: {
-      type: Number,
-      required: true
+    // Giá
+    totalPrice: { type: Number, required: true },
+    shippingFee: { type: Number, default: 0 },
+
+    // Thanh toán
+    paymentMethod: {
+      type: String,
+      enum: ['COD', 'MOMO', 'VNPAY'],
+      default: 'COD'
     },
 
+    // Trạng thái
     status: {
       type: String,
+      enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'],
       default: 'pending'
-    }
+    },
+
+    notes: String
   },
   {
-    timestamps: true // ✅ cực kỳ quan trọng cho thống kê theo tháng
+    timestamps: true
   }
 );
+
+// ✅ Cấu hình pre-save hook để tạo orderId nếu chưa có
+orderSchema.pre('save', function(next) {
+  if (!this.orderId) {
+    // Tạo orderId dạng: ORDER_timestamp_randomId
+    this.orderId = `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+  next();
+});
 
 module.exports = mongoose.model('Order', orderSchema);
