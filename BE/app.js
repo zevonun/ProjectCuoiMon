@@ -41,10 +41,6 @@ var testRouter = require('./routes/test');
 
 var app = express();
 
-/* ── View engine ── */
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'hbs');
-
 /* ── Middleware cơ bản ── */
 app.use(logger('dev'));
 app.use(express.json());
