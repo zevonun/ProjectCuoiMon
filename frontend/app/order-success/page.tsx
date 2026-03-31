@@ -34,7 +34,7 @@ export default function OrderSuccess() {
 
         {/* Nút hành động */}
         <div className="action-buttons">
-          <Link href="/profile/orders" className="btn-view-orders">
+          <Link href="/orders" className="btn-view-orders">
             <i className="fas fa-box"></i> Xem đơn hàng của tôi
           </Link>
           <Link href="/" className="btn-continue-shopping">

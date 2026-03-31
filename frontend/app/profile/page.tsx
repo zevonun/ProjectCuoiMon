@@ -106,7 +106,7 @@ export default function ProfilePage() {
         <h2>Xin chào, {user.name}!</h2>
         <nav className={styles.nav}>
           <a href="#info" className={styles.navItem}>Thông tin cá nhân</a>
-          <a href="#orders" className={styles.navItem}>Đơn hàng của tôi</a>
+          {/* <a href="#orders" className={styles.navItem}>Đơn hàng của tôi</a> */}
           <a href="#password" className={styles.navItem}>Đổi mật khẩu</a>
         </nav>
       </div>
@@ -206,28 +206,6 @@ export default function ProfilePage() {
               {isUpdating ? "Đang xử lý..." : "Đổi mật khẩu"}
             </button>
           </form>
-        </section>
-
-        {/* 3. Lịch sử đơn hàng */}
-        <section id="orders" className={styles.section}>
-          <h3>Đơn hàng của tôi</h3>
-          <div className={styles.orderList}>
-            {/* TODO: Fetch từ API thực */}
-            <div className={styles.orderItem}>
-              <p><strong>Mã đơn:</strong> #12345</p>
-              <p><strong>Ngày đặt:</strong> 10/11/2025</p>
-              <p><strong>Ngày giao (dự kiến):</strong> 12/11/2025</p>
-              <p><strong>Trạng thái:</strong> <span className={styles.statusProcessing}>Đang xử lý</span></p>
-              <p><strong>Tổng tiền:</strong> 1.200.000đ</p>
-            </div>
-            <div className={styles.orderItem}>
-              <p><strong>Mã đơn:</strong> #12300</p>
-              <p><strong>Ngày đặt:</strong> 01/11/2025</p>
-              <p><strong>Ngày giao:</strong> 03/11/2025</p>
-              <p><strong>Trạng thái:</strong> <span className={styles.statusDelivered}>Đã giao</span></p>
-              <p><strong>Tổng tiền:</strong> 350.000đ</p>
-            </div>
-          </div>
         </section>
       </div>
     </div>
