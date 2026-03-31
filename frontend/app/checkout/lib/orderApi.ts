@@ -1,5 +1,5 @@
 // app/checkout/lib/orderApi.ts
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+import { apiFetch } from '../../lib/apiClient';
 
 export interface CreateOrderPayload {
   userId: string;
@@ -53,12 +53,8 @@ export async function createOrder(payload: CreateOrderPayload): Promise<OrderRes
       console.warn('⚠️ Token format suspicious - not starting with eyJ');
     }
     
-    const response = await fetch(`${API_URL}/api/orders`, {
+    const response = await apiFetch('/api/orders', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
       body: JSON.stringify(payload),
     });
 
@@ -79,12 +75,8 @@ export async function createOrder(payload: CreateOrderPayload): Promise<OrderRes
 
 export async function getOrders(userId: string): Promise<any[]> {
   try {
-    const token = localStorage.getItem('access_token');
-    
-    const response = await fetch(`${API_URL}/api/orders?userId=${userId}`, {
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
+    const response = await apiFetch(`/api/orders?userId=${userId}`, {
+      method: 'GET',
     });
 
     const data = await response.json();
@@ -102,12 +94,8 @@ export async function getOrders(userId: string): Promise<any[]> {
 
 export async function getOrderDetails(orderId: string): Promise<any> {
   try {
-    const token = localStorage.getItem('access_token');
-    
-    const response = await fetch(`${API_URL}/api/orders/${orderId}`, {
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
+    const response = await apiFetch(`/api/orders/${orderId}`, {
+      method: 'GET',
     });
 
     const data = await response.json();

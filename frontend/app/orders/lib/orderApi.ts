@@ -1,6 +1,5 @@
 // app/orders/lib/orderApi.ts
-// @ts-ignore
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+import { apiFetch } from '../../lib/apiClient';
 
 export interface OrderCustomerInfo {
   fullName: string;
@@ -55,12 +54,8 @@ export async function getOrders(
       query.append('status', status);
     }
 
-    const response = await fetch(`${API_URL}/api/orders?${query}`, {
+    const response = await apiFetch(`/api/orders?${query}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeader(),
-      },
     });
 
     const data: ApiResponse<Order[]> = await response.json();
@@ -79,12 +74,8 @@ export async function getOrders(
 // ✅ GET /api/orders/:id - Lấy chi tiết đơn hàng
 export async function getOrderDetails(orderId: string): Promise<Order> {
   try {
-    const response = await fetch(`${API_URL}/api/orders/${orderId}`, {
+    const response = await apiFetch(`/api/orders/${orderId}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeader(),
-      },
     });
 
     const data: ApiResponse<Order> = await response.json();
@@ -103,12 +94,8 @@ export async function getOrderDetails(orderId: string): Promise<Order> {
 // ✅ PATCH /api/orders/:id/cancel - Hủy đơn hàng
 export async function cancelOrder(orderId: string): Promise<Order> {
   try {
-    const response = await fetch(`${API_URL}/api/orders/${orderId}/cancel`, {
+    const response = await apiFetch(`/api/orders/${orderId}/cancel`, {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeader(),
-      },
     });
 
     const data: ApiResponse<Order> = await response.json();
@@ -135,12 +122,8 @@ export async function updateOrderAddress(
   }
 ): Promise<Order> {
   try {
-    const response = await fetch(`${API_URL}/api/orders/${orderId}/address`, {
+    const response = await apiFetch(`/api/orders/${orderId}/address`, {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeader(),
-      },
       body: JSON.stringify(address),
     });
 

@@ -1,5 +1,5 @@
-// lib/fetchWithAuth.ts
-// Centralized API client with automatic token refresh logic for admin-frontend
+// app/lib/apiClient.ts
+// Centralized API client with automatic token refresh logic
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -12,7 +12,7 @@ interface FetchOptions extends RequestInit {
  */
 function getAccessToken(): string | null {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem('mybeauty_access_token');
+  return localStorage.getItem('access_token');
 }
 
 /**
@@ -20,7 +20,7 @@ function getAccessToken(): string | null {
  */
 function getRefreshToken(): string | null {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem('mybeauty_refresh_token');
+  return localStorage.getItem('refresh_token');
 }
 
 /**
@@ -28,8 +28,8 @@ function getRefreshToken(): string | null {
  */
 function setTokens(accessToken: string, refreshToken: string): void {
   if (typeof window === 'undefined') return;
-  localStorage.setItem('mybeauty_access_token', accessToken);
-  localStorage.setItem('mybeauty_refresh_token', refreshToken);
+  localStorage.setItem('access_token', accessToken);
+  localStorage.setItem('refresh_token', refreshToken);
 }
 
 /**
@@ -73,7 +73,7 @@ async function refreshAccessToken(): Promise<boolean> {
 /**
  * Enhanced fetch with automatic token refresh on 401
  */
-export async function fetchWithAuth(
+export async function apiFetch(
   url: string,
   options: FetchOptions = {}
 ): Promise<Response> {
@@ -98,15 +98,15 @@ export async function fetchWithAuth(
 
     if (refreshed) {
       console.log('✅ Token refreshed, retrying request...');
-      return fetchWithAuth(url, { ...options, retry: true });
+      return apiFetch(url, { ...options, retry: true });
     }
 
     // Refresh failed - redirect to login
     console.log('❌ Token refresh failed, redirecting to login...');
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('mybeauty_access_token');
-      localStorage.removeItem('mybeauty_refresh_token');
-      localStorage.removeItem('mybeauty_user');
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user');
       window.location.href = '/login';
     }
   }
@@ -117,15 +117,15 @@ export async function fetchWithAuth(
 /**
  * Convenience wrapper for GET requests
  */
-export async function authGet(url: string, options: FetchOptions = {}) {
-  return fetchWithAuth(url, { ...options, method: 'GET' });
+export async function apiGet(url: string, options: FetchOptions = {}) {
+  return apiFetch(url, { ...options, method: 'GET' });
 }
 
 /**
  * Convenience wrapper for POST requests
  */
-export async function authPost(url: string, body?: any, options: FetchOptions = {}) {
-  return fetchWithAuth(url, {
+export async function apiPost(url: string, body?: any, options: FetchOptions = {}) {
+  return apiFetch(url, {
     ...options,
     method: 'POST',
     body: body ? JSON.stringify(body) : undefined,
@@ -135,8 +135,8 @@ export async function authPost(url: string, body?: any, options: FetchOptions = 
 /**
  * Convenience wrapper for PATCH requests
  */
-export async function authPatch(url: string, body?: any, options: FetchOptions = {}) {
-  return fetchWithAuth(url, {
+export async function apiPatch(url: string, body?: any, options: FetchOptions = {}) {
+  return apiFetch(url, {
     ...options,
     method: 'PATCH',
     body: body ? JSON.stringify(body) : undefined,
@@ -146,17 +146,6 @@ export async function authPatch(url: string, body?: any, options: FetchOptions =
 /**
  * Convenience wrapper for DELETE requests
  */
-export async function authDelete(url: string, options: FetchOptions = {}) {
-  return fetchWithAuth(url, { ...options, method: 'DELETE' });
-}
-
-/**
- * Convenience wrapper for PUT requests
- */
-export async function authPut(url: string, body?: any, options: FetchOptions = {}) {
-  return fetchWithAuth(url, {
-    ...options,
-    method: 'PUT',
-    body: body ? JSON.stringify(body) : undefined,
-  });
+export async function apiDelete(url: string, options: FetchOptions = {}) {
+  return apiFetch(url, { ...options, method: 'DELETE' });
 }
