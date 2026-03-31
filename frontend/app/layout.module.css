@@ -37,11 +37,10 @@
   min-height: 70vh; /* Giúp đẩy footer xuống nếu trang quá ngắn */
 }
 
-/* Style cho Footer (có thể giữ lại vì globals.css không có) */
+/* Style cho Footer (có thể giữ lại vì globals.css không có)
 .footer {
   background-color: #f9fafb;
   margin-top: 3rem;
   padding: 2rem 0;
   text-align: center;
   color: var(--text-light); /* Dùng biến từ globals.css */
-}
