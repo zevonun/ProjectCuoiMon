@@ -207,8 +207,6 @@ export default function ProfilePage() {
             </button>
           </form>
         </section>
-
-
       </div>
     </div>
   );
