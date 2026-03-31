@@ -127,16 +127,25 @@ export default function CheckoutPage() {
       // Send to backend API
       const apiPayload = {
         userId: user._id,
-        customerInfo,
+        customerInfo: {
+          fullName: customerInfo.fullName.trim(),
+          phone: customerInfo.phone.trim(),
+          email: customerInfo.email.trim(),
+          address: customerInfo.address.trim(),
+          province: customerInfo.province.trim(),
+          notes: customerInfo.notes?.trim(),
+        },
         products: cart.map(item => ({
           productId: String(item.id),
-          quantity: item.quantity,
-          price: item.price,
+          quantity: Number(item.quantity),
+          price: Number(item.price),
         })),
         paymentMethod,
-        totalPrice: calculateTotal(),
-        shippingFee: SHIPPING_FEE,
+        totalPrice: Number(calculateTotal()),
+        shippingFee: Number(SHIPPING_FEE),
       };
+
+      console.log('📤 Sending payload to backend:', apiPayload);
 
       const response = await createOrderApi(apiPayload);
 

@@ -37,6 +37,7 @@ var adminBannersRouter = require('./routes/admin/banners');
 var vouchersApiRouter = require('./routes/api/vouchers');
 var adminVouchersRouter = require('./routes/admin/vouchers');
 var otpRouter = require('./routes/api/otp');
+var testRouter = require('./routes/test');
 
 var app = express();
 
@@ -111,6 +112,7 @@ app.use('/api/categories', apiCategoriesRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/orderDetails', orderDetailsRouter);
 app.use('/api/upload', uploadRouter);
+app.use('/api/test', testRouter);
 
 app.use('/api/dashboard', dashboardRouter);
 

@@ -55,6 +55,10 @@ export default function UserMenu({ user }: UserMenuProps) {
             <i className="fas fa-user-circle"></i>
             Xem thông tin của tôi
           </Link>
+          <Link href="/orders" className={styles.dropdownItem} onClick={() => setIsDropdownOpen(false)}>
+            <i className="fas fa-list"></i>
+            Đơn hàng của tôi
+          </Link>
           <button className={styles.dropdownItem} onClick={handleLogout}>
             <i className="fas fa-sign-out-alt"></i>
             Đăng xuất

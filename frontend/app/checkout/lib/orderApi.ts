@@ -38,11 +38,26 @@ export async function createOrder(payload: CreateOrderPayload): Promise<OrderRes
   try {
     const token = localStorage.getItem('access_token');
     
+    console.log('🔑 Token:', token ? `${token.substring(0, 20)}...` : 'NOT FOUND');
+    console.log('🔑 Full token check:', {
+      exists: !!token,
+      length: token?.length,
+      starts_with_eyJ: token?.startsWith('eyJ'),
+    });
+    
+    if (!token) {
+      throw new Error('Bạn cần đăng nhập để tạo đơn hàng');
+    }
+
+    if (!token.startsWith('eyJ')) {
+      console.warn('⚠️ Token format suspicious - not starting with eyJ');
+    }
+    
     const response = await fetch(`${API_URL}/api/orders`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` }),
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(payload),
     });
@@ -50,7 +65,9 @@ export async function createOrder(payload: CreateOrderPayload): Promise<OrderRes
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Lỗi khi tạo đơn hàng');
+      const errorMsg = data.message || data.error || JSON.stringify(data) || 'Lỗi khi tạo đơn hàng';
+      console.error('❌ Backend error response:', { status: response.status, data, payload });
+      throw new Error(errorMsg);
     }
 
     return data;
