@@ -10,7 +10,8 @@ const safeUser = (item) => ({
   phone: item.phone,
   address: item.address,
   role: item.role,
-  googleId: item.googleId ? true : undefined, // chỉ báo có Google, không lộ ID
+  googleId: item.googleId ? true : undefined,
+  createdAt: item.createdAt,  // ← thêm dòng này
 });
 
 const getAllUsers = async (req, res) => {
@@ -105,5 +106,6 @@ const deleteUser = async (req, res) => {
     res.status(500).json({ message: 'Lỗi server' });
   }
 };
+
 
 module.exports = { getAllUsers, createUser, updateUser, getUserById, deleteUser };

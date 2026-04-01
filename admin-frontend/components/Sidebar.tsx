@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -8,30 +8,58 @@ import {
   ShoppingCart,
   Folder,
   Image,
-  Ticket,  // ✅ THÊM icon Ticket
+  Ticket,
+  Users,
+  ClipboardList,
+  Star,
+  UserCheck,
   LogOut,
   ChevronLeft,
-  ChevronRight
 } from "lucide-react";
-import { signOut } from "@/lib/auth";
+import { signOut, getUser } from "@/lib/auth";
 import "./Sidebar.css";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [adminName, setAdminName] = useState("");
+
+  useEffect(() => {
+    const user = getUser();
+    if (user?.name) setAdminName(user.name);
+  }, []);
 
   const isActive = (path: string) => pathname.startsWith(path);
 
   return (
     <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
+
+      {/* ── ADMIN PROFILE ── */}
+      <div className="sidebar-profile">
+        <div className="sidebar-avatar">
+          {adminName ? adminName.charAt(0).toUpperCase() : "A"}
+        </div>
+        {!collapsed && (
+          <div className="sidebar-profile-info">
+            <p className="sidebar-profile-name">{adminName || "Admin"}</p>
+            <p className="sidebar-profile-role">Quản trị viên</p>
+          </div>
+        )}
+      </div>
+
+      {/* ── TOGGLE ARROW BUTTON ── */}
       <button
         className="sidebar-toggle"
         onClick={() => setCollapsed(!collapsed)}
+        title={collapsed ? "Mở rộng" : "Thu gọn"}
       >
-        {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+        <ChevronLeft
+          size={16}
+          className={`sidebar-toggle-icon ${collapsed ? "rotated" : ""}`}
+        />
       </button>
 
-      <h2 className="sidebar-header">ADMIN</h2>
+      {!collapsed && <p className="sidebar-header">ADMIN</p>}
 
       <ul className="sidebar-nav">
         <li className={isActive("/dashboard") ? "active" : ""}>
@@ -62,11 +90,38 @@ export default function Sidebar() {
           </Link>
         </li>
 
-        {/* ✅ THÊM MENU VOUCHERS */}
         <li className={isActive("/vouchers") ? "active" : ""}>
           <Link href="/vouchers">
             <Ticket size={18} />
             <span>Vouchers</span>
+          </Link>
+        </li>
+
+        <li className={isActive("/users") ? "active" : ""}>
+          <Link href="/users">
+            <Users size={18} />
+            <span>Người dùng</span>
+          </Link>
+        </li>
+
+        <li className={isActive("/orders") ? "active" : ""}>
+          <Link href="/orders">
+            <ClipboardList size={18} />
+            <span>Đơn hàng</span>
+          </Link>
+        </li>
+
+        <li className={isActive("/reviews") ? "active" : ""}>
+          <Link href="/reviews">
+            <Star size={18} />
+            <span>Đánh giá</span>
+          </Link>
+        </li>
+
+        <li className={isActive("/customers") ? "active" : ""}>
+          <Link href="/customers">
+            <UserCheck size={18} />
+            <span>Khách hàng</span>
           </Link>
         </li>
 

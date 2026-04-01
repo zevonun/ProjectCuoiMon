@@ -8,6 +8,9 @@ const { isAdmin } = require('../../middleware/isAdmin');    // ✅ ADMIN CHECK
 // ✅ Tất cả route admin đều phải:
 // 1. Đăng nhập hợp lệ
 // 2. Có quyền admin
+
+// routes/api/users.js
+
 router.use(verifyToken, isAdmin);
 
 // 👥 CRUD người dùng admin

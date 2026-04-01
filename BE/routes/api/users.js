@@ -424,5 +424,31 @@ router.get('/auth/google/callback',
     }
   }
 );
+// POST /api/users/register-admin
+router.post('/register-admin', async (req, res) => {
+  try {
+    const { name, email, phone, address, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ error: 'Thiếu thông tin bắt buộc' });
+    }
+
+    const existing = await User.findOne({ email });
+    if (existing) return res.status(400).json({ error: 'Email đã tồn tại' });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await User.create({
+      name, email, phone, address,
+      password: hashedPassword,
+      role: 'admin'
+    });
+
+    const { password: _, refreshToken: __, ...safeUser } = newUser.toObject();
+    res.status(201).json(safeUser);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Lỗi server' });
+  }
+});
 
 module.exports = router;

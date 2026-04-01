@@ -20,44 +20,30 @@ REQUIRED_ENV.forEach(key => {
   }
 });
 
-// ── Routes ──
-var indexRouter = require('./routes/index');
-var adminUsersRouter = require('./routes/admin/users');
-var apiUsersRouter = require('./routes/api/users');
-var adminProductsRouter = require('./routes/admin/products');
-var apiProductsRouter = require('./routes/api/products');
-var adminCategoriesRouter = require('./routes/admin/categories');
-var apiCategoriesRouter = require('./routes/api/categories');
-var ordersRouter = require('./routes/orders');
-var orderDetailsRouter = require('./routes/orderDetails');
-var uploadRouter = require('./routes/upload');
-var dashboardRouter = require('./routes/api/dashboard');
-var bannersApiRouter = require('./routes/api/banners');
-var adminBannersRouter = require('./routes/admin/banners');
-var vouchersApiRouter = require('./routes/api/vouchers');
-var adminVouchersRouter = require('./routes/admin/vouchers');
-var otpRouter = require('./routes/api/otp');
-var testRouter = require('./routes/test');
+// ── Kết nối Database TRƯỚC KHI làm bất cứ điều gì ──
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log('✅ MongoDB connected');
+    const { setupVoucherCron } = require('./services/voucherCron');
+    setupVoucherCron();
+  })
+  .catch(err => {
+    console.error('❌ MongoDB connection error:', err);
+    process.exit(1);
+  });
 
 var app = express();
 
-/* ── Middleware cơ bản ── */
+// ═══════════════════════════════════════════
+// 1. MIDDLEWARE CƠ BẢN (không cần auth)
+// ═══════════════════════════════════════════
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
-/* ── Static files ──
-   Chỉ dùng MỘT điểm mount cho uploads để tránh conflict.
-   Frontend truy cập ảnh tại: /uploads/products/xxx.png
-*/
 app.use(express.static(path.join(__dirname, 'public')));
-// ✅ Bỏ dòng app.use('/uploads', express.static('uploads')) trùng với public/uploads
 
-/* ── CORS ──
-   Đọc allowed origins từ .env (cách nhau bằng dấu phẩy)
-   Ví dụ .env: CORS_ORIGIN=http://localhost:3000,http://localhost:3001
-*/
+// ── CORS ──
 const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map(s => s.trim())
   : ['http://localhost:3000', 'http://localhost:3001'];
@@ -69,9 +55,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-/* ── Session ── */
+// ── Session ──
 app.use(session({
-  secret: process.env.SESSION_SECRET, // ✅ Không có fallback yếu
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -82,61 +68,50 @@ app.use(session({
   },
 }));
 
-/* ── Passport ── */
+// ── Passport ──
 app.use(passport.initialize());
 app.use(passport.session());
 
-/* ── Security middleware ── */
+// ═══════════════════════════════════════════
+// 2. SECURITY MIDDLEWARE
+// ═══════════════════════════════════════════
 const { apiLimiter } = require('./middleware/rateLimit');
 const checkBlacklist = require('./middleware/checkBlacklist');
 app.use(apiLimiter);
 app.use(checkBlacklist);
 
-/* ── Routes ── */
-app.use('/', indexRouter);
+// ═══════════════════════════════════════════
+// 3. ROUTES PUBLIC (không cần auth) — ĐẶT TRƯỚC
+// ═══════════════════════════════════════════
+app.use('/', require('./routes/index'));
+app.use('/api/users', require('./routes/api/users'));           // có /register-admin bên trong
+app.use('/api/product', require('./routes/api/products'));      // giữ path cũ để không break FE
+app.use('/api/products', require('./routes/api/products'));
+app.use('/api/categories', require('./routes/api/categories'));
+app.use('/api/orders', require('./routes/orders'));
+app.use('/api/upload', require('./routes/upload'));
+app.use('/api/test', require('./routes/test'));
+app.use('/api/dashboard', require('./routes/api/dashboard'));
+app.use('/api/banners', require('./routes/api/banners'));
+app.use('/api/vouchers', require('./routes/api/vouchers'));
+app.use('/api/otp', require('./routes/api/otp'));
+app.use('/api/chat', require('./routes/chat-temp'));
+app.use('/orderDetails', require('./routes/orderDetails'));
 
-app.use('/admin/users', adminUsersRouter);
-app.use('/api/users', apiUsersRouter);
+// ═══════════════════════════════════════════
+// 4. ROUTES ADMIN (cần verifyToken + isAdmin — xử lý bên trong từng router)
+// ═══════════════════════════════════════════
+app.use('/admin/users', require('./routes/admin/users'));
+app.use('/admin/products', require('./routes/admin/products'));
+app.use('/admin/categories', require('./routes/admin/categories'));
+app.use('/admin/banners', require('./routes/admin/banners'));
+app.use('/admin/vouchers', require('./routes/admin/vouchers'));
+app.use('/admin/orders', require('./routes/admin/orders'));
+app.use('/admin/reviews', require('./routes/admin/reviews'));
 
-app.use('/admin/products', adminProductsRouter);
-app.use('/api/product', apiProductsRouter);   // giữ nguyên path để không break frontend
-app.use('/api/products', apiProductsRouter); 
-
-app.use('/admin/categories', adminCategoriesRouter);
-app.use('/api/categories', apiCategoriesRouter);
-
-app.use('/api/orders', ordersRouter);
-app.use('/orderDetails', orderDetailsRouter);
-app.use('/api/upload', uploadRouter);
-app.use('/api/test', testRouter);
-
-app.use('/api/dashboard', dashboardRouter);
-
-app.use('/api/banners', bannersApiRouter);
-app.use('/admin/banners', adminBannersRouter);
-
-app.use('/api/vouchers', vouchersApiRouter);
-app.use('/admin/vouchers', adminVouchersRouter);
-
-app.use('/api/otp', otpRouter);
-
-// ✅ ĐẶT Ở ĐÂY (TRƯỚC 404)
-const chatRoute = require('./routes/chat-temp');
-app.use('/api/chat', chatRoute);
-
-/* ── Database ── */
-mongoose.connect(process.env.MONGODB_URI) // ✅ Đọc từ .env
-  .then(() => {
-    console.log('✅ MongoDB connected');
-    const { setupVoucherCron } = require('./services/voucherCron');
-    setupVoucherCron();
-  })
-  .catch(err => {
-    console.error('❌ MongoDB connection error:', err);
-    process.exit(1);
-  });
-
-/* ── Error handling ── */
+// ═══════════════════════════════════════════
+// 5. ERROR HANDLING — ĐẶT CUỐI CÙNG
+// ═══════════════════════════════════════════
 app.use(function (req, res, next) {
   res.status(404).json({ error: 'Not Found' });
 });
