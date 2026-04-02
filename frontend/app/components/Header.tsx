@@ -9,6 +9,7 @@ import { AuthContext } from '../context/AuthContext'; // Import Context
 import { useCart } from '../context/CartContext'; // SỬA 1.1: Import useCart
 import UserMenu from './UserMenu'; // Import UserMenu
 import { fetchProducts, Product } from '../lib/api'; // Import fetchProducts và Product type
+import { formatPrice } from '../lib/formatPrice'; // Import formatPrice
 
 // Mapping từ slug/name sang displayName cho menu
 const CATEGORY_MAPPING: Record<string, string> = {
@@ -128,8 +129,8 @@ export default function Header() {
       </Link>
       <Link href={`/product/${product._id}`}><p>{product.ten_sp}</p></Link>
       <div className="pure-item-price-info">
-        <span className="price">{product.gia_km ? `${product.gia_km.toLocaleString()}đ` : `${product.gia.toLocaleString()}đ`}</span>
-        {product.gia_km && <span className="old-price">{product.gia.toLocaleString()}đ</span>}
+        <span className="price">{product.gia_km ? formatPrice(product.gia_km) : formatPrice(product.gia)}</span>
+        {product.gia_km && <span className="old-price">{formatPrice(product.gia)}</span>}
       </div>
     </div>
   );

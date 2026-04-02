@@ -7,6 +7,7 @@ import Link from "next/link";
 import styles from "./page.module.css";
 import OrderStatusBadge from "../components/OrderStatusBadge";
 import { getOrderDetails, Order } from "../lib/orderApi";
+import { formatPrice } from "../../lib/formatPrice";
 
 export default function OrderDetailPage() {
   const params = useParams();
@@ -211,10 +212,10 @@ export default function OrderDetailPage() {
                 </div>
                 <div className={styles.col2}>{product.quantity}</div>
                 <div className={styles.col3}>
-                  {product.price.toLocaleString()} đ
+                  {formatPrice(product.price)}
                 </div>
                 <div className={styles.col4}>
-                  {(product.price * product.quantity).toLocaleString()} đ
+                  {formatPrice(product.price * product.quantity)}
                 </div>
               </div>
             ))}
@@ -228,19 +229,18 @@ export default function OrderDetailPage() {
             <div className={styles.pricingRow}>
               <span>Tổng giá sản phẩm:</span>
               <span>
-                {(
+                {formatPrice(
                   order.totalPrice - (order.shippingFee || 0)
-                ).toLocaleString()}{" "}
-                đ
+                )}
               </span>
             </div>
             <div className={styles.pricingRow}>
               <span>Phí vận chuyển:</span>
-              <span>{(order.shippingFee || 0).toLocaleString()} đ</span>
+              <span>{formatPrice(order.shippingFee || 0)}</span>
             </div>
             <div className={`${styles.pricingRow} ${styles.total}`}>
               <span>Tổng thanh toán:</span>
-              <span>{order.totalPrice.toLocaleString()} đ</span>
+              <span>{formatPrice(order.totalPrice)}</span>
             </div>
           </div>
         </section>

@@ -7,6 +7,7 @@ import styles from "./OrderItem.module.css";
 import OrderStatusBadge from "./OrderStatusBadge";
 import ChangeAddressModal from "./ChangeAddressModal";
 import { Order } from "../lib/orderApi";
+import { formatPrice } from "../../lib/formatPrice";
 
 interface OrderItemProps {
   order: Order;
@@ -77,13 +78,13 @@ export default function OrderItem({
               <div className={styles.productInfo}>
                 <div className={styles.productName}>Sản phẩm #{idx + 1}</div>
                 <div className={styles.productDetails}>
-                  x{product.quantity} | {product.price.toLocaleString()} đ
+                  x{product.quantity} | {formatPrice(product.price)}
                 </div>
               </div>
 
               {/* Price per product */}
               <div className={styles.productPrice}>
-                {(product.price * product.quantity).toLocaleString()} đ
+                {formatPrice(product.price * product.quantity)}
               </div>
             </div>
           ))}
@@ -93,7 +94,7 @@ export default function OrderItem({
         <div className={styles.totalSection}>
           <div className={styles.totalLabel}>Tổng tiền:</div>
           <div className={styles.totalPrice}>
-            {order.totalPrice.toLocaleString()} đ
+            {formatPrice(order.totalPrice)}
           </div>
         </div>
 

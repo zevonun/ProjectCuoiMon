@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { formatPrice } from '../lib/formatPrice';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -215,7 +216,7 @@ export default function Chatbot() {
                       <div style={{ marginLeft: 8, flex: 1 }}>
                         <div style={{ fontSize: 12, fontWeight: 600 }}>{p.name}</div>
                         <div style={{ color: '#3f6f12', fontWeight: 'bold' }}>
-                          {p.price?.toLocaleString()}đ
+                          {formatPrice(p.price || 0)}
                         </div>
                         <a href={`/product/${p.id}`}>
                           <button style={{
