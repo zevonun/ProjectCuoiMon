@@ -1,5 +1,5 @@
 "use client";
-import { getAccessToken } from "@/lib/auth";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 import { useEffect, useState } from "react";
 import styles from "./page.module.css";
 
@@ -30,19 +30,26 @@ export default function AdminCustomersPage() {
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [loading, setLoading]       = useState(true);
 
-  const token = getAccessToken();
-
   useEffect(() => {
     (async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${API}/admin/users`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        console.log('🔍 Fetching customers...');
+        
+        const res = await fetchWithAuth('/admin/users');
+        
+        console.log('📊 Response status:', res.status);
+        
         const json = await res.json();
+        console.log('📦 Response data:', json);
+        
         const users = (Array.isArray(json) ? json : Array.isArray(json.data) ? json.data : [])
           .filter((u: User & { role: string }) => u.role !== "admin");
+        
+        console.log('✅ Filtered customers:', users);
         setCustomers(users);
+      } catch (err) {
+        console.error('❌ Error fetching customers:', err);
       } finally {
         setLoading(false);
       }
@@ -52,9 +59,7 @@ export default function AdminCustomersPage() {
   const loadOrders = async (userId: string) => {
     setLoadingOrders(true);
     try {
-      const res = await fetch(`${API}/orders?userId=${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetchWithAuth(`/orders?userId=${userId}`);
       const json = await res.json();
       setOrders(Array.isArray(json.data) ? json.data : []);
     } finally {

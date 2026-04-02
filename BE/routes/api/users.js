@@ -296,19 +296,53 @@ router.post('/refresh-token', async (req, res) => {
 });
 
 // ──────────────────────────────────────────────────────────
-// POST /api/users/logout   (không đổi)
+// POST /api/users/logout - Logout người dùng (không yêu cầu token hợp lệ)
 // ──────────────────────────────────────────────────────────
-router.post('/logout', verifyToken, async (req, res) => {
-  const token = req.headers.authorization.split(' ')[1];
-  const decoded = jwt.decode(token);
+router.post('/logout', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    // Nếu không có token, vẫn trả về success (frontend đã clear)
+    if (!authHeader) {
+      return res.json({ message: 'Đã đăng xuất' });
+    }
 
-  await TokenBlacklist.create({
-    token,
-    expiredAt: new Date(decoded.exp * 1000)
-  });
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+      return res.json({ message: 'Đã đăng xuất' });
+    }
 
-  await User.updateOne({ _id: req.user.id }, { refreshToken: null });
-  res.json({ message: 'Đăng xuất thành công' });
+    // Decode token (không verify - để handle expired tokens)
+    const decoded = jwt.decode(token);
+    if (!decoded) {
+      return res.json({ message: 'Đã đăng xuất' });
+    }
+
+    // ✅ Add token to blacklist (ngay cả khi expired)
+    try {
+      await TokenBlacklist.create({
+        token,
+        expiredAt: new Date(decoded.exp * 1000)
+      });
+    } catch (err) {
+      console.warn('⚠️ Could not add token to blacklist:', err.message);
+    }
+
+    // ✅ Clear refreshToken from user
+    if (decoded.id) {
+      try {
+        await User.updateOne({ _id: decoded.id }, { refreshToken: null });
+      } catch (err) {
+        console.warn('⚠️ Could not clear refreshToken:', err.message);
+      }
+    }
+
+    res.json({ message: 'Đã đăng xuất thành công' });
+  } catch (err) {
+    console.error('❌ Logout error:', err);
+    // Vẫn trả về success để frontend có thể clear token
+    res.json({ message: 'Đã đăng xuất' });
+  }
 });
 
 // Thêm vào routes/api/users.js (hoặc tạo routes/api/adminAuth.js riêng)
