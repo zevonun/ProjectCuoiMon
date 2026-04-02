@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import Image from 'next/image';
+import Link from 'next/link';
 import { formatPrice } from '../lib/formatPrice';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -100,7 +102,15 @@ export default function Chatbot() {
           el.style.background = 'linear-gradient(135deg, #5a8a2f, #8abf5f)';
         }}
       >
-        💄
+        <Link href="/">
+            <Image
+              src="/img/logo1.png"
+              alt="Chatbot Logo"
+              width={40}
+              height={40}
+              style={{ cursor: 'pointer' }}
+            />
+        </Link>
         <style jsx>{`
           @keyframes pulse {
             0% { transform: scale(1) rotate(0deg); }
@@ -150,7 +160,18 @@ export default function Chatbot() {
           fontSize: 15,
           boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
         }}>
-          💄 Beauty Support
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Link href="/">
+              <Image
+                src="/img/logo1.png"
+                alt="Chatbot Logo"
+                width={30}
+                height={30}
+                style={{ cursor: 'pointer', display: 'block' }}
+              />
+            </Link>
+            <span>Beauty Support</span>
+          </div>
           <button
             onClick={() => setOpen(false)}
             style={{
