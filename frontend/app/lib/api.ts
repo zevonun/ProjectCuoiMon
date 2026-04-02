@@ -9,6 +9,7 @@ export interface Product {
   hinh: string;
   mo_ta?: string;
   categoryId?: string;
+  subcategory?: string; // Danh mục con
   brandId?: string | null;
   sale?: number;
 }
@@ -39,6 +40,7 @@ const normalizeProduct = (raw: unknown): Product => {
     gia_km: p.gia_km != null ? Number(p.gia_km) : null,
     hinh: resolveImage(p.hinh ?? p.image),
     categoryId: categoryId || undefined,
+    subcategory: (p.subcategory as string) || undefined, // Danh mục con
     brandId: (p.brandId as string) ?? null,
     sale: p.sale != null ? Number(p.sale) : 0,
   };

@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import styles from "./page.module.css";
 import OrderStatusBadge from "../components/OrderStatusBadge";
 import { getOrderDetails, Order } from "../lib/orderApi";
@@ -17,6 +18,60 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [productDetails, setProductDetails] = useState<Record<string, any>>({}); // Cache sản phẩm
+
+  // Lấy chi tiết sản phẩm
+  const fetchProductDetails = async (productIds: string[]) => {
+    try {
+      console.log('📦 Fetching products for IDs:', productIds);
+      
+      // Lấy tất cả sản phẩm từ API
+      const res = await fetch('http://localhost:5000/api/products');
+      if (!res.ok) {
+        console.error('❌ Failed to fetch products:', res.status);
+        return;
+      }
+      
+      const json = await res.json();
+      console.log('Raw API response:', json);
+      
+      const allProducts = Array.isArray(json.data) ? json.data : Array.isArray(json) ? json : [];
+      console.log('✅ All products loaded:', allProducts.length);
+      console.log('First product:', allProducts[0]);
+      
+      // Tạo map theo ID - thử cả _id và id
+      const details: Record<string, any> = {};
+      const API_URL = 'http://localhost:5000';
+      
+      allProducts.forEach((p: any) => {
+        const id = p._id || p.id;
+        let imageUrl = p.hinh || p.image || '/img/no-image.jpg';
+        
+        // Resolve relative paths
+        if (imageUrl.startsWith('/') && !imageUrl.startsWith('http')) {
+          imageUrl = `${API_URL}${imageUrl}`;
+        }
+        
+        console.log(`Mapping product: ${id} -> ${p.ten_sp || p.name} (image: ${imageUrl})`);
+        
+        details[id] = {
+          ten_sp: p.ten_sp || p.name || 'Sản phẩm',
+          hinh: imageUrl,
+          gia: p.gia || p.price || 0,
+        };
+      });
+      
+      console.log('✅ Product map created:', Object.keys(details).length, 'items');
+      console.log('Looking for product IDs:', productIds);
+      productIds.forEach(id => {
+        console.log(`  - ${id}: ${details[id]?.ten_sp || 'NOT FOUND'}`);
+      });
+      
+      setProductDetails(details);
+    } catch (err) {
+      console.error('❌ Error fetching products:', err);
+    }
+  };
 
   useEffect(() => {
     if (!orderId) return;
@@ -27,6 +82,10 @@ export default function OrderDetailPage() {
         setError(null);
         const data = await getOrderDetails(orderId);
         setOrder(data);
+        
+        // Lấy chi tiết sản phẩm
+        const productIds = data.products.map(p => p.productId);
+        await fetchProductDetails(productIds);
       } catch (err) {
         console.error("Error fetching order:", err);
         setError(
@@ -195,30 +254,51 @@ export default function OrderDetailPage() {
               <div className={styles.col3}>Giá</div>
               <div className={styles.col4}>Tổng</div>
             </div>
-            {order.products.map((product, idx) => (
-              <div key={idx} className={styles.tableRow}>
-                <div className={styles.col1}>
-                  <div className={styles.productInfo}>
-                    <div className={styles.productPlaceholder}>📦</div>
-                    <div>
-                      <div className={styles.productName}>
-                        Sản phẩm #{idx + 1}
+            {order.products.map((product, idx) => {
+              const productInfo = productDetails[product.productId];
+              console.log(`Rendering product ${idx}:`, { id: product.productId, info: productInfo });
+              
+              return (
+                <div key={idx} className={styles.tableRow}>
+                  <div className={styles.col1}>
+                    <div className={styles.productInfo}>
+                      <div className={styles.productImage}>
+                        {productInfo?.hinh && productInfo.hinh !== '/img/no-image.jpg' ? (
+                          <Image 
+                            src={productInfo.hinh} 
+                            alt={productInfo.ten_sp || 'Sản phẩm'}
+                            width={80}
+                            height={80}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            onError={(e) => {
+                              console.error('Image error:', productInfo.hinh);
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        ) : (
+                          <div className={styles.productPlaceholder}>📦</div>
+                        )}
                       </div>
-                      <div className={styles.productId}>
-                        ID: {product.productId}
+                      <div>
+                        <div className={styles.productName}>
+                          {productInfo?.ten_sp || `Sản phẩm #${idx + 1}`}
+                        </div>
+                        <div className={styles.productId}>
+                          ID: {product.productId}
+                        </div>
                       </div>
                     </div>
                   </div>
+                  <div className={styles.col2}>{product.quantity}</div>
+                  <div className={styles.col3}>
+                    {formatPrice(product.price)}
+                  </div>
+                  <div className={styles.col4}>
+                    {formatPrice(product.price * product.quantity)}
+                  </div>
                 </div>
-                <div className={styles.col2}>{product.quantity}</div>
-                <div className={styles.col3}>
-                  {formatPrice(product.price)}
-                </div>
-                <div className={styles.col4}>
-                  {formatPrice(product.price * product.quantity)}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 
