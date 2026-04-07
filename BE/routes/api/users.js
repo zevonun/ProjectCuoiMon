@@ -485,4 +485,18 @@ router.post('/register-admin', async (req, res) => {
   }
 });
 
+// ✅ GET /me - Lấy thông tin current user
+router.get('/me', verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password -refreshToken');
+    if (!user) {
+      return res.status(404).json({ error: 'Người dùng không tồn tại' });
+    }
+    res.json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Lỗi server' });
+  }
+});
+
 module.exports = router;

@@ -1,25 +1,12 @@
 // seed.js – CHẠY LẦN DUY NHẤT ĐỂ TẠO DỮ LIỆU THẬT
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 const Category = require('./models/category');
 const Product = require('./models/product');
+const User = require('./models/user');
 
-const categories = [
-  "Trang điểm", "Chăm sóc da", "Tóc", "Cơ thể",
-  "Làm đẹp đường uống", "Em bé", "Hương thơm"
-];
 
-const sampleProducts = [
-  { name: "Kem chống nắng Some By Mi Truecica", price: 320000, sale: 259000, image: "/images/kcn-somebymi.jpg", hot: 1, categoryName: "Chăm sóc da" },
-  { name: "Son 3CE Velvet Lip Tint - Going Right", price: 420000, sale: 350000, image: "/images/3ce-going-right.jpg", hot: 1, categoryName: "Trang điểm" },
-  { name: "Toner Caryophy Portulaca", price: 350000, sale: 299000, image: "/images/toner-caryophy.jpg", categoryName: "Chăm sóc da" },
-  { name: "Serum The Ordinary Niacinamide 10%", price: 380000, sale: 320000, image: "/images/the-ordinary.jpg", categoryName: "Chăm sóc da" },
-  { name: "Máy rửa mặt Foreo Luna Mini 3", price: 4500000, sale: 3990000, image: "/images/foreo-luna.jpg", hot: 1, categoryName: "Cơ thể" },
-  { name: "Nước tẩy trang Bioderma 500ml", price: 480000, sale: 399000, image: "/images/bioderma.jpg", categoryName: "Chăm sóc da" },
-  { name: "Mặt nạ ngủ Laneige Water Sleeping Mask", price: 650000, sale: 520000, image: "/images/laneige-mask.jpg", categoryName: "Chăm sóc da" },
-  { name: "Son Romand Juicy Lasting Tint #13", price: 320000, sale: 259000, image: "/images/romand-13.jpg", hot: 1, categoryName: "Trang điểm" },
-  { name: "Sữa rửa mặt Senka Perfect Whip", price: 145000, sale: 109000, image: "/images/senka.jpg", categoryName: "Chăm sóc da" },
-  { name: "Kem dưỡng ẩm La Roche-Posay Cicaplast", price: 550000, sale: 450000, image: "/images/cicaplast.jpg", categoryName: "Chăm sóc da" },
-];
+
 
 async function seed() {
   await mongoose.connect('mongodb://localhost:27017/mybeauty');
@@ -27,6 +14,53 @@ async function seed() {
   // Xóa dữ liệu cũ
   await Category.deleteMany({});
   await Product.deleteMany({});
+  await User.deleteMany({ role: 'admin' }); // ✅ Xóa admin cũ
+
+  // ✅ TẠO ADMIN 1
+  console.log('👤 Tạo Admin 1...');
+  const admin1Password = await bcrypt.hash('Admin@123456', 10);
+  const admin1 = new User({
+    name: 'Admin Quản Lý',
+    email: 'Phuochhps40071@gmail.com',
+    phone: '0900000001',
+    address: 'Hà Nội',
+    password: admin1Password,
+    role: 'admin',
+    permissions: {
+      manage_products: true,
+      manage_orders: true,
+      manage_users: true,
+      manage_banners: true,
+      manage_categories: true,
+      manage_vouchers: true,
+      manage_admins: true,
+    },
+  });
+  await admin1.save();
+  console.log('✅ Admin 1 created: admin@mybeauty.com / Admin@123456');
+
+  // ✅ TẠO ADMIN 2
+  console.log('👤 Tạo Admin 2...');
+  const admin2Password = await bcrypt.hash('Admin2@123456', 10);
+  const admin2 = new User({
+    name: 'Admin Sản Phẩm',
+    email: 'ph940738@gmail.com',
+    phone: '0900000002',
+    address: 'Hồ Chí Minh',
+    password: admin2Password,
+    role: 'admin',
+    permissions: {
+      manage_products: true,
+      manage_orders: true,
+      manage_users: false,
+      manage_banners: true,
+      manage_categories: true,
+      manage_vouchers: true,
+      manage_admins: true,
+    },
+  });
+  await admin2.save();
+  console.log('✅ Admin 2 created: adminproduct@mybeauty.com / Admin2@123456');
 
   // Tạo danh mục + lưu map tên → id
   const catMap = {};
