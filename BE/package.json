@@ -29,6 +29,7 @@
     "openai": "^6.33.0",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
+    "qs": "^6.15.0",
     "socket.io-client": "^4.8.3"
   }
 }

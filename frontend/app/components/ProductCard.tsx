@@ -12,11 +12,9 @@ interface ProductCardProps {
 
 const formatCurrency = (value: number): string =>
   new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  })
-    .format(value)
-    .replace("₫", "đ");
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value) + " vnđ";
 
 export default function ProductCard({ product }: ProductCardProps) {
   const productId = product._id;

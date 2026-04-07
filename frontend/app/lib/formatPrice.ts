@@ -6,14 +6,12 @@
  */
 export const formatPrice = (price: number | string): string => {
   const num = typeof price === 'string' ? parseFloat(price) : price;
-  if (isNaN(num)) return '0 ₫';
+  if (isNaN(num)) return '0 vnđ';
   
   return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(num);
+  }).format(num) + ' vnđ';
 };
 
 /**

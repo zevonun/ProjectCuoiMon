@@ -153,8 +153,8 @@ export default function ProductDetailClient({
                 <div className="shipping-info">
                   <div className="ship-col">
                     <h4>Phí Ship</h4>
-                    <p>Nội thành Hà Nội - 20.000đ</p>
-                    <p>Các tỉnh còn lại - 25.000đ</p>
+                    <p>Nội thành Hà Nội - 20.000 vnđ</p>
+                    <p>Các tỉnh còn lại - 25.000 vnđ</p>
                   </div>
                   <div className="ship-col">
                     <h4>Thời gian ship dự kiến</h4>

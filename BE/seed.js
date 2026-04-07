@@ -34,6 +34,7 @@ async function seed() {
       manage_categories: true,
       manage_vouchers: true,
       manage_admins: true,
+      manage_articles: true,
     },
   });
   await admin1.save();
@@ -57,6 +58,7 @@ async function seed() {
       manage_categories: true,
       manage_vouchers: true,
       manage_admins: true,
+      manage_articles: true,
     },
   });
   await admin2.save();

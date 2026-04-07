@@ -89,6 +89,7 @@ app.use('/api/product', require('./routes/api/products'));      // giá»¯ path cÅ
 app.use('/api/products', require('./routes/api/products'));
 app.use('/api/categories', require('./routes/api/categories'));
 app.use('/api/orders', require('./routes/orders'));
+app.use('/api/vnpay', require('./routes/vnpay'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/test', require('./routes/test'));
 app.use('/api/dashboard', require('./routes/api/dashboard'));

@@ -28,6 +28,7 @@ const UserSchema = new Schema(
       manage_categories: { type: Boolean, default: false },
       manage_vouchers: { type: Boolean, default: false },
       manage_admins: { type: Boolean, default: false },
+      manage_articles: { type: Boolean, default: false },
     },
 
     refreshToken: { type: String, default: null },
