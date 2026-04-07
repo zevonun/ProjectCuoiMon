@@ -97,6 +97,7 @@ app.use('/api/banners', require('./routes/api/banners'));
 app.use('/api/vouchers', require('./routes/api/vouchers'));
 app.use('/api/otp', require('./routes/api/otp'));
 app.use('/api/chat', require('./routes/chat-temp'));
+app.use('/api/articles', require('./routes/api/articles'));
 app.use('/orderDetails', require('./routes/orderDetails'));
 
 // ═══════════════════════════════════════════

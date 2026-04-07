@@ -1,0 +1,149 @@
+/* admin-frontend/app/(admin)/articles/page.module.css */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  color: #e5e7eb;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 16px;
+}
+
+.titleContainer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.btnBack {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #1e293b;
+  background: #0f172a;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnBack:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #f8fafc;
+  margin-bottom: 0 !important;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.searchInput {
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+  background: #0f172a;
+  color: #fff;
+  font-size: 14px;
+  min-width: 250px;
+}
+
+.btnPrimary {
+  height: 36px;
+  padding: 0 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(59,130,246,.4);
+  background: rgba(59,130,246,.15);
+  color: #bfdbfe;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.btnPrimary:hover {
+  background: rgba(59,130,246,.3);
+  border-color: #3b82f6;
+}
+
+.tableWrapper {
+  background: rgba(15,23,42,.7);
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 24px;
+  padding: 16px;
+  border-top: 1px solid #1e293b;
+}
+
+.btnPage {
+  background: transparent;
+  border: 1px solid #334155;
+  color: #64748b;
+  padding: 6px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.btnPage:hover:not(:disabled) {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.btnPage:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .actions {
+    width: 100%;
+    flex-direction: column;
+  }
+  
+  .searchInput {
+    min-width: 0;
+    width: 100%;
+  }
+  
+  .btnPrimary {
+    width: 100%;
+  }
+}
