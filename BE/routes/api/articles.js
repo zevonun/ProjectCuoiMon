@@ -8,6 +8,7 @@ const { isAdmin } = require('../../middleware/isAdmin');
 // Routes PUBLIC (có thể để xem công khai, hoặc chỉ admin — theo yêu cầu là quản lý admin-frontend)
 router.get('/', controller.getAllArticles);
 router.get('/:id', controller.getArticleById);
+router.get('/slug/:slug', controller.getArticleBySlug);
 
 // Routes ADMIN
 router.post('/', verifyToken, isAdmin, controller.createArticle);

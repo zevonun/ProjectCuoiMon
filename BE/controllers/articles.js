@@ -75,6 +75,23 @@ const getArticleById = async (req, res) => {
 };
 
 /**
+ * GET /api/articles/slug/:slug
+ */
+const getArticleBySlug = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const article = await Article.findOne({ slug_vi: slug }).lean();
+    if (!article) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy bài viết' });
+    }
+    res.json({ success: true, data: formatArticle(article) });
+  } catch (err) {
+    console.error('getArticleBySlug error:', err);
+    res.status(500).json({ success: false, message: 'Lỗi server' });
+  }
+};
+
+/**
  * POST /api/articles
  */
 const createArticle = async (req, res) => {
@@ -161,6 +178,7 @@ const deleteArticle = async (req, res) => {
 module.exports = {
   getAllArticles,
   getArticleById,
+  getArticleBySlug,
   createArticle,
   updateArticle,
   deleteArticle,

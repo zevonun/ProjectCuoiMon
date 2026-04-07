@@ -1,44 +1,14 @@
 import Link from "next/link";
 import "./about.css";
 
-const posts = [
-  {
-    slug: "cham-soc-da",
-    title: "Routine Chăm Sóc Da Chuẩn Cho Làn Da Việt",
-    image: "https://down-vn.img.susercontent.com/file/vn-11134207-7r98o-ltxawe5584cxf9.webp?q=80&w=1974&auto=format&fit=crop",
-    desc: "Khám phá quy trình 7 bước dưỡng da chuẩn chuyên gia, giúp phục hồi và nuôi dưỡng làn da khỏe đẹp từ bên trong cùng các chiết xuất từ trà xanh và tràm trà.",
-  },
-  {
-    slug: "tri-mun",
-    title: "Giải Pháp Trị Mụn Hiệu Quả Từ Tinh Dầu Thiên Nhiên",
-    image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=2070&auto=format&fit=crop",
-    desc: "Mụn không còn là nỗi lo với sự kết hợp hoàn hảo từ tràm trà, rau má. Giải pháp an toàn, không để lại thâm sẹo cho làn da nhạy cảm nhất.",
-  },
-  {
-    slug: "duong-am",
-    title: "Dưỡng Ẩm Chuyên Sâu: Chìa Khóa Cho Làn Da Căng Mọng",
-    image: "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?q=80&w=2000&auto=format&fit=crop",
-    desc: "Đừng để làn da khô ráp lấy đi sự tự tin của bạn. Học ngay cách cấp ẩm đúng cách với Hyaluronic Acid tự nhiên và bơ hạt mỡ hữu cơ.",
-  },
-  {
-    slug: "chong-nang",
-    title: "Bảo Vệ Da Toàn Diện Trước Tác Động Của Tia UV",
-    image: "https://cdn-i.vtcnews.vn/resize/th/upload/2024/06/24/chong-nang-1-17105797.jpg?q=80&w=2070&auto=format&fit=crop",
-    desc: "Tại sao kem chống nắng là vật bất ly thân? Tìm hiểu cách lựa chọn kem chống nắng vật lý lành tính cho mọi loại da.",
-  },
-  {
-    slug: "tay-trang",
-    title: "Sạch Sâu Lỗ Chân Lông Với Công Nghệ Double Cleansing",
-    image: "https://cdn.shopify.com/s/files/1/0738/2099/5809/files/double-cleansing-2.jpg?v=1741435422&q=80&w=2070&auto=format&fit=crop",
-    desc: "Tẩy trang không chỉ là làm sạch lớp makeup mà còn là bước thải độc cho da. Tìm hiểu bí quyết tẩy trang sạch sâu mà vẫn dịu nhẹ.",
-  },
-  {
-    slug: "serum",
-    title: "Tối Ưu Hiệu Quả Dưỡng Da Với Serum Đặc Trị",
-    image: "https://images-1.eucerin.com/~/media/eucerin/local/vn/cach-su-dung-serum/btshynh31311540-1.webp?la=vi-vn&h=511.111&w=713.556&q=80&w=2071&auto=format&fit=crop",
-    desc: "Cách layer serum đúng cách để phát huy tối đa công dụng của Vitamin C, Niacinamide và các tinh chất thực vật quý hiếm.",
-  },
-];
+interface Article {
+  slug_vi: string;
+  title_vi: string;
+  image: string;
+  short_description_vi: string;
+}
+
+const API_URL_BE = "http://localhost:5000";
 
 const teamMembers = [
   {
@@ -58,7 +28,20 @@ const teamMembers = [
   },
 ];
 
-export default function AboutPage() {
+async function getArticles() {
+  try {
+    const res = await fetch('http://localhost:5000/api/articles?limit=6', { cache: 'no-store' });
+    const json = await res.json();
+    return json.success ? json.data : [];
+  } catch (err) {
+    console.error('Fetch articles error:', err);
+    return [];
+  }
+}
+
+export default async function AboutPage() {
+  const posts = await getArticles();
+
   return (
     <div className="about">
       {/* HERO SECTION */}
@@ -158,13 +141,13 @@ export default function AboutPage() {
         <section className="about-blog">
           <h2>Cẩm Nang <span>Làm Đẹp</span> Từ Chuyên Gia</h2>
           <div className="blog-grid">
-            {posts.map((post) => (
-              <Link key={post.slug} href={`/article/${post.slug}`}>
+            {posts.map((post: Article) => (
+              <Link key={post.slug_vi} href={`/article/${post.slug_vi}`}>
                 <div className="blog-card">
-                  <img src={post.image} alt={post.title} />
+                  <img src={`${API_URL_BE}/${post.image}`} alt={post.title_vi} />
                   <div className="blog-card-content">
-                    <h3>{post.title}</h3>
-                    <p>{post.desc}</p>
+                    <h3>{post.title_vi}</h3>
+                    <p>{post.short_description_vi}</p>
                     <span className="read-more">Xem chi tiết →</span>
                   </div>
                 </div>
