@@ -17,6 +17,7 @@ import { createOrder as createOrderApi } from './lib/orderApi';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useOrder } from '../context/OrderContext';
+import { apiPost } from '../lib/apiClient';
 import styles from './checkout.module.css';
 
 const SHIPPING_FEE = 30000;
@@ -178,11 +179,44 @@ export default function CheckoutPage() {
           // Redirect to VNPay payment gateway
           console.log('Redirecting to VNPay payment...');
           setSuccessMessage('Chuyển hướng đến VNPay...');
-          // TODO: Implement VNPay integration
-          setTimeout(() => {
-            clearCart();
-            router.push('/order-success');
-          }, 2000);
+          
+          try {
+            // Get order ID from the created response
+            const orderId = response.data?._id;
+            if (!orderId) throw new Error('Không tìm thấy ID đơn hàng từ hệ thống');
+
+            console.log('🔗 Fetching VNPAY URL for order:', orderId);
+
+            // Call internal API to get VNPay URL using centralized apiClient
+            const vnpayResponse = await apiPost('/api/vnpay/create_payment_url', {
+              orderId: orderId,
+              amount: Number(calculateTotal()),
+              bankCode: '',
+            });
+
+            if (!vnpayResponse.ok) {
+              const errorData = await vnpayResponse.json();
+              throw new Error(errorData.message || 'Lỗi từ phía máy chủ thanh toán');
+            }
+
+            const vnpayData = await vnpayResponse.json();
+
+            if (vnpayData.success && vnpayData.paymentUrl) {
+              console.log('🚀 Redirecting to VNPAY:', vnpayData.paymentUrl);
+              // Clear cart before redirecting
+              clearCart();
+              // Redirect to VNPay
+              window.location.href = vnpayData.paymentUrl;
+            } else {
+              throw new Error(vnpayData.message || 'Không nhận được đường dẫn thanh toán từ VNPAY');
+            }
+          } catch (vnpError: any) {
+             console.error('❌ VNPay redirect error:', vnpError);
+             setErrorMessage(`Lỗi VNPAY: ${vnpError.message || 'Đã có lỗi xảy ra'}`);
+             // Reset loading state to let user try again or choose another method
+             setIsLoading(false);
+             setOrderLoading(false);
+          }
           break;
         default:
           // COD - order processing
@@ -256,7 +290,11 @@ export default function CheckoutPage() {
             {/* Checkout Button */}
             <div className={styles.checkoutButtonContainer}>
               <button
-                onClick={handleCheckout}
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleCheckout();
+                }}
                 disabled={isLoading || cart.length === 0}
                 className={`${styles.checkoutButton} ${
                   isLoading ? styles.loading : ''

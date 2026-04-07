@@ -89,6 +89,7 @@ app.use('/api/product', require('./routes/api/products'));      // giữ path c�
 app.use('/api/products', require('./routes/api/products'));
 app.use('/api/categories', require('./routes/api/categories'));
 app.use('/api/orders', require('./routes/orders'));
+app.use('/api/vnpay', require('./routes/vnpay'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/test', require('./routes/test'));
 app.use('/api/dashboard', require('./routes/api/dashboard'));
@@ -96,6 +97,7 @@ app.use('/api/banners', require('./routes/api/banners'));
 app.use('/api/vouchers', require('./routes/api/vouchers'));
 app.use('/api/otp', require('./routes/api/otp'));
 app.use('/api/chat', require('./routes/chat-temp'));
+app.use('/api/articles', require('./routes/api/articles'));
 app.use('/orderDetails', require('./routes/orderDetails'));
 
 // ═══════════════════════════════════════════

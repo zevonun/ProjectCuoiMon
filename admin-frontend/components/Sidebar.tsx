@@ -15,6 +15,7 @@ import {
   UserCheck,
   LogOut,
   ChevronLeft,
+  FileText,
 } from "lucide-react";
 import { signOut, getUser } from "@/lib/auth";
 import "./Sidebar.css";
@@ -87,6 +88,13 @@ export default function Sidebar() {
           <Link href="/banners">
             <Image size={18} />
             <span>Banners</span>
+          </Link>
+        </li>
+
+        <li className={isActive("/articles") ? "active" : ""}>
+          <Link href="/articles">
+            <FileText size={18} />
+            <span>Articles</span>
           </Link>
         </li>
 

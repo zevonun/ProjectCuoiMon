@@ -5,7 +5,7 @@ import { Upload, X } from "lucide-react";
 import styles from "./ImageUpload.module.css";
 
 interface ImageUploadProps {
-  type: "banners" | "products" | "categories" | "others";
+  type: "banners" | "products" | "categories" | "articles" | "others";
   value?: string;
   onChange: (url: string) => void;
 }
