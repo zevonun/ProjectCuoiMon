@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import styles from "./ProductSlider.module.css";
+import { formatPrice } from "../lib/formatPrice";
 
 interface Product {
   _id: string;
@@ -48,7 +49,7 @@ export default function ProductSlider({ title, iconUrl, apiUrl }: ProductSliderP
             <img src={p.image || "/img/no-image.jpg"} className={styles.productImage} />
             <p className={styles.productName}>{p.name}</p>
             <p className={styles.productPrice}>
-              {p.price.toLocaleString("vi-VN")}đ
+              {formatPrice(p.price)}
             </p>
           </div>
         ))}

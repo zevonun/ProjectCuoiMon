@@ -10,6 +10,7 @@ const safeUser = (item) => ({
   phone: item.phone,
   address: item.address,
   role: item.role,
+  permissions: item.permissions || {}, // ← thêm permissions
   googleId: item.googleId ? true : undefined,
   createdAt: item.createdAt,  // ← thêm dòng này
 });
@@ -27,7 +28,12 @@ const getAllUsers = async (req, res) => {
 
 const createUser = async (req, res) => {
   try {
-    const { name, email, phone, address, password } = req.body;
+    const { name, email, phone, address, password, role, permissions } = req.body;
+
+    // ✅ Admin panel chỉ được tạo admin account
+    if (role !== 'admin') {
+      return res.status(400).json({ message: 'Chỉ được tạo tài khoản admin từ admin panel' });
+    }
 
     if (!name || !email || !phone || !address || !password) {
       return res.status(400).json({ message: 'Thiếu thông tin bắt buộc' });
@@ -44,7 +50,27 @@ const createUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ name, email, phone, address, password: hashedPassword });
+    
+    // ✅ Tạo admin với permissions
+    const adminPermissions = {
+      manage_products: permissions?.manage_products ?? false,
+      manage_orders: permissions?.manage_orders ?? false,
+      manage_users: permissions?.manage_users ?? false,
+      manage_banners: permissions?.manage_banners ?? false,
+      manage_categories: permissions?.manage_categories ?? false,
+      manage_vouchers: permissions?.manage_vouchers ?? false,
+      manage_admins: permissions?.manage_admins ?? false,
+    };
+
+    const newUser = new User({ 
+      name, 
+      email, 
+      phone, 
+      address, 
+      password: hashedPassword,
+      role: 'admin',
+      permissions: adminPermissions
+    });
     const savedUser = await newUser.save();
 
     res.status(201).json(safeUser(savedUser));
@@ -56,10 +82,15 @@ const createUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    const { name, email, phone, address, password } = req.body;
+    const { name, email, phone, address, password, role, permissions } = req.body;
     const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ message: 'Người dùng không tồn tại' });
+    }
+
+    // ✅ BẢNG: Không cho phép nâng role thành admin
+    if (role && role === 'admin' && user.role !== 'admin') {
+      return res.status(403).json({ message: 'Không được nâng người dùng thành admin từ endpoint này' });
     }
 
     if (name) user.name = name;
@@ -67,6 +98,18 @@ const updateUser = async (req, res) => {
     if (phone) user.phone = phone;
     if (address) user.address = address;
     if (password) user.password = await bcrypt.hash(password, 10);
+    if (role) user.role = role;
+    if (permissions && role === 'admin') {
+      user.permissions = {
+        manage_products: permissions?.manage_products ?? user.permissions?.manage_products ?? false,
+        manage_orders: permissions?.manage_orders ?? user.permissions?.manage_orders ?? false,
+        manage_users: permissions?.manage_users ?? user.permissions?.manage_users ?? false,
+        manage_banners: permissions?.manage_banners ?? user.permissions?.manage_banners ?? false,
+        manage_categories: permissions?.manage_categories ?? user.permissions?.manage_categories ?? false,
+        manage_vouchers: permissions?.manage_vouchers ?? user.permissions?.manage_vouchers ?? false,
+        manage_admins: permissions?.manage_admins ?? user.permissions?.manage_admins ?? false,
+      };
+    }
 
     await user.save();
     res.status(200).json(safeUser(user));

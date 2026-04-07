@@ -15,6 +15,7 @@ const formatProduct = (p) => ({
   hinh: p.image || p.hinh || '/img/no-image.jpg',
   categoryId: (p.categoryId || p.id_loai)?.toString?.() || p.categoryId || p.id_loai,
   id_loai: (p.categoryId || p.id_loai)?.toString?.() || p.categoryId || p.id_loai,
+  subcategory: p.subcategory || null,
   mo_ta: p.description || p.mo_ta,
   ngay: p.ngay || p.createdAt || new Date().toISOString(),
 });
@@ -150,7 +151,7 @@ const getProductByCategoryId = async (req, res) => {
 
 const createProduct = async (req, res) => {
   try {
-    const { name, price, categoryId, sale, image, description } = req.body;
+    const { name, price, categoryId, sale, image, description, subcategory } = req.body;
 
     if (!name || price == null || !categoryId) {
       return res.status(400).json({ success: false, message: 'Thiếu thông tin bắt buộc' });
@@ -167,7 +168,7 @@ const createProduct = async (req, res) => {
 
     const newProduct = new Product({
       name, price, sale: sale ?? 0, categoryId,
-      image: image || '', description: description || '', brandId: null,
+      image: image || '', description: description || '', subcategory: subcategory || null, brandId: null,
     });
 
     const saved = await newProduct.save();
@@ -187,7 +188,7 @@ const updateProduct = async (req, res) => {
     const product = await Product.findById(id);
     if (!product) return res.status(404).json({ success: false, message: 'Không tìm thấy sản phẩm' });
 
-    const { name, price, sale, categoryId, image, description } = req.body;
+    const { name, price, sale, categoryId, image, description, subcategory } = req.body;
     if (categoryId) {
       if (!mongoose.Types.ObjectId.isValid(categoryId)) {
         return res.status(400).json({ success: false, message: 'categoryId không hợp lệ' });
@@ -202,6 +203,7 @@ const updateProduct = async (req, res) => {
     product.sale        = sale        ?? product.sale;
     product.image       = image       || product.image;
     product.description = description || product.description;
+    product.subcategory = subcategory || product.subcategory;
 
     const saved = await product.save();
     res.json({ success: true, data: formatProduct(saved) });

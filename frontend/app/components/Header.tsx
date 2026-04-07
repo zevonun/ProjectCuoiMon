@@ -9,6 +9,7 @@ import { AuthContext } from '../context/AuthContext'; // Import Context
 import { useCart } from '../context/CartContext'; // SỬA 1.1: Import useCart
 import UserMenu from './UserMenu'; // Import UserMenu
 import { fetchProducts, Product } from '../lib/api'; // Import fetchProducts và Product type
+import { formatPrice } from '../lib/formatPrice'; // Import formatPrice
 
 // Mapping từ slug/name sang displayName cho menu
 const CATEGORY_MAPPING: Record<string, string> = {
@@ -42,6 +43,11 @@ export default function Header() {
   const [categories, setCategories] = useState<CategoryData[]>([]);
   const [categoryIdMap, setCategoryIdMap] = useState<Record<string, string>>({}); // Map slug -> categoryId
   const [loading, setLoading] = useState(true);
+  
+  // State cho search
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Product[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
 
   // SỬA 2: Lấy giá trị từ AuthContext
   const authContext = useContext(AuthContext);
@@ -57,6 +63,7 @@ export default function Header() {
 
         // Fetch all products
         const fetchedProducts = await fetchProducts('http://localhost:5000/api/products');
+        console.log('✅ Products loaded:', fetchedProducts.length, fetchedProducts);
         setProducts(fetchedProducts);
 
         // Fetch all categories
@@ -80,7 +87,7 @@ export default function Header() {
           setCategoryIdMap(mapping);
         }
       } catch (error) {
-        console.error('Error loading data:', error);
+        console.error('❌ Error loading data:', error);
       } finally {
         setLoading(false);
       }
@@ -108,6 +115,37 @@ export default function Header() {
     setActiveMenu(null);
   };
 
+  // Hàm xử lý tìm kiếm sản phẩm
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    if (query.trim() === '') {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+
+    console.log('🔍 Searching:', query, 'in', products.length, 'products');
+
+    // Filter sản phẩm theo tên
+    const results = products.filter(p =>
+      p.ten_sp.toLowerCase().includes(query.toLowerCase())
+    ).slice(0, 8); // Hiển thị tối đa 8 kết quả
+
+    console.log('📦 Search results:', results);
+    setSearchResults(results);
+    setShowSearchResults(true);
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // Redirect đến trang search với query
+      window.location.href = `/products?search=${encodeURIComponent(searchQuery)}`;
+    }
+  };
+
   // Hàm render tab menu bên trái (để tránh lặp code)
   const renderSubMenuItem = (title: string, tabId: string) => (
     <li
@@ -128,36 +166,28 @@ export default function Header() {
       </Link>
       <Link href={`/product/${product._id}`}><p>{product.ten_sp}</p></Link>
       <div className="pure-item-price-info">
-        <span className="price">{product.gia_km ? `${product.gia_km.toLocaleString()}đ` : `${product.gia.toLocaleString()}đ`}</span>
-        {product.gia_km && <span className="old-price">{product.gia.toLocaleString()}đ</span>}
+        <span className="price">{product.gia_km ? formatPrice(product.gia_km) : formatPrice(product.gia)}</span>
+        {product.gia_km && <span className="old-price">{formatPrice(product.gia)}</span>}
       </div>
     </div>
   );
 
-  // Hàm render danh sách sản phẩm theo category name (từ submenu item)
-  const renderProductsByCategory = (categoryName: string) => {
-    // Normalize category name to find matching category ID
-    const normalizedName = categoryName.toLowerCase().trim();
+  // Hàm render danh sách sản phẩm theo subcategory name
+  const renderProductsBySubcategory = (subcategoryName: string) => {
+    if (!subcategoryName) {
+      return <p style={{ padding: '10px', color: '#999' }}>Chưa có sản phẩm</p>;
+    }
 
-    // Tìm category có name matching
-    const matchedCategory = categories.find(cat =>
-      cat.name.toLowerCase() === normalizedName ||
-      cat.name.toLowerCase().includes(normalizedName) ||
-      normalizedName.includes(cat.name.toLowerCase())
+    // Filter products theo subcategory
+    const subcategoryProducts = products.filter(p => 
+      p.subcategory && p.subcategory.toLowerCase().trim() === subcategoryName.toLowerCase().trim()
     );
 
-    if (!matchedCategory) {
+    if (subcategoryProducts.length === 0) {
       return <p style={{ padding: '10px', color: '#999' }}>Chưa có sản phẩm</p>;
     }
 
-    // Filter products theo categoryId
-    const categoryProducts = products.filter(p => p.categoryId === matchedCategory._id);
-
-    if (categoryProducts.length === 0) {
-      return <p style={{ padding: '10px', color: '#999' }}>Chưa có sản phẩm</p>;
-    }
-
-    return categoryProducts.slice(0, 4).map((product: Product) => renderProductItem(product));
+    return subcategoryProducts.slice(0, 4).map((product: Product) => renderProductItem(product));
   };
 
   return (
@@ -187,9 +217,73 @@ export default function Header() {
             <span>|</span>
             <Link href="#">Dầu Gội</Link>
           </div>
-          <div className="search-box">
-            <input type="text" placeholder="Tìm sản phẩm, danh mục mong muốn ..." />
-            <button><i className="fa fa-search"></i></button>
+          <div className="search-box" style={{ position: 'relative' }}>
+            <input 
+              type="text" 
+              placeholder="Tìm sản phẩm, danh mục mong muốn ..." 
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onFocus={() => searchQuery && setShowSearchResults(true)}
+              onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
+            />
+            <button onClick={handleSearchSubmit}><i className="fa fa-search"></i></button>
+            
+            {/* Search Results Dropdown */}
+            {showSearchResults && searchResults.length > 0 && (
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                left: 0,
+                right: 0,
+                backgroundColor: 'white',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                maxHeight: '400px',
+                overflowY: 'auto',
+                zIndex: 1000,
+                boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+              }}>
+                {searchResults.map((product) => (
+                  <Link 
+                    key={product._id}
+                    href={`/product/${product._id}`}
+                    onClick={() => {
+                      setSearchQuery('');
+                      setShowSearchResults(false);
+                    }}
+                    style={{
+                      display: 'flex',
+                      padding: '10px 12px',
+                      borderBottom: '1px solid #f0f0f0',
+                      textDecoration: 'none',
+                      color: 'inherit',
+                      transition: 'background-color 0.2s',
+                      cursor: 'pointer'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  >
+                    <div style={{ width: '50px', height: '50px', marginRight: '10px', flexShrink: 0 }}>
+                      <Image 
+                        src={product.hinh} 
+                        alt={product.ten_sp} 
+                        width={50} 
+                        height={50} 
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }}
+                      />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 500, fontSize: '14px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {product.ten_sp}
+                      </div>
+                      <div style={{ color: '#ee4d2d', fontWeight: 600, fontSize: '13px' }}>
+                        {formatPrice(product.gia_km && product.gia_km > 0 ? product.gia_km : product.gia)}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </div>
         <div className="header-top-right">
@@ -252,21 +346,21 @@ export default function Header() {
               </div>
 
               <div className="pure-item-right right-1" style={{ display: activeSubMenu === 'right-1' ? 'grid' : 'none' }}>
-                {renderProductsByCategory('Combo chăm sóc da')}
+                {renderProductsBySubcategory('Combo chăm sóc da')}
               </div>
 
               <div className="pure-item-right right-2" style={{ display: activeSubMenu === 'right-2' ? 'grid' : 'none' }}>
-                {renderProductsByCategory('Combo chăm sóc tóc')}
+                {renderProductsBySubcategory('Combo chăm sóc tóc')}
               </div>
 
               <div className="pure-item-right right-3" style={{ display: activeSubMenu === 'right-3' ? 'grid' : 'none' }}>
-                {renderProductsByCategory('Combo chăm sóc môi')}
+                {renderProductsBySubcategory('Combo chăm sóc môi')}
               </div>
               <div className="pure-item-right right-4" style={{ display: activeSubMenu === 'right-4' ? 'grid' : 'none' }}>
-                {renderProductsByCategory('Combo khác')}
+                {renderProductsBySubcategory('Combo khác')}
               </div>
               <div className="pure-item-right right-5" style={{ display: activeSubMenu === 'right-5' ? 'grid' : 'none' }}>
-                {renderProductsByCategory('Black Green Day')}
+                {renderProductsBySubcategory('Black Green Day')}
               </div>
             </div>
           </li>
@@ -287,10 +381,10 @@ export default function Header() {
               </div>
 
               <div className="pure-item-right right-1" style={{ display: activeSubMenu === 'right-1' ? 'grid' : 'none' }}>
-                {renderProductsByCategory('Son dưỡng môi')}
+                {renderProductsBySubcategory('Son dưỡng môi')}
               </div>
               <div className="pure-item-right right-2" style={{ display: activeSubMenu === 'right-2' ? 'grid' : 'none' }}>
-                {renderProductsByCategory('Son màu')}
+                {renderProductsBySubcategory('Son màu')}
               </div>
             </div>
           </li>
@@ -310,16 +404,16 @@ export default function Header() {
               </div>
 
               <div className="pure-item-right right-1" style={{ display: activeSubMenu === 'right-1' ? 'grid' : 'none' }}>
-                {renderProductsByCategory('Tẩy trang - rửa mặt')}
+                {renderProductsBySubcategory('Tẩy trang - rửa mặt')}
               </div>
               <div className="pure-item-right right-2" style={{ display: activeSubMenu === 'right-2' ? 'grid' : 'none' }}>
-                {renderProductsByCategory('Toner - xịt khoáng')}
+                {renderProductsBySubcategory('Toner - xịt khoáng')}
               </div>
               <div className="pure-item-right right-3" style={{ display: activeSubMenu === 'right-3' ? 'grid' : 'none' }}>
-                {renderProductsByCategory('Dưỡng da')}
+                {renderProductsBySubcategory('Dưỡng da')}
               </div>
               <div className="pure-item-right right-4" style={{ display: activeSubMenu === 'right-4' ? 'grid' : 'none' }}>
-                {renderProductsByCategory('Kem chống nắng')}
+                {renderProductsBySubcategory('Kem chống nắng')}
               </div>
             </div>
           </li>

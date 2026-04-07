@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import Image from 'next/image';
+import Link from 'next/link';
+import { formatPrice } from '../lib/formatPrice';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -36,6 +39,15 @@ export default function Chatbot() {
     const t = setTimeout(() => setOpen(true), 4000);
     return () => clearTimeout(t);
   }, []);
+
+  const getImageUrl = (imagePath: string | undefined) => {
+    if (!imagePath) return '/no-image.png';
+    const path = imagePath;
+    if (path.startsWith('/') && !path.startsWith('http')) {
+      return `http://localhost:5000${path}`;
+    }
+    return path;
+  };
 
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
@@ -99,7 +111,15 @@ export default function Chatbot() {
           el.style.background = 'linear-gradient(135deg, #5a8a2f, #8abf5f)';
         }}
       >
-        💄
+        <Link href="/">
+            <Image
+              src="/img/logo1.png"
+              alt="Chatbot Logo"
+              width={40}
+              height={40}
+              style={{ cursor: 'pointer' }}
+            />
+        </Link>
         <style jsx>{`
           @keyframes pulse {
             0% { transform: scale(1) rotate(0deg); }
@@ -149,7 +169,18 @@ export default function Chatbot() {
           fontSize: 15,
           boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
         }}>
-          💄 Beauty Support
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Link href="/">
+              <Image
+                src="/img/logo1.png"
+                alt="Chatbot Logo"
+                width={30}
+                height={30}
+                style={{ cursor: 'pointer', display: 'block' }}
+              />
+            </Link>
+            <span>Beauty Support</span>
+          </div>
           <button
             onClick={() => setOpen(false)}
             style={{
@@ -210,12 +241,17 @@ export default function Chatbot() {
                       el.style.transform = 'translateY(0)';
                       el.style.boxShadow = '0 0 0 rgba(0,0,0,0)';
                     }}>
-                      <img src={p.image || '/no-image.png'}
-                        style={{ width: 45, height: 45, borderRadius: 6, objectFit: 'cover' }} />
+                      <Image 
+                        src={getImageUrl(p.image)}
+                        alt={p.name}
+                        width={45}
+                        height={45}
+                        style={{ borderRadius: 6, objectFit: 'cover' }}
+                      />
                       <div style={{ marginLeft: 8, flex: 1 }}>
                         <div style={{ fontSize: 12, fontWeight: 600 }}>{p.name}</div>
                         <div style={{ color: '#3f6f12', fontWeight: 'bold' }}>
-                          {p.price?.toLocaleString()}đ
+                          {formatPrice(p.price || 0)}
                         </div>
                         <a href={`/product/${p.id}`}>
                           <button style={{

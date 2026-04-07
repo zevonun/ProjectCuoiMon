@@ -4,10 +4,11 @@ import { useCart } from "../context/CartContext";
 import Image from "next/image";
 import Link from "next/link";
 import "./cart-page.css"; // Bạn sẽ tạo file này ở bước sau
+import { formatPrice } from "../lib/formatPrice";
 
 // Định dạng tiền Việt Nam
 const formatCurrency = (value: number) => {
-  return value.toLocaleString("vi-VN") + "đ";
+  return formatPrice(value);
 };
 
 export default function CartPage() {

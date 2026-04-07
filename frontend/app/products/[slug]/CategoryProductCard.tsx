@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import styles from "./page.module.css";
+import { formatPrice } from "../../lib/formatPrice";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -36,15 +37,15 @@ export default function CategoryProductCard({ product }: { product: Product }) {
           {product.gia_km && product.gia_km > 0 ? (
             <>
               <span className={styles.oldPrice}>
-                {product.gia.toLocaleString()} đ
+                {formatPrice(product.gia)}
               </span>
               <span className={styles.newPrice}>
-                {product.gia_km.toLocaleString()} đ
+                {formatPrice(product.gia_km)}
               </span>
             </>
           ) : (
             <span className={styles.newPrice}>
-              {product.gia.toLocaleString()} đ
+              {formatPrice(product.gia)}
             </span>
           )}
         </p>

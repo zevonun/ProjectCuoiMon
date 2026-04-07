@@ -19,6 +19,17 @@ const UserSchema = new Schema(
 
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
 
+    // ✅ Permissions
+    permissions: {
+      manage_products: { type: Boolean, default: false },
+      manage_orders: { type: Boolean, default: false },
+      manage_users: { type: Boolean, default: false },
+      manage_banners: { type: Boolean, default: false },
+      manage_categories: { type: Boolean, default: false },
+      manage_vouchers: { type: Boolean, default: false },
+      manage_admins: { type: Boolean, default: false },
+    },
+
     refreshToken: { type: String, default: null },
 
     // ✅ Google OAuth – lưu Google sub ID

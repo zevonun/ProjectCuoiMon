@@ -11,6 +11,7 @@ export interface ProductData {
   mo_ta?: string;
   hinh?: string;
   categoryId?: string;
+  subcategory?: string; // Danh mục con
 }
 
 export interface ProductPayload {
@@ -18,6 +19,7 @@ export interface ProductPayload {
   price: number;
   sale: number;
   categoryId: string;
+  subcategory?: string; // Danh mục con
   description?: string;
   image?: string;
 }
@@ -45,6 +47,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSubmit, initialData }) => {
     mo_ta: initialData?.mo_ta ?? '',
     hinh: initialData?.hinh ?? '',
     categoryId: initialData?.categoryId ?? '',
+    subcategory: initialData?.subcategory ?? '',
   }));
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -93,6 +96,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSubmit, initialData }) => {
       price: Number(form.gia),
       sale: Number(form.gia_km) || 0,
       categoryId: form.categoryId,
+      subcategory: form.subcategory || '',
       description: form.mo_ta || '',
       image: form.hinh || '',
     };
@@ -158,6 +162,17 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSubmit, initialData }) => {
             </option>
           ))}
         </select>
+      </div>
+
+      <div className={styles.fieldGroup}>
+        <label className={styles.label}>Danh mục con</label>
+        <input
+          name="subcategory"
+          value={form.subcategory}
+          onChange={handleChange}
+          className={styles.input}
+          placeholder="Ví dụ: Combo chăm sóc da, Son màu, Dưỡng da..."
+        />
       </div>
 
       <div className={styles.fieldGroup}>

@@ -16,7 +16,6 @@ const verifyToken = (req, res, next) => {
 
     const decoded = jwt.verify(token, jwtSecret);
 
-    // ✅ SỬA: Token có cấu trúc { id, email, role }
     req.user = {
       _id: decoded.id,
       id: decoded.id,

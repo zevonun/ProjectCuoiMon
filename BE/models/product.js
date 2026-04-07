@@ -8,11 +8,12 @@ const product = new Schema(
     name: { type: String, required: true },
     price: { type: Number, required: true },
     categoryId: { type: ObjectId, ref: 'category', required: true },
+    subcategory: { type: String, default: null }, // Danh mục con
     sale: { type: Number, required: true },
     brandId: { type: ObjectId, default: null, ref: 'brand' },
     image: { type: String, default: '' }
   },
-  { timestamps: true }  // ← thêm dòng này
+  { timestamps: true }
 );
 
 

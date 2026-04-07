@@ -6,6 +6,7 @@ import Link from "next/link";
 import ProductCard from "./ProductCard";
 import { Product, Category } from "../lib/api";
 import { useCart } from "../context/CartContext";
+import { formatPrice } from "../lib/formatPrice";
 import "../../app/product-detail.css";
 
 interface ProductDetailClientProps {
@@ -101,12 +102,12 @@ export default function ProductDetailClient({
 
                 <div className="product-price">
                   <span className="current-price">
-                    {product.gia.toLocaleString("vi-VN")}đ
+                    {formatPrice(product.gia)}
                   </span>
                   {product.gia_km && product.gia_km < product.gia && (
                     <>
                       <span className="old-price">
-                        {product.gia_km.toLocaleString("vi-VN")}đ
+                        {formatPrice(product.gia_km)}
                       </span>
                       <span className="new-badge">Giảm giá</span>
                     </>
