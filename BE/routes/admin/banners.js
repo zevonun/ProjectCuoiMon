@@ -1,6 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const Banner = require('../../models/banner');
+const { verifyToken } = require('../../middleware/authen');
+const { isAdmin } = require('../../middleware/isAdmin');
+const { requirePermission } = require('../../middleware/requirePermission');
+
+router.use(verifyToken, isAdmin, requirePermission('manage_banners'));
 
 // GET /admin/banners
 router.get('/', async (req, res) => {

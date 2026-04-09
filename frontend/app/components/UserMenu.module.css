@@ -45,7 +45,7 @@
 .userName {
   font-size: 15px;
   font-weight: 500;
-  color: #333;
+  color: #e7e7e7;
   margin-right: 5px;
   /* Đảm bảo tên không quá dài */
   max-width: 100px;

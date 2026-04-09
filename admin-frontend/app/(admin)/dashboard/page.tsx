@@ -29,8 +29,6 @@ const STATUS_LABEL: Record<string, string> = {
   shipped: "Đang giao",
   delivered: "Đã giao",
   cancelled: "Đã hủy",
-  returning: "Đang hoàn",
-  returned: "Đã hoàn",
 };
 
 const STATUS_COLOR: Record<string, string> = {
@@ -39,8 +37,16 @@ const STATUS_COLOR: Record<string, string> = {
   shipped: "#8b5cf6",
   delivered: "#10b981",
   cancelled: "#ef4444",
-  returning: "#f97316",
-  returned: "#6b7280",
+};
+
+const getStatusLabel = (status: string) => {
+  if (status === "returning" || status === "returned") return STATUS_LABEL.cancelled;
+  return STATUS_LABEL[status] || status;
+};
+
+const getStatusColor = (status: string) => {
+  if (status === "returning" || status === "returned") return STATUS_COLOR.cancelled;
+  return STATUS_COLOR[status] || "#ccc";
 };
 
 type Stats = {
@@ -48,6 +54,8 @@ type Stats = {
   totalUsers: number;
   totalOrders: number;
   totalRevenue: number;
+  revenueGroupBy?: "day" | "month" | "year";
+  revenueSeries?: { _id: string; total: number }[];
   revenueByMonth: { _id: number; total: number }[];
   orderStatus: Record<string, number>;
   latestOrders: {
@@ -67,26 +75,36 @@ type Stats = {
 export default function DashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [revenueGroupBy, setRevenueGroupBy] = useState<"day" | "month" | "year">("month");
 
   useEffect(() => {
     const token = getAccessToken();
-    fetch(`${API}/api/dashboard/stats`, {
+    setLoading(true);
+    fetch(`${API}/api/dashboard/stats?groupBy=${revenueGroupBy}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => res.json())
       .then(data => { setStats(data); setLoading(false); })
       .catch(() => setLoading(false));
-  }, []);
+  }, [revenueGroupBy]);
 
   if (loading) return <div className="dashboard-loading">Đang tải dashboard...</div>;
   if (!stats) return <div className="dashboard-loading">Không thể tải dữ liệu</div>;
 
-  // ── Biểu đồ doanh thu theo tháng ──
+  const revenueSeries = stats.revenueSeries || [];
+  const chartTitle =
+    revenueGroupBy === "day"
+      ? "Doanh thu theo ngày (30 ngày gần nhất)"
+      : revenueGroupBy === "month"
+        ? "Doanh thu theo tháng (12 tháng gần nhất)"
+        : "Doanh thu theo năm (5 năm gần nhất)";
+
+  // ── Biểu đồ doanh thu ──
   const revenueChartData = {
-    labels: stats.revenueByMonth.map(i => `Tháng ${i._id}`),
+    labels: revenueSeries.map(i => i._id),
     datasets: [{
       label: "Doanh thu (VNĐ)",
-      data: stats.revenueByMonth.map(i => i.total),
+      data: revenueSeries.map(i => i.total),
       backgroundColor: "#6366f1",
       borderRadius: 6,
     }],
@@ -95,10 +113,10 @@ export default function DashboardPage() {
   // ── Biểu đồ tình trạng đơn hàng ──
   const statusEntries = Object.entries(stats.orderStatus);
   const statusChartData = {
-    labels: statusEntries.map(([k]) => STATUS_LABEL[k] || k),
+    labels: statusEntries.map(([k]) => getStatusLabel(k)),
     datasets: [{
       data: statusEntries.map(([, v]) => v),
-      backgroundColor: statusEntries.map(([k]) => STATUS_COLOR[k] || "#ccc"),
+      backgroundColor: statusEntries.map(([k]) => getStatusColor(k)),
       borderWidth: 0,
     }],
   };
@@ -142,8 +160,27 @@ export default function DashboardPage() {
       {/* ── BIỂU ĐỒ ── */}
       <div className="charts-row">
         <div className="chart-box chart-large">
-          <h3 className="chart-title">Doanh thu theo tháng</h3>
-          {stats.revenueByMonth.length > 0
+          <div style={{ display: "flex", gap: 12, alignItems: "center", justifyContent: "space-between" }}>
+            <h3 className="chart-title" style={{ margin: 0 }}>{chartTitle}</h3>
+            <select
+              value={revenueGroupBy}
+              onChange={(e) => setRevenueGroupBy(e.target.value as any)}
+              style={{
+                padding: "8px 10px",
+                borderRadius: 10,
+                border: "1px solid rgba(148, 163, 184, 0.35)",
+                background: "rgba(15, 23, 42, 0.25)",
+                color: "#e2e8f0",
+                outline: "none",
+              }}
+              aria-label="Chọn kiểu xem doanh thu"
+            >
+              <option value="day">Theo ngày</option>
+              <option value="month">Theo tháng</option>
+              <option value="year">Theo năm</option>
+            </select>
+          </div>
+          {revenueSeries.length > 0
             ? <Bar data={revenueChartData} options={{
                 responsive: true,
                 plugins: { legend: { display: false } },
@@ -196,8 +233,8 @@ export default function DashboardPage() {
                     <td>{o.customerInfo?.fullName}</td>
                     <td style={{ color: "#ee4d2d", fontWeight: 700 }}>{o.totalPrice?.toLocaleString()}đ</td>
                     <td>
-                      <span className="status-badge" style={{ background: STATUS_COLOR[o.status] + "22", color: STATUS_COLOR[o.status] }}>
-                        {STATUS_LABEL[o.status] || o.status}
+                      <span className="status-badge" style={{ background: getStatusColor(o.status) + "22", color: getStatusColor(o.status) }}>
+                        {getStatusLabel(o.status)}
                       </span>
                     </td>
                     <td>{new Date(o.createdAt).toLocaleDateString("vi-VN")}</td>

@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const { verifyToken } = require('../../middleware/authen');
 const { isAdmin } = require('../../middleware/isAdmin');
-const isSuperAdmin = require('../../middleware/isSuperAdmin');
+const { requirePermission } = require('../../middleware/requirePermission');
 const {
   getAllAdmins,
   createAdmin,
@@ -14,8 +14,8 @@ const {
   getLogs,
 } = require('../../controllers/adminController');
 
-// ✅ Tất cả route cần: verifyToken -> isAdmin -> isSuperAdmin
-router.use(verifyToken, isAdmin, isSuperAdmin);
+// ✅ Tất cả route cần: verifyToken -> isAdmin -> permission manage_admins
+router.use(verifyToken, isAdmin, requirePermission('manage_admins'));
 
 // ✅ GET - Danh sách tất cả admin
 router.get('/', getAllAdmins);

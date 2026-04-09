@@ -5,9 +5,10 @@ const productsController = require('../../controllers/products');
 const upload = require('../../services/Upload');
 const { verifyToken } = require('../../middleware/authen');
 const { isAdmin } = require('../../middleware/isAdmin');
+const { requirePermission } = require('../../middleware/requirePermission');
 
 // Tất cả route admin đều yêu cầu đăng nhập + quyền admin
-router.use(verifyToken, isAdmin);
+router.use(verifyToken, isAdmin, requirePermission('manage_products'));
 
 // CRUD sản phẩm
 router.post('/', productsController.createProduct);

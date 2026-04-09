@@ -4,6 +4,10 @@ const User = require('../models/user');
 
 exports.getStats = async (req, res) => {
   try {
+    const groupBy = String(req.query.groupBy || 'month').toLowerCase(); // day | month | year
+    const allowedGroupBy = new Set(['day', 'month', 'year']);
+    const safeGroupBy = allowedGroupBy.has(groupBy) ? groupBy : 'month';
+
     // ── TỔNG QUAN ──
     const totalProducts = await Product.countDocuments();
     const totalUsers = await User.countDocuments({ role: 'user' });
@@ -16,17 +20,45 @@ exports.getStats = async (req, res) => {
     ]);
     const totalRevenue = totalRevenueData[0]?.total || 0;
 
-    // ── DOANH THU THEO THÁNG ──
-    const revenueByMonth = await Order.aggregate([
-      { $match: { status: 'delivered' } },
+    // ── DOANH THU THEO NGÀY / THÁNG / NĂM ──
+    const now = new Date();
+    const start = new Date(now);
+    if (safeGroupBy === 'day') start.setDate(start.getDate() - 29);          // 30 ngày gần nhất
+    if (safeGroupBy === 'month') start.setMonth(start.getMonth() - 11);      // 12 tháng gần nhất
+    if (safeGroupBy === 'year') start.setFullYear(start.getFullYear() - 4);  // 5 năm gần nhất
+
+    const labelFormat = safeGroupBy === 'day'
+      ? '%Y-%m-%d'
+      : safeGroupBy === 'month'
+        ? '%Y-%m'
+        : '%Y';
+
+    const revenueSeries = await Order.aggregate([
+      {
+        $match: {
+          status: 'delivered',
+          createdAt: { $gte: start, $lte: now },
+        }
+      },
       {
         $group: {
-          _id: { $month: '$createdAt' },
+          _id: {
+            $dateToString: {
+              format: labelFormat,
+              date: '$createdAt',
+              timezone: 'Asia/Ho_Chi_Minh',
+            }
+          },
           total: { $sum: '$totalPrice' }
         }
       },
       { $sort: { _id: 1 } }
     ]);
+
+    // backward compat for old frontend expecting month numbers
+    const revenueByMonth = safeGroupBy === 'month'
+      ? revenueSeries.map(i => ({ _id: Number(String(i._id).split('-')[1]), total: i.total }))
+      : [];
 
     // ── TÌNH TRẠNG ĐƠN HÀNG ──
     const orderStatusData = await Order.aggregate([
@@ -131,6 +163,8 @@ exports.getStats = async (req, res) => {
       totalUsers,
       totalOrders,
       totalRevenue,
+      revenueGroupBy: safeGroupBy,
+      revenueSeries,
       revenueByMonth,
       orderStatus,
       latestOrders,

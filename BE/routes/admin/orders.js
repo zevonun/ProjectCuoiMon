@@ -5,8 +5,9 @@ const Order = require('../../models/order');
 const User = require('../../models/user');
 const { verifyToken } = require('../../middleware/authen');
 const { isAdmin } = require('../../middleware/isAdmin');
+const { requirePermission } = require('../../middleware/requirePermission');
 
-router.use(verifyToken, isAdmin);
+router.use(verifyToken, isAdmin, requirePermission('manage_orders'));
 
 // GET /admin/orders — danh sách tất cả đơn hàng, có filter + phân trang
 router.get('/', async (req, res) => {
@@ -54,18 +55,37 @@ router.get('/:id', async (req, res) => {
 router.patch('/:id/status', async (req, res) => {
   try {
     const { status } = req.body;
-    const validStatuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled', 'returning', 'returned'];
+    const validStatuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
 
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ success: false, message: 'Trạng thái không hợp lệ' });
     }
 
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    );
+    const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
+
+    const current = order.status;
+    const allowedNextByCurrent = {
+      pending: ['confirmed', 'cancelled'],
+      confirmed: ['shipped', 'cancelled'],
+      shipped: ['delivered'],
+      delivered: [],
+      cancelled: [],
+      // legacy: allow moving out of these states
+      returning: ['cancelled'],
+      returned: ['cancelled'],
+    };
+    const allowedNext = allowedNextByCurrent[current] ?? [];
+
+    if (!allowedNext.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Không thể chuyển trạng thái từ "${current}" sang "${status}"`,
+      });
+    }
+
+    order.status = status;
+    await order.save();
 
     res.json({ success: true, message: 'Cập nhật thành công', data: order });
   } catch (err) {

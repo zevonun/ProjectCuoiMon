@@ -20,17 +20,58 @@ import {
 import { signOut, getUser } from "@/lib/auth";
 import "./Sidebar.css";
 
+type PermissionKey =
+  | "manage_products"
+  | "manage_orders"
+  | "manage_users"
+  | "manage_banners"
+  | "manage_categories"
+  | "manage_vouchers"
+  | "manage_admins"
+  | "manage_articles";
+
 export default function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [adminName, setAdminName] = useState("");
+  const [permissions, setPermissions] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const user = getUser();
     if (user?.name) setAdminName(user.name);
+    setPermissions((user as any)?.permissions || {});
   }, []);
 
   const isActive = (path: string) => pathname.startsWith(path);
+
+  const can = (key?: PermissionKey) => {
+    if (!key) return true;
+    return !!permissions?.[key];
+  };
+
+  const navItems: Array<{
+    href?: string;
+    label: string;
+    icon: any;
+    permission?: PermissionKey;
+    type?: "link" | "action";
+    onClick?: () => void;
+    activePrefix?: string;
+  }> = [
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, type: "link", activePrefix: "/dashboard" },
+    { href: "/products", label: "Products", icon: ShoppingCart, permission: "manage_products", type: "link", activePrefix: "/products" },
+    { href: "/categories", label: "Categories", icon: Folder, permission: "manage_categories", type: "link", activePrefix: "/categories" },
+    { href: "/banners", label: "Banners", icon: Image, permission: "manage_banners", type: "link", activePrefix: "/banners" },
+    { href: "/articles", label: "Articles", icon: FileText, permission: "manage_products", type: "link", activePrefix: "/articles" },
+    { href: "/vouchers", label: "Vouchers", icon: Ticket, permission: "manage_vouchers", type: "link", activePrefix: "/vouchers" },
+    { href: "/users", label: "Người dùng", icon: Users, permission: "manage_users", type: "link", activePrefix: "/users" },
+    { href: "/orders", label: "Đơn hàng", icon: ClipboardList, permission: "manage_orders", type: "link", activePrefix: "/orders" },
+    { href: "/reviews", label: "Đánh giá", icon: Star, permission: "manage_products", type: "link", activePrefix: "/reviews" },
+    { href: "/customers", label: "Khách hàng", icon: UserCheck, permission: "manage_users", type: "link", activePrefix: "/customers" },
+    { label: "Đăng xuất", icon: LogOut, type: "action", onClick: signOut },
+  ];
+
+  const visibleNavItems = navItems.filter((i) => can(i.permission));
 
   return (
     <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
@@ -63,82 +104,28 @@ export default function Sidebar() {
       {!collapsed && <p className="sidebar-header">ADMIN</p>}
 
       <ul className="sidebar-nav">
-        <li className={isActive("/dashboard") ? "active" : ""}>
-          <Link href="/dashboard">
-            <LayoutDashboard size={18} />
-            <span>Dashboard</span>
-          </Link>
-        </li>
-
-        <li className={isActive("/products") ? "active" : ""}>
-          <Link href="/products">
-            <ShoppingCart size={18} />
-            <span>Products</span>
-          </Link>
-        </li>
-
-        <li className={isActive("/categories") ? "active" : ""}>
-          <Link href="/categories">
-            <Folder size={18} />
-            <span>Categories</span>
-          </Link>
-        </li>
-
-        <li className={isActive("/banners") ? "active" : ""}>
-          <Link href="/banners">
-            <Image size={18} />
-            <span>Banners</span>
-          </Link>
-        </li>
-
-        <li className={isActive("/articles") ? "active" : ""}>
-          <Link href="/articles">
-            <FileText size={18} />
-            <span>Articles</span>
-          </Link>
-        </li>
-
-        <li className={isActive("/vouchers") ? "active" : ""}>
-          <Link href="/vouchers">
-            <Ticket size={18} />
-            <span>Vouchers</span>
-          </Link>
-        </li>
-
-        <li className={isActive("/users") ? "active" : ""}>
-          <Link href="/users">
-            <Users size={18} />
-            <span>Người dùng</span>
-          </Link>
-        </li>
-
-        <li className={isActive("/orders") ? "active" : ""}>
-          <Link href="/orders">
-            <ClipboardList size={18} />
-            <span>Đơn hàng</span>
-          </Link>
-        </li>
-
-        <li className={isActive("/reviews") ? "active" : ""}>
-          <Link href="/reviews">
-            <Star size={18} />
-            <span>Đánh giá</span>
-          </Link>
-        </li>
-
-        <li className={isActive("/customers") ? "active" : ""}>
-          <Link href="/customers">
-            <UserCheck size={18} />
-            <span>Khách hàng</span>
-          </Link>
-        </li>
-
-        <li>
-          <button className="sidebar-logout" onClick={signOut}>
-            <LogOut size={18} />
-            <span>Đăng xuất</span>
-          </button>
-        </li>
+        {visibleNavItems.map((item, idx) => {
+          const Icon = item.icon;
+          const active = item.activePrefix ? isActive(item.activePrefix) : false;
+          if (item.type === "action") {
+            return (
+              <li key={`action-${idx}`}>
+                <button className="sidebar-logout" onClick={item.onClick}>
+                  <Icon size={18} />
+                  <span>{item.label}</span>
+                </button>
+              </li>
+            );
+          }
+          return (
+            <li key={item.href} className={active ? "active" : ""}>
+              <Link href={item.href!}>
+                <Icon size={18} />
+                <span>{item.label}</span>
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </aside>
   );

@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ProductCard from "./ProductCard";
 import { Product, Category } from "../lib/api";
 import { useCart } from "../context/CartContext";
 import { formatPrice } from "../lib/formatPrice";
+import { getProductReviews, type ProductReview } from "../lib/reviewApi";
 import "../../app/product-detail.css";
 
 interface ProductDetailClientProps {
@@ -28,6 +29,9 @@ export default function ProductDetailClient({
   const [activeTab, setActiveTab] = useState<'info' | 'usage'>('info');
   // rating filter for review section ('all' or 1..5)
   const [activeFilter, setActiveFilter] = useState<'all' | 1 | 2 | 3 | 4 | 5>('all');
+  const [reviews, setReviews] = useState<ProductReview[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [reviewsError, setReviewsError] = useState<string | null>(null);
 
   const decreaseQty = () => {
     if (quantity > 1) setQuantity(quantity - 1);
@@ -48,6 +52,48 @@ export default function ProductDetailClient({
       : product.hinh
       ? `${API_URL}${product.hinh}`
       : "/img/no-image.jpg";
+
+  useEffect(() => {
+    const pid = String(product?._id || "");
+    if (!pid) return;
+    (async () => {
+      try {
+        setReviewsLoading(true);
+        setReviewsError(null);
+        const data = await getProductReviews(pid);
+        setReviews(data);
+      } catch (e) {
+        setReviewsError((e as Error).message || "Không thể tải đánh giá");
+        setReviews([]);
+      } finally {
+        setReviewsLoading(false);
+      }
+    })();
+  }, [product?._id]);
+
+  const reviewStats = useMemo(() => {
+    const total = reviews.length;
+    const byStar: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    let sum = 0;
+    for (const r of reviews) {
+      const s = Math.min(5, Math.max(1, Number(r.rating) || 0));
+      byStar[s] = (byStar[s] || 0) + 1;
+      sum += s;
+    }
+    const avg = total ? sum / total : 0;
+    return { total, byStar, avg };
+  }, [reviews]);
+
+  const filteredReviews = useMemo(() => {
+    if (activeFilter === "all") return reviews;
+    return reviews.filter(r => Number(r.rating) === activeFilter);
+  }, [reviews, activeFilter]);
+
+  const starsText = (n: number) => {
+    const filled = "★★★★★".slice(0, n);
+    const empty = "☆☆☆☆☆".slice(0, 5 - n);
+    return filled + empty;
+  };
 
   return (
     <>
@@ -232,22 +278,26 @@ export default function ProductDetailClient({
           <h2 className="section-title">ĐÁNH GIÁ TỪ KHÁCH HÀNG ĐÃ MUA</h2>
           <div className="review-card">
             <div className="rating-overall">
-              <div className="rating-number">0.0</div>
-              <div className="stars">
-                ☆☆☆☆☆
-              </div>
-              <div className="rating-note">Theo 0 đánh giá</div>
+              <div className="rating-number">{reviewStats.avg.toFixed(1)}</div>
+              <div className="stars">{starsText(Math.round(reviewStats.avg))}</div>
+              <div className="rating-note">Theo {reviewStats.total} đánh giá</div>
             </div>
             <div className="rating-breakdown">
               {[5,4,3,2,1].map(n => (
+                (() => {
+                  const count = reviewStats.byStar[n] || 0;
+                  const pct = reviewStats.total ? Math.round((count / reviewStats.total) * 100) : 0;
+                  return (
                 <div className="breakdown-row" key={n}>
                   <div className="stars-count">{n} <span className="star">★</span></div>
-                  <div className="bar"><div className="fill" style={{ width: "0%" }} /></div>
-                  <div className="count">(0)</div>
+                  <div className="bar"><div className="fill" style={{ width: `${pct}%` }} /></div>
+                  <div className="count">({count})</div>
                 </div>
+                  );
+                })()
               ))}
             </div>
-            <button className="write-review-btn">VIẾT ĐÁNH GIÁ ✏️</button>
+            <Link className="write-review-btn" href="/orders">VIẾT ĐÁNH GIÁ ✏️</Link>
           </div>
           <div className="review-filters">
             <button
@@ -261,6 +311,43 @@ export default function ProductDetailClient({
                 onClick={() => setActiveFilter(n as 1|2|3|4|5)}
               >{n} ⭐</button>
             ))}
+          </div>
+
+          <div style={{ marginTop: 16 }}>
+            {reviewsLoading ? (
+              <div style={{ color: "#666" }}>Đang tải đánh giá...</div>
+            ) : reviewsError ? (
+              <div style={{ color: "#c00" }}>{reviewsError}</div>
+            ) : filteredReviews.length === 0 ? (
+              <div style={{ color: "#666" }}>Chưa có đánh giá phù hợp.</div>
+            ) : (
+              <div style={{ display: "grid", gap: 12 }}>
+                {filteredReviews.map((r, idx) => (
+                  <div
+                    key={`${r.userName}-${r.createdAt}-${idx}`}
+                    style={{
+                      background: "#fff",
+                      border: "1px solid #eee",
+                      borderRadius: 12,
+                      padding: 12,
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
+                      <div style={{ fontWeight: 700 }}>{r.userName}</div>
+                      <div style={{ color: "#f59e0b", fontWeight: 700 }}>{starsText(Number(r.rating) || 0)}</div>
+                    </div>
+                    {r.comment ? (
+                      <div style={{ marginTop: 6, color: "#111" }}>{r.comment}</div>
+                    ) : (
+                      <div style={{ marginTop: 6, color: "#666" }}>Không có bình luận.</div>
+                    )}
+                    <div style={{ marginTop: 8, fontSize: 12, color: "#888" }}>
+                      {new Date(r.createdAt).toLocaleDateString("vi-VN")}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

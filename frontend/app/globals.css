@@ -8,7 +8,7 @@
 
 body {
   color: var(--text-dark);
-
+  overflow-x: hidden;
 }
 
 a {
