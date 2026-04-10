@@ -20,17 +20,58 @@ import {
 import { signOut, getUser } from "@/lib/auth";
 import "./Sidebar.css";
 
+type PermissionKey =
+  | "manage_products"
+  | "manage_orders"
+  | "manage_users"
+  | "manage_banners"
+  | "manage_categories"
+  | "manage_vouchers"
+  | "manage_admins"
+  | "manage_articles";
+
 export default function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [adminName, setAdminName] = useState("");
+  const [permissions, setPermissions] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const user = getUser();
     if (user?.name) setAdminName(user.name);
+    setPermissions((user as any)?.permissions || {});
   }, []);
 
   const isActive = (path: string) => pathname.startsWith(path);
+
+  const can = (key?: PermissionKey) => {
+    if (!key) return true;
+    return !!permissions?.[key];
+  };
+
+  const navItems: Array<{
+    href?: string;
+    label: string;
+    icon: any;
+    permission?: PermissionKey;
+    type?: "link" | "action";
+    onClick?: () => void;
+    activePrefix?: string;
+  }> = [
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, type: "link", activePrefix: "/dashboard" },
+    { href: "/products", label: "Products", icon: ShoppingCart, permission: "manage_products", type: "link", activePrefix: "/products" },
+    { href: "/categories", label: "Categories", icon: Folder, permission: "manage_categories", type: "link", activePrefix: "/categories" },
+    { href: "/banners", label: "Banners", icon: Image, permission: "manage_banners", type: "link", activePrefix: "/banners" },
+    { href: "/articles", label: "Articles", icon: FileText, permission: "manage_products", type: "link", activePrefix: "/articles" },
+    { href: "/vouchers", label: "Vouchers", icon: Ticket, permission: "manage_vouchers", type: "link", activePrefix: "/vouchers" },
+    { href: "/users", label: "Người dùng", icon: Users, permission: "manage_users", type: "link", activePrefix: "/users" },
+    { href: "/orders", label: "Đơn hàng", icon: ClipboardList, permission: "manage_orders", type: "link", activePrefix: "/orders" },
+    { href: "/reviews", label: "Đánh giá", icon: Star, permission: "manage_products", type: "link", activePrefix: "/reviews" },
+    { href: "/customers", label: "Khách hàng", icon: UserCheck, permission: "manage_users", type: "link", activePrefix: "/customers" },
+    { label: "Đăng xuất", icon: LogOut, type: "action", onClick: signOut },
+  ];
+
+  const visibleNavItems = navItems.filter((i) => can(i.permission));
 
   return (
     <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>

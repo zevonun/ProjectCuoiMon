@@ -4,6 +4,16 @@ export type UserSafe = {
   email: string;
   name?: string;
   role: 'admin' | 'user';
+  permissions?: {
+    manage_products?: boolean;
+    manage_orders?: boolean;
+    manage_users?: boolean;
+    manage_banners?: boolean;
+    manage_categories?: boolean;
+    manage_vouchers?: boolean;
+    manage_admins?: boolean;
+    manage_articles?: boolean;
+  };
 };
 
 const USER_KEY = 'mybeauty_user';

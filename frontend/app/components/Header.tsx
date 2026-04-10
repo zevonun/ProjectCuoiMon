@@ -43,7 +43,7 @@ export default function Header() {
   const [categories, setCategories] = useState<CategoryData[]>([]);
   const [categoryIdMap, setCategoryIdMap] = useState<Record<string, string>>({}); // Map slug -> categoryId
   const [loading, setLoading] = useState(true);
-  
+
   // State cho search
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Product[]>([]);
@@ -201,7 +201,7 @@ export default function Header() {
     }
 
     // Filter products theo subcategory
-    const subcategoryProducts = products.filter(p => 
+    const subcategoryProducts = products.filter(p =>
       p.subcategory && p.subcategory.toLowerCase().trim() === subcategoryName.toLowerCase().trim()
     );
 
@@ -240,16 +240,16 @@ export default function Header() {
             <Link href="#">Dầu Gội</Link>
           </div>
           <div className="search-box" style={{ position: 'relative' }}>
-            <input 
-              type="text" 
-              placeholder="Tìm sản phẩm, danh mục mong muốn ..." 
+            <input
+              type="text"
+              placeholder="Tìm sản phẩm, danh mục mong muốn ..."
               value={searchQuery}
               onChange={handleSearchChange}
               onFocus={() => searchQuery && setShowSearchResults(true)}
               onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
             />
             <button onClick={handleSearchSubmit}><i className="fa fa-search"></i></button>
-            
+
             {/* Search Results Dropdown */}
             {showSearchResults && searchResults.length > 0 && (
               <div style={{
@@ -266,7 +266,7 @@ export default function Header() {
                 boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
               }}>
                 {searchResults.map((product) => (
-                  <Link 
+                  <Link
                     key={product._id}
                     href={`/product/${product._id}`}
                     onClick={() => {
@@ -286,11 +286,11 @@ export default function Header() {
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
                     <div style={{ width: '50px', height: '50px', marginRight: '10px', flexShrink: 0 }}>
-                      <Image 
-                        src={product.hinh} 
-                        alt={product.ten_sp} 
-                        width={50} 
-                        height={50} 
+                      <Image
+                        src={product.hinh}
+                        alt={product.ten_sp}
+                        width={50}
+                        height={50}
                         style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }}
                       />
                     </div>
@@ -308,7 +308,7 @@ export default function Header() {
             )}
           </div>
         </div>
-        <div className="header-top-right">
+        <div className="header-top-right" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <div className="cart">
             <Link href="/stores" className="cart-link">
               <i className="fas fa-home"></i>

@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import BannerForm from "./components/BannerForm";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 // Định nghĩa kiểu rõ ràng cho dữ liệu từ backend
 interface BannerFromAPI {
@@ -27,12 +28,10 @@ export default function BannerAdminPage() {
   const [editing, setEditing] = useState<Banner | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const API_BASE = "http://localhost:5000/admin/banners";
-
   const fetchBanners = async () => {
     try {
       setLoading(true);
-      const res = await fetch(API_BASE);
+      const res = await fetchWithAuth("/admin/banners", { method: "GET" });
       if (!res.ok) throw new Error("Failed to fetch banners");
 
       const data: BannerFromAPI[] = await res.json();
@@ -60,9 +59,8 @@ export default function BannerAdminPage() {
 
   const toggleActive = async (id: string, current: boolean) => {
     try {
-      const res = await fetch(`${API_BASE}/${id}`, {
+      const res = await fetchWithAuth(`/admin/banners/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ active: !current }),
       });
 
@@ -80,7 +78,7 @@ export default function BannerAdminPage() {
     if (!confirm("Xóa banner này thật chứ?")) return;
 
     try {
-      const res = await fetch(`${API_BASE}/${id}`, { method: "DELETE" });
+      const res = await fetchWithAuth(`/admin/banners/${id}`, { method: "DELETE" });
       if (res.ok) {
         setBanners((prev) => prev.filter((b) => b.id !== id));
       } else {
@@ -94,9 +92,8 @@ export default function BannerAdminPage() {
   const handleSubmit = async (payload: { title: string; image: string; link?: string }) => {
     try {
       if (editing) {
-        const res = await fetch(`${API_BASE}/${editing.id}`, {
+        const res = await fetchWithAuth(`/admin/banners/${editing.id}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ...payload, active: editing.active }),
         });
         if (!res.ok) throw new Error("Update failed");
@@ -117,9 +114,8 @@ export default function BannerAdminPage() {
         );
         setEditing(null);
       } else {
-        const res = await fetch(API_BASE, {
+        const res = await fetchWithAuth("/admin/banners", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ...payload, active: true }),
         });
         if (!res.ok) throw new Error("Create failed");

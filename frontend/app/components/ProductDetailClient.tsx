@@ -7,6 +7,7 @@ import ProductCard from "./ProductCard";
 import { Product, Category } from "../lib/api";
 import { useCart } from "../context/CartContext";
 import { formatPrice } from "../lib/formatPrice";
+import { getProductReviews, type ProductReview } from "../lib/reviewApi";
 import "../../app/product-detail.css";
 
 interface ProductDetailClientProps {

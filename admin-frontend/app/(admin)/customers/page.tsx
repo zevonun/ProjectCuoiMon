@@ -75,7 +75,12 @@ export default function AdminCustomersPage() {
   const STATUS_LABEL: Record<string, string> = {
     pending: "Chờ xác nhận", confirmed: "Đã xác nhận",
     shipped: "Đang giao", delivered: "Đã giao",
-    cancelled: "Đã hủy", returning: "Đang hoàn", returned: "Đã hoàn",
+    cancelled: "Đã hủy",
+  };
+
+  const getStatusLabel = (status: string) => {
+    if (status === "returning" || status === "returned") return STATUS_LABEL.cancelled;
+    return STATUS_LABEL[status] || status;
   };
 
   const filtered = customers.filter(c =>
@@ -186,7 +191,7 @@ export default function AdminCustomersPage() {
                   orders.slice(0, 10).map(o => (
                     <div key={o._id} className={styles.orderRow}>
                       <span style={{ fontSize: 12, color: "#888" }}>{new Date(o.createdAt).toLocaleDateString("vi-VN")}</span>
-                      <span style={{ fontSize: 12 }}>{STATUS_LABEL[o.status] || o.status}</span>
+                      <span style={{ fontSize: 12 }}>{getStatusLabel(o.status)}</span>
                       <span style={{ fontWeight: 700, color: "#ee4d2d" }}>{o.totalPrice?.toLocaleString()}đ</span>
                     </div>
                   ))

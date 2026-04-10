@@ -4,6 +4,7 @@ var router = express.Router();
 const usersController = require('../../controllers/users');
 const { verifyToken } = require('../../middleware/authen'); // ✅ LẤY ĐÚNG FUNCTION
 const { isAdmin } = require('../../middleware/isAdmin');    // ✅ ADMIN CHECK
+const { requirePermission } = require('../../middleware/requirePermission');
 
 // ✅ Tất cả route admin đều phải:
 // 1. Đăng nhập hợp lệ
@@ -11,7 +12,7 @@ const { isAdmin } = require('../../middleware/isAdmin');    // ✅ ADMIN CHECK
 
 // routes/api/users.js
 
-router.use(verifyToken, isAdmin);
+router.use(verifyToken, isAdmin, requirePermission('manage_users'));
 
 // 👥 CRUD người dùng admin
 router.get('/', usersController.getAllUsers);     

@@ -169,13 +169,6 @@
 
 /* ================== MINH BẠCH NGUYÊN LIỆU ================== */
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-}
-
 .homeResources {
   width: 100vw;
   margin-left: calc(50% - 50vw);

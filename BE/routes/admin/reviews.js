@@ -4,8 +4,9 @@ const router = express.Router();
 const Review = require('../../models/review');
 const { verifyToken } = require('../../middleware/authen');
 const { isAdmin } = require('../../middleware/isAdmin');
+const { requirePermission } = require('../../middleware/requirePermission');
 
-router.use(verifyToken, isAdmin);
+router.use(verifyToken, isAdmin, requirePermission('manage_products'));
 
 // GET /admin/reviews
 router.get('/', async (req, res) => {

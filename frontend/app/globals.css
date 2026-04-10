@@ -8,7 +8,7 @@
 
 body {
   color: var(--text-dark);
-
+  overflow-x: hidden;
 }
 
 a {
@@ -986,6 +986,7 @@ a {
   /* Đảm bảo nó không bị ảnh hưởng bởi con trỏ */
   pointer-events: none;
 }
+
 /* ================= FOOTER XỊN MATCH HEADER ================= */
 .footer {
   background: #f3f7f0;
@@ -1184,6 +1185,7 @@ a {
     grid-template-columns: 1fr;
   }
 }
+
 /* ===== ABOUT ===== */
 .about {
   padding: 40px 20px;
@@ -1253,7 +1255,7 @@ a {
   background: #fff;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   transition: 0.3s;
 }
 

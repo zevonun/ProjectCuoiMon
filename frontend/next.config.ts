@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
+  outputFileTracingRoot: path.resolve(__dirname),
   images: {
     remotePatterns: [
       {
@@ -12,9 +13,6 @@ const nextConfig: NextConfig = {
       },
     ],
     unoptimized: true, // QUAN TRỌNG: tránh lỗi private ip
-  },
-  turbopack: {
-    root: path.join(process.cwd(), "."), // Đặt Turbopack workspace root đúng
   },
 };
 

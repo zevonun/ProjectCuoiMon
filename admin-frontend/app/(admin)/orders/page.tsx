@@ -22,9 +22,35 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
   shipped:   { label: "Đang giao",    color: "#8b5cf6" },
   delivered: { label: "Đã giao",      color: "#10b981" },
   cancelled: { label: "Đã hủy",       color: "#ef4444" },
-  returning: { label: "Đang hoàn",    color: "#f97316" },
-  returned:  { label: "Đã hoàn",      color: "#6b7280" },
 };
+
+const LEGACY_STATUS_MAP: Record<string, { label: string; color: string }> = {
+  returning: { label: "Đã hủy", color: STATUS_MAP.cancelled.color },
+  returned: { label: "Đã hủy", color: STATUS_MAP.cancelled.color },
+};
+
+const getAllowedNextStatuses = (current: string): string[] => {
+  switch (current) {
+    case "pending":
+      return ["confirmed", "cancelled"];
+    case "confirmed":
+      return ["shipped", "cancelled"];
+    case "shipped":
+      return ["delivered"];
+    case "delivered":
+    case "cancelled":
+      return [];
+    case "returning":
+    case "returned":
+      // legacy statuses: allow admin to move them out
+      return ["cancelled"];
+    default:
+      return [];
+  }
+};
+
+const getStatusMeta = (status: string) =>
+  STATUS_MAP[status] || LEGACY_STATUS_MAP[status] || { label: status, color: "#6b7280" };
 
 export default function AdminOrdersPage() {
   const [orders, setOrders]       = useState<Order[]>([]);
@@ -147,8 +173,11 @@ export default function AdminOrdersPage() {
                     </td>
                     <td><strong style={{ color: "#ee4d2d" }}>{o.totalPrice?.toLocaleString()}đ</strong></td>
                     <td>
-                      <span className={styles.statusBadge} style={{ background: STATUS_MAP[o.status]?.color + "20", color: STATUS_MAP[o.status]?.color }}>
-                        {STATUS_MAP[o.status]?.label || o.status}
+                      <span
+                        className={styles.statusBadge}
+                        style={{ background: getStatusMeta(o.status).color + "20", color: getStatusMeta(o.status).color }}
+                      >
+                        {getStatusMeta(o.status).label}
                       </span>
                     </td>
                     <td>{new Date(o.createdAt).toLocaleDateString("vi-VN")}</td>
@@ -183,15 +212,27 @@ export default function AdminOrdersPage() {
 
               <div className={styles.detailSection}>
                 <strong>Cập nhật trạng thái:</strong>
+                {(() => {
+                  const current = selected.status;
+                  const allowedNext = getAllowedNextStatuses(current);
+                  const disabled = allowedNext.length === 0;
+                  return (
                 <select
                   className={styles.select}
-                  value={selected.status}
+                  value={current}
+                  disabled={disabled}
                   onChange={e => handleStatusChange(selected._id, e.target.value)}
                 >
-                  {Object.entries(STATUS_MAP).map(([val, { label }]) => (
-                    <option key={val} value={val}>{label}</option>
-                  ))}
+                  <option value={current}>{getStatusMeta(current).label}</option>
+                  {allowedNext
+                    .filter(s => s !== current)
+                    .map(s => (
+                      <option key={s} value={s}>{getStatusMeta(s).label}</option>
+                    ))
+                  }
                 </select>
+                  );
+                })()}
               </div>
 
               <div className={styles.detailSection}>
