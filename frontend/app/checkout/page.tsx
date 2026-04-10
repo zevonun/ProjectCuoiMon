@@ -169,11 +169,39 @@ export default function CheckoutPage() {
           // Redirect to MoMo payment gateway
           console.log('Redirecting to MoMo payment...');
           setSuccessMessage('Chuyển hướng đến MoMo...');
-          // TODO: Implement MoMo integration
-          setTimeout(() => {
-            clearCart();
-            router.push('/order-success');
-          }, 2000);
+          
+          try {
+            const orderId = response.data?._id;
+            if (!orderId) throw new Error('Không tìm thấy ID đơn hàng từ hệ thống');
+
+            console.log('🔗 Fetching MoMo URL for order:', orderId);
+
+            const momoResponse = await apiPost('/api/momo/create_payment', {
+              orderId: orderId,
+              amount: Number(calculateTotal()),
+              orderInfo: 'Thanh toán đơn hàng MyBeauty ' + orderId,
+            });
+
+            if (!momoResponse.ok) {
+              const errorData = await momoResponse.json();
+              throw new Error(errorData.message || 'Lỗi từ phía máy chủ thanh toán MoMo');
+            }
+
+            const momoData = await momoResponse.json();
+
+            if (momoData.success && momoData.payUrl) {
+              console.log('🚀 Redirecting to MoMo:', momoData.payUrl);
+              clearCart();
+              window.location.href = momoData.payUrl;
+            } else {
+              throw new Error(momoData.message || 'Không nhận được đường dẫn thanh toán từ MoMo');
+            }
+          } catch (momoError: any) {
+            console.error('❌ MoMo redirect error:', momoError);
+            setErrorMessage(`Lỗi MoMo: ${momoError.message || 'Đã có lỗi xảy ra'}`);
+            setIsLoading(false);
+            setOrderLoading(false);
+          }
           break;
         case 'VNPAY':
           // Redirect to VNPay payment gateway

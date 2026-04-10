@@ -82,13 +82,13 @@ async function downloadImage(url, filename) {
 const categories = ["Sữa rửa mặt", "Serum - Tinh chất", "Kem dưỡng da", "Chống nắng", "Dầu - Nước tẩy trang", "Mặt nạ dưỡng da", "Trang điểm"];
 
 const sampleProducts = [
-  { name: "Sữa Rửa Mặt Aura Trà Xanh", price: 180000, sale: 150000, image: "https://down-vn.img.susercontent.com/file/vn-11134207-7r98o-lty68p29107o1c", categoryName: "Sữa rửa mặt", hot: 1 },
-  { name: "Serum HA Aura Hydration", price: 350000, sale: 290000, image: "https://down-vn.img.susercontent.com/file/vn-11134207-7r98o-lty68p2910b2z7", categoryName: "Serum - Tinh chất", hot: 1 },
-  { name: "Kem Dưỡng Aura Rose", price: 420000, sale: 380000, image: "https://down-vn.img.susercontent.com/file/vn-11134207-7r98o-lty68p29107o1c", categoryName: "Kem dưỡng da", hot: 0 },
-  { name: "Kem Chống Nắng Aura Sunscreen", price: 280000, sale: 250000, image: "https://down-vn.img.susercontent.com/file/vn-11134207-7r98o-lty68p2910b2z7", categoryName: "Chống nắng", hot: 1 },
-  { name: "Nước Tẩy Trang Aura Micellar", price: 120000, sale: 99000, image: "https://down-vn.img.susercontent.com/file/vn-11134207-7r98o-lty68p29107o1c", categoryName: "Dầu - Nước tẩy trang", hot: 0 },
-  { name: "Mặt nạ Aura Sáng Da", price: 25000, sale: 20000, image: "https://down-vn.img.susercontent.com/file/vn-11134207-7r98o-lty68p2910b2z7", categoryName: "Mặt nạ dưỡng da", hot: 0 },
-  { name: "Son Aura Matte Lipstick", price: 220000, sale: 195000, image: "https://down-vn.img.susercontent.com/file/vn-11134207-7r98o-lty68p29107o1c", categoryName: "Trang điểm", hot: 1 },
+  { name: "Sữa Rửa Mặt Aura Trà Xanh", price: 180000, sale: 150000, image: "https://down-vn.img.susercontent.com/file/vn-11134207-7r98o-lty68p29107o1c", categoryName: "Sữa rửa mặt", hot: 1, stock: 50 },
+  { name: "Serum HA Aura Hydration", price: 350000, sale: 290000, image: "https://down-vn.img.susercontent.com/file/vn-11134207-7r98o-lty68p2910b2z7", categoryName: "Serum - Tinh chất", hot: 1, stock: 30 },
+  { name: "Kem Dưỡng Aura Rose", price: 420000, sale: 380000, image: "https://down-vn.img.susercontent.com/file/vn-11134207-7r98o-lty68p29107o1c", categoryName: "Kem dưỡng da", hot: 0, stock: 5 },
+  { name: "Kem Chống Nắng Aura Sunscreen", price: 280000, sale: 250000, image: "https://down-vn.img.susercontent.com/file/vn-11134207-7r98o-lty68p2910b2z7", categoryName: "Chống nắng", hot: 1, stock: 0 },
+  { name: "Nước Tẩy Trang Aura Micellar", price: 120000, sale: 99000, image: "https://down-vn.img.susercontent.com/file/vn-11134207-7r98o-lty68p29107o1c", categoryName: "Dầu - Nước tẩy trang", hot: 0, stock: 12 },
+  { name: "Mặt nạ Aura Sáng Da", price: 25000, sale: 20000, image: "https://down-vn.img.susercontent.com/file/vn-11134207-7r98o-lty68p2910b2z7", categoryName: "Mặt nạ dưỡng da", hot: 0, stock: 100 },
+  { name: "Son Aura Matte Lipstick", price: 220000, sale: 195000, image: "https://down-vn.img.susercontent.com/file/vn-11134207-7r98o-lty68p29107o1c", categoryName: "Trang điểm", hot: 1, stock: 0 },
 ];
 
 async function seed() {
@@ -173,6 +173,7 @@ async function seed() {
       image: p.image,
       categoryId: catMap[p.categoryName],
       hot: p.hot || 0,
+      stock: p.stock ?? 0,
     });
     await product.save();
   }

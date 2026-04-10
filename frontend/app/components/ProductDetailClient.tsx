@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ProductCard from "./ProductCard";
@@ -29,15 +29,44 @@ export default function ProductDetailClient({
   // rating filter for review section ('all' or 1..5)
   const [activeFilter, setActiveFilter] = useState<'all' | 1 | 2 | 3 | 4 | 5>('all');
 
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  // Sync with localStorage
+  useEffect(() => {
+    const list = JSON.parse(localStorage.getItem("love_list") || "[]");
+    setIsFavorite(list.includes(product._id));
+  }, [product._id]);
+
+  const toggleFavorite = () => {
+    const list = JSON.parse(localStorage.getItem("love_list") || "[]");
+    let newList;
+    if (list.includes(product._id)) {
+      newList = list.filter((id: string) => id !== product._id);
+      setIsFavorite(false);
+    } else {
+      newList = [...list, product._id];
+      setIsFavorite(true);
+    }
+    localStorage.setItem("love_list", JSON.stringify(newList));
+    // Optional: dispatch event if other components need to know
+    window.dispatchEvent(new Event("wishlistUpdated"));
+  };
+
   const decreaseQty = () => {
     if (quantity > 1) setQuantity(quantity - 1);
   };
 
   const increaseQty = () => {
-    setQuantity(quantity + 1);
+    if (quantity < (product.stock || 0)) {
+      setQuantity(quantity + 1);
+    }
   };
 
   const handleAddToCart = () => {
+    if ((product.stock || 0) <= 0) {
+      alert("Sản phẩm hiện đang hết hàng!");
+      return;
+    }
     addToCart(product, quantity);
   };
 
@@ -49,9 +78,58 @@ export default function ProductDetailClient({
       ? `${API_URL}${product.hinh}`
       : "/img/no-image.jpg";
 
+  // reviews state
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(false);
+
+  // Fetch reviews
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        setLoadingReviews(true);
+        const res = await fetch(`http://localhost:5000/api/reviews/product/${product._id}`);
+        const json = await res.json();
+        if (json.success) {
+          setReviews(json.data);
+        }
+      } catch (err) {
+        console.error("Error fetching reviews:", err);
+      } finally {
+        setLoadingReviews(false);
+      }
+    };
+    if (product._id) fetchReviews();
+  }, [product._id]);
+
+  // Statistics
+  const avgRating = reviews.length > 0 
+    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+    : "0.0";
+  
+  const breakdown = [5, 4, 3, 2, 1].map(n => ({
+    stars: n,
+    count: reviews.filter(r => r.rating === n).length,
+    percentage: reviews.length > 0 ? (reviews.filter(r => r.rating === n).length / reviews.length * 100) : 0
+  }));
+
+  const filteredReviews = activeFilter === 'all' 
+    ? reviews 
+    : reviews.filter(r => r.rating === activeFilter);
+
+  const renderStars = (rating: number) => {
+    return (
+      <div className="stars">
+        {[1, 2, 3, 4, 5].map(star => (
+          <span key={star} className={star <= rating ? "star full" : "star empty"}>
+            ★
+          </span>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <>
-      {/* Breadcrumb */}
       <div className="breadcrumb">
         <div className="product-container">
           <ul className="breadcrumb-list">
@@ -70,11 +148,9 @@ export default function ProductDetailClient({
         </div>
       </div>
 
-      {/* Chi tiết sản phẩm */}
       <div className="product-detail-container">
         <div className="product-container">
           <div className="row">
-            {/* Ảnh */}
             <div className="col-md-6">
               <div className="product-images">
                 <div className="main-image">
@@ -84,7 +160,7 @@ export default function ProductDetailClient({
                     width={600}
                     height={600}
                     priority
-                    unoptimized   // ✅ FIX 404 + private IP
+                    unoptimized
                     style={{
                       width: "100%",
                       height: "auto",
@@ -95,7 +171,6 @@ export default function ProductDetailClient({
               </div>
             </div>
 
-            {/* Thông tin */}
             <div className="col-md-6">
               <div className="product-info">
                 <h1 className="product-title">{product.ten_sp}</h1>
@@ -114,7 +189,14 @@ export default function ProductDetailClient({
                   )}
                 </div>
 
-                {/* Số lượng + nút trong cùng hàng */}
+                <div className="product-stock-status">
+                  <p>Trạng thái: 
+                    <span className={(product.stock || 0) > 0 ? "stock-available" : "stock-empty"}>
+                      {(product.stock || 0) > 0 ? ` Còn hàng (${product.stock})` : " Hết hàng"}
+                    </span>
+                  </p>
+                </div>
+
                 <div className="product-quantity">
                   <label>Số lượng:</label>
                   <div className="qty-add-group">
@@ -126,15 +208,25 @@ export default function ProductDetailClient({
                         readOnly
                         className="qty-input"
                       />
-                      <button className="qty-btn" onClick={increaseQty}>+</button>
+                      <button className="qty-btn" onClick={increaseQty} disabled={quantity >= (product.stock || 0)}>+</button>
                     </div>
-                    <button className="add-to-cart-btn" onClick={handleAddToCart}>
-                      Thêm vào giỏ hàng ({quantity})
+                    <button 
+                      className="add-to-cart-btn" 
+                      onClick={handleAddToCart}
+                      disabled={(product.stock || 0) <= 0}
+                    >
+                      {(product.stock || 0) > 0 ? `Thêm vào giỏ hàng (${quantity})` : "Hết hàng"}
+                    </button>
+                    <button 
+                      className={`favorite-btn ${isFavorite ? 'active' : ''}`} 
+                      onClick={toggleFavorite}
+                      title={isFavorite ? "Bỏ yêu thích" : "Yêu thích"}
+                    >
+                      {isFavorite ? "❤️" : "🤍"}
                     </button>
                   </div>
                 </div>
 
-                {/* thông báo mua số lượng lớn */}
                 <div className="bulk-order-note">
                   <p>
                     Nếu bạn muốn mua hàng với số lượng lớn, xin vui lòng liên hệ Hotline: 
@@ -143,13 +235,11 @@ export default function ProductDetailClient({
                   </p>
                 </div>
 
-                {/* mã giảm giá */}
                 <div className="discount-code-box">
                   <div className="icon-percent">%</div>
                   <span>Mã giảm giá <small>(Không áp dụng đồng thời)</small></span>
                 </div>
 
-                {/* thông tin vận chuyển */}
                 <div className="shipping-info">
                   <div className="ship-col">
                     <h4>Phí Ship</h4>
@@ -162,55 +252,49 @@ export default function ProductDetailClient({
                     <p>Các tỉnh còn lại: 2 - 5 ngày</p>
                   </div>
                 </div>
-
               </div>
             </div>
           </div>
         </div>
       </div>
-{/* Thông tin sản phẩm / hướng dẫn sử dụng */}
-<div className="product-info-section">
-  <div className="product-container">
-    <div className="product-info-card">
 
-      <div className="product-info-tabs">
-        <div
-          className={`tab ${activeTab === "info" ? "active" : ""}`}
-          onClick={() => setActiveTab("info")}
-        >
-          THÔNG TIN SẢN PHẨM
-        </div>
-
-        <div
-          className={`tab ${activeTab === "usage" ? "active" : ""}`}
-          onClick={() => setActiveTab("usage")}
-        >
-          HƯỚNG DẪN SỬ DỤNG
+      <div className="product-info-section">
+        <div className="product-container">
+          <div className="product-info-card">
+            <div className="product-info-tabs">
+              <div
+                className={`tab ${activeTab === "info" ? "active" : ""}`}
+                onClick={() => setActiveTab("info")}
+              >
+                THÔNG TIN SẢN PHẨM
+              </div>
+              <div
+                className={`tab ${activeTab === "usage" ? "active" : ""}`}
+                onClick={() => setActiveTab("usage")}
+              >
+                HƯỚNG DẪN SỬ DỤNG
+              </div>
+            </div>
+            <div className="tab-content">
+              {activeTab === "info" ? (
+                <>
+                  <button className="view-details-btn">
+                    Xem chi tiết
+                  </button>
+                  <p className="product-description-text">
+                    {product.mo_ta || "Không có mô tả."}
+                  </p>
+                </>
+              ) : (
+                <p className="product-description-text">
+                  Chưa có hướng dẫn sử dụng.
+                </p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="tab-content">
-        {activeTab === "info" ? (
-          <>
-            <button className="view-details-btn">
-              Xem chi tiết
-            </button>
-
-            <p className="product-description-text">
-              {product.mo_ta || "Không có mô tả."}
-            </p>
-          </>
-        ) : (
-          <p className="product-description-text">
-            Chưa có hướng dẫn sử dụng.
-          </p>
-        )}
-      </div>
-
-    </div>
-  </div>
-</div>
-      {/* Sản phẩm liên quan */}
       {relatedProducts.length > 0 && (
         <div className="related-products-section">
           <div className="product-container">
@@ -226,46 +310,68 @@ export default function ProductDetailClient({
         </div>
       )}
 
-      {/* Review summary section */}
       <div className="review-section">
         <div className="product-container">
           <h2 className="section-title">ĐÁNH GIÁ TỪ KHÁCH HÀNG ĐÃ MUA</h2>
           <div className="review-card">
             <div className="rating-overall">
-              <div className="rating-number">0.0</div>
-              <div className="stars">
-                ☆☆☆☆☆
-              </div>
-              <div className="rating-note">Theo 0 đánh giá</div>
+              <div className="rating-number">{avgRating}</div>
+              {renderStars(Math.round(Number(avgRating)))}
+              <div className="rating-note">Theo {reviews.length} đánh giá</div>
             </div>
             <div className="rating-breakdown">
-              {[5,4,3,2,1].map(n => (
-                <div className="breakdown-row" key={n}>
-                  <div className="stars-count">{n} <span className="star">★</span></div>
-                  <div className="bar"><div className="fill" style={{ width: "0%" }} /></div>
-                  <div className="count">(0)</div>
+              {breakdown.map(item => (
+                <div className="breakdown-row" key={item.stars}>
+                  <div className="stars-count">{item.stars} <span className="star">★</span></div>
+                  <div className="bar"><div className="fill" style={{ width: `${item.percentage}%` }} /></div>
+                  <div className="count">({item.count})</div>
                 </div>
               ))}
             </div>
-            <button className="write-review-btn">VIẾT ĐÁNH GIÁ ✏️</button>
+            <Link href="/orders" className="write-review-btn">ĐÁNH GIÁ NGAY ✏️</Link>
           </div>
+          
           <div className="review-filters">
             <button
               className={`filter ${activeFilter === 'all' ? 'active' : ''}`}
               onClick={() => setActiveFilter('all')}
-            >Tất cả</button>
-            {[5,4,3,2,1].map(n => (
-              <button
-                key={n}
-                className={`filter ${activeFilter === n ? 'active' : ''}`}
-                onClick={() => setActiveFilter(n as 1|2|3|4|5)}
-              >{n} ⭐</button>
-            ))}
+            >Tất cả ({reviews.length})</button>
+            {[5,4,3,2,1].map(n => {
+              const count = reviews.filter(r => r.rating === n).length;
+              return (
+                <button
+                  key={n}
+                  className={`filter ${activeFilter === n ? 'active' : ''}`}
+                  onClick={() => setActiveFilter(n as any)}
+                >{n} ⭐ ({count})</button>
+              );
+            })}
+          </div>
+
+          <div className="review-list">
+            {loadingReviews ? (
+              <p className="review-empty">Đang tải đánh giá...</p>
+            ) : filteredReviews.length > 0 ? (
+              filteredReviews.map((rev, idx) => (
+                <div key={idx} className="review-item">
+                  <div className="review-user">
+                    <strong>{rev.userName}</strong>
+                    <span className="review-date">{new Date(rev.createdAt).toLocaleDateString('vi-VN')}</span>
+                  </div>
+                  <div className="review-stars">
+                    {renderStars(rev.rating)}
+                  </div>
+                  <div className="review-text">
+                    {rev.comment || "Không có nhận xét."}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="review-empty">Chưa có đánh giá nào cho mức điểm này.</p>
+            )}
           </div>
         </div>
       </div>
-
-
     </>
   );
 }

@@ -90,6 +90,7 @@ app.use('/api/products', require('./routes/api/products'));
 app.use('/api/categories', require('./routes/api/categories'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/vnpay', require('./routes/vnpay'));
+app.use('/api/momo', require('./routes/momo'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/test', require('./routes/test'));
 app.use('/api/dashboard', require('./routes/api/dashboard'));
@@ -98,6 +99,7 @@ app.use('/api/vouchers', require('./routes/api/vouchers'));
 app.use('/api/otp', require('./routes/api/otp'));
 app.use('/api/chat', require('./routes/chat-temp'));
 app.use('/api/articles', require('./routes/api/articles'));
+app.use('/api/reviews', require('./routes/api/reviews'));
 app.use('/orderDetails', require('./routes/orderDetails'));
 
 // ═══════════════════════════════════════════
@@ -110,6 +112,7 @@ app.use('/admin/banners', require('./routes/admin/banners'));
 app.use('/admin/vouchers', require('./routes/admin/vouchers'));
 app.use('/admin/orders', require('./routes/admin/orders'));
 app.use('/admin/reviews', require('./routes/admin/reviews'));
+app.use('/admin/inventory', require('./routes/admin/inventory'));
 
 // ═══════════════════════════════════════════
 // 5. ERROR HANDLING — ĐẶT CUỐI CÙNG

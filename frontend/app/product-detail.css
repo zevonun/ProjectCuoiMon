@@ -225,6 +225,30 @@
   transform: translateY(-2px);
 }
 
+.favorite-btn {
+  background: white;
+  border: 1px solid #ddd;
+  color: #ff6b35;
+  padding: 8px 12px;
+  font-size: 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.favorite-btn:hover {
+  border-color: #ff6b35;
+  background: #fff5f2;
+}
+
+.favorite-btn.active {
+  background: #fff5f2;
+  border-color: #ff6b35;
+}
+
 /* Ghi chú mua số lượng lớn */
 .bulk-order-note {
   background: #f0f8ff;
@@ -574,6 +598,73 @@
   color: white;
 }
 
+/* Review List */
+.review-list {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.review-item {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.review-user {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.review-user strong {
+  font-size: 16px;
+  color: #333;
+}
+
+.review-date {
+  font-size: 13px;
+  color: #999;
+}
+
+.review-stars {
+  margin-bottom: 12px;
+}
+
+.review-stars .star {
+  font-size: 16px;
+  margin-right: 2px;
+}
+
+.star.full {
+  color: #fbc02d;
+}
+
+.star.empty {
+  color: #e0e0e0;
+}
+
+.review-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #444;
+  white-space: pre-wrap;
+}
+
+.review-empty {
+  text-align: center;
+  padding: 40px;
+  color: #888;
+  font-style: italic;
+  background: white;
+  border-radius: 12px;
+  border: 1px dashed #ccc;
+}
+
 @media (max-width: 768px) {
   .review-card {
     flex-direction: column;
@@ -582,4 +673,32 @@
   .rating-overall {
     flex: 0 0 auto;
   }
+}
+
+/* STOCK STATUS STYLES */
+.product-stock-status {
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.stock-available {
+  color: #28a745;
+  font-weight: 700;
+}
+
+.stock-empty {
+  color: #dc3545;
+  font-weight: 700;
+}
+
+.qty-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.add-to-cart-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
 }

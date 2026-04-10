@@ -128,12 +128,14 @@ export default function OrderItem({
               >
                 Mua lại
               </button>
-              <button
-                className={`${styles.actionBtn} ${styles.primary}`}
-                onClick={() => onReview?.(order._id)}
-              >
-                Đánh giá
-              </button>
+              {!order.isReviewed && (
+                <button
+                  className={`${styles.actionBtn} ${styles.primary}`}
+                  onClick={() => onReview?.(order._id)}
+                >
+                  Đánh giá
+                </button>
+              )}
             </>
           ) : null}
 

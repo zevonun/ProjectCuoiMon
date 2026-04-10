@@ -124,7 +124,7 @@ export default function OrdersPage() {
 
   const handleReview = (orderId: string) => {
     // Navigate to review page
-    router.push(`/orders/${orderId}/review`);
+    router.push(`/rate/${orderId}`);
   };
 
   const handleRepurchase = async (orderId: string) => {

@@ -18,6 +18,7 @@ const formatProduct = (p) => ({
   subcategory: p.subcategory || null,
   mo_ta: p.description || p.mo_ta,
   ngay: p.ngay || p.createdAt || new Date().toISOString(),
+  stock: p.stock || 0,
 });
 
 // ==================== ADMIN & FRONT ====================
@@ -151,7 +152,7 @@ const getProductByCategoryId = async (req, res) => {
 
 const createProduct = async (req, res) => {
   try {
-    const { name, price, categoryId, sale, image, description, subcategory } = req.body;
+    const { name, price, categoryId, sale, image, description, subcategory, stock } = req.body;
 
     if (!name || price == null || !categoryId) {
       return res.status(400).json({ success: false, message: 'Thiếu thông tin bắt buộc' });
@@ -169,6 +170,7 @@ const createProduct = async (req, res) => {
     const newProduct = new Product({
       name, price, sale: sale ?? 0, categoryId,
       image: image || '', description: description || '', subcategory: subcategory || null, brandId: null,
+      stock: stock || 0
     });
 
     const saved = await newProduct.save();
@@ -188,7 +190,7 @@ const updateProduct = async (req, res) => {
     const product = await Product.findById(id);
     if (!product) return res.status(404).json({ success: false, message: 'Không tìm thấy sản phẩm' });
 
-    const { name, price, sale, categoryId, image, description, subcategory } = req.body;
+    const { name, price, sale, categoryId, image, description, subcategory, stock } = req.body;
     if (categoryId) {
       if (!mongoose.Types.ObjectId.isValid(categoryId)) {
         return res.status(400).json({ success: false, message: 'categoryId không hợp lệ' });
@@ -204,6 +206,7 @@ const updateProduct = async (req, res) => {
     product.image       = image       || product.image;
     product.description = description || product.description;
     product.subcategory = subcategory || product.subcategory;
+    product.stock       = stock       ?? product.stock;
 
     const saved = await product.save();
     res.json({ success: true, data: formatProduct(saved) });

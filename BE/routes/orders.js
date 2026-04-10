@@ -53,6 +53,20 @@ router.post('/', verifyToken, async (req, res) => {
 
     await order.save();
 
+    // ✅ Cập nhật số lượng tồn kho (Deduction)
+    try {
+      const Product = require('../models/product');
+      for (const item of products) {
+        await Product.findByIdAndUpdate(item.productId, {
+          $inc: { stock: -Math.abs(item.quantity) }
+        });
+      }
+      console.log('📦 Stock updated for order:', order._id);
+    } catch (stockErr) {
+      console.error('❌ Error updating stock:', stockErr);
+      // Tiếp tục vì đơn hàng đã được tạo thành công
+    }
+
     console.log('✅ Order created:', order._id);
 
     res.status(201).json({
@@ -106,7 +120,7 @@ router.get('/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
 
-    const order = await Order.findById(id);
+    const order = await Order.findById(id).populate('products.productId');
     
     if (!order) {
       return res.status(404).json({ 
@@ -152,6 +166,19 @@ router.patch('/:id/cancel', verifyToken, async (req, res) => {
 
     order.status = 'cancelled';
     await order.save();
+
+    // ✅ Hoàn lại số lượng tồn kho (Restore)
+    try {
+      const Product = require('../models/product');
+      for (const item of order.products) {
+        await Product.findByIdAndUpdate(item.productId, {
+          $inc: { stock: Math.abs(item.quantity) }
+        });
+      }
+      console.log('🔄 Stock restored for cancelled order:', order._id);
+    } catch (stockErr) {
+      console.error('❌ Error restoring stock:', stockErr);
+    }
 
     res.json({
       success: true,

@@ -8,5 +8,6 @@ export interface Product {
 
   categoryId?: string;
   hot?: number;
+  stock?: number;
   createdAt?: string;
 }

@@ -55,6 +55,28 @@ export default function Header() {
   // SỬA 2.1: Lấy itemCount từ CartContext
   const { itemCount } = useCart();
 
+  // State cho số lượng yêu thích
+  const [wishlistCount, setWishlistCount] = useState(0);
+
+  useEffect(() => {
+    const updateWishlistCount = () => {
+      const list = JSON.parse(localStorage.getItem("love_list") || "[]");
+      setWishlistCount(list.length);
+    };
+
+    updateWishlistCount();
+
+    // Lắng nghe sự kiện cập nhật wishlist
+    window.addEventListener("wishlistUpdated", updateWishlistCount);
+    // Cũng lắng nghe storage event nếu user mở nhiều tab
+    window.addEventListener("storage", updateWishlistCount);
+
+    return () => {
+      window.removeEventListener("wishlistUpdated", updateWishlistCount);
+      window.removeEventListener("storage", updateWishlistCount);
+    };
+  }, []);
+
   // Gọi API lấy sản phẩm và categories khi component mount
   useEffect(() => {
     const loadData = async () => {
@@ -293,8 +315,13 @@ export default function Header() {
               <span>Hệ thống cửa hàng</span>
             </Link>
           </div>
-          <div className="cart">
-            <Link href="/profile"><i className="fas fa-heart"></i></Link>
+          <div className="cart wishlist-container">
+            <Link href="/love" className="wishlist-link">
+              <i className="fas fa-heart"></i>
+              {wishlistCount > 0 && (
+                <span className="wishlist-badge">{wishlistCount}</span>
+              )}
+            </Link>
           </div>
 
           {/* --- KHU VỰC ĐÃ ĐƯỢC SỬA LỖI --- */}

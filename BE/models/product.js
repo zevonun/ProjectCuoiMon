@@ -11,7 +11,8 @@ const product = new Schema(
     subcategory: { type: String, default: null }, // Danh mục con
     sale: { type: Number, required: true },
     brandId: { type: ObjectId, default: null, ref: 'brand' },
-    image: { type: String, default: '' }
+    image: { type: String, default: '' },
+    stock: { type: Number, default: 0 }
   },
   { timestamps: true }
 );

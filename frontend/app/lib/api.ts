@@ -12,6 +12,7 @@ export interface Product {
   subcategory?: string; // Danh mục con
   brandId?: string | null;
   sale?: number;
+  stock?: number;
 }
 
 export interface Category {
@@ -43,6 +44,7 @@ const normalizeProduct = (raw: unknown): Product => {
     subcategory: (p.subcategory as string) || undefined, // Danh mục con
     brandId: (p.brandId as string) ?? null,
     sale: p.sale != null ? Number(p.sale) : 0,
+    stock: p.stock != null ? Number(p.stock) : 0,
   };
 };
 

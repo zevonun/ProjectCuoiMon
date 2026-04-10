@@ -1,0 +1,120 @@
+.container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 15px;
+  min-height: 70vh;
+}
+
+.header {
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.breadcrumb {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #666;
+}
+
+.breadcrumb li a:hover {
+  color: #ec4899;
+}
+
+.breadcrumb li:not(:last-child)::after {
+  content: "/";
+  margin-left: 10px;
+  color: #ccc;
+}
+
+.active {
+  color: #333;
+  font-weight: 600;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #2c5530;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 16px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 30px;
+}
+
+.cardWrapper {
+  transition: transform 0.3s;
+}
+
+.cardWrapper:hover {
+  transform: translateY(-5px);
+}
+
+.loading {
+  text-align: center;
+  padding: 100px 0;
+  font-size: 18px;
+  color: #666;
+}
+
+.empty {
+  text-align: center;
+  padding: 80px 20px;
+  background: #fdfdfd;
+  border-radius: 20px;
+  border: 2px dashed #eee;
+}
+
+.emptyIcon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.empty h3 {
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.empty p {
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.shopBtn {
+  display: inline-block;
+  background: #ec4899;
+  color: white;
+  padding: 14px 30px;
+  border-radius: 30px;
+  font-weight: 700;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+}
+
+.shopBtn:hover {
+  background: #db2777;
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(236, 72, 153, 0.4);
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 28px;
+  }
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+}

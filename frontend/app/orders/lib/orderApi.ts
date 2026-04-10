@@ -27,6 +27,7 @@ export interface Order {
   paymentMethod: 'COD' | 'MOMO' | 'VNPAY';
   status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled' | 'returning' | 'returned';
   notes?: string;
+  isReviewed: boolean;
   createdAt: string;
   updatedAt: string;
 }

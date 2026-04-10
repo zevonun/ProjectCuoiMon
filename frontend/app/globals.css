@@ -1291,3 +1291,30 @@ a {
     gap: 20px;
   }
 }
+/* Wishlist Badge CSS */
+.wishlist-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wishlist-badge {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  background-color: #ec4899;
+  color: white;
+  border-radius: 50%;
+  padding: 1px 5px;
+  min-width: 18px;
+  height: 18px;
+  font-size: 10px;
+  font-weight: bold;
+  border: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}

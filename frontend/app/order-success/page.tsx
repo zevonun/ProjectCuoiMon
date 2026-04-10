@@ -44,6 +44,20 @@ function OrderSuccessContent() {
          setMessage("Giao dịch thanh toán thất bại. Vui lòng kiểm tra lại phương thức thanh toán.");
       }
     }
+    
+    // Check for MoMo params
+    const resultCode = searchParams.get("resultCode");
+    const momoMessage = searchParams.get("message");
+
+    if (resultCode !== null) {
+      if (resultCode === "0") {
+        setStatus("success");
+        setMessage("Thanh toán MoMo thành công! Đơn hàng của bạn đã được xác nhận.");
+      } else {
+        setStatus("error");
+        setMessage(`Thanh toán MoMo thất bại: ${momoMessage || 'Đã có lỗi xảy ra'}`);
+      }
+    }
 
     // Clear order from localStorage
     localStorage.removeItem("lastOrder");

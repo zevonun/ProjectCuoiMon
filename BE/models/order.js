@@ -28,7 +28,7 @@ const orderSchema = new mongoose.Schema(
     // Sản phẩm
     products: [
       {
-        productId: { type: String, required: true },
+        productId: { type: mongoose.Schema.Types.ObjectId, ref: 'product', required: true },
         quantity: { type: Number, required: true },
         price: { type: Number, required: true }
       }
@@ -58,7 +58,8 @@ const orderSchema = new mongoose.Schema(
       default: 'pending'
     },
 
-    notes: String
+    notes: String,
+    isReviewed: { type: Boolean, default: false }
   },
   {
     timestamps: true

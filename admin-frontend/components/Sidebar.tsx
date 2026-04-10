@@ -119,6 +119,13 @@ export default function Sidebar() {
           </Link>
         </li>
 
+        <li className={isActive("/manage-inventory") ? "active" : ""}>
+          <Link href="/manage-inventory">
+            <Folder size={18} />
+            <span>Quản lý tồn kho</span>
+          </Link>
+        </li>
+
         <li className={isActive("/reviews") ? "active" : ""}>
           <Link href="/reviews">
             <Star size={18} />
