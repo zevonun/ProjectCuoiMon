@@ -171,3 +171,39 @@ exports.getOutOfStockProducts = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+/**
+ * Cập nhật tồn kho sản phẩm
+ */
+exports.updateStock = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { stock } = req.body;
+
+    if (stock === undefined || stock === null || isNaN(stock)) {
+      return res.status(400).json({ success: false, message: 'Số lượng không hợp lệ' });
+    }
+
+    const product = await Product.findByIdAndUpdate(
+      id,
+      { stock: parseInt(stock) },
+      { new: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy sản phẩm' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Cập nhật tồn kho thành công',
+      data: {
+        id: product._id,
+        name: product.name,
+        stock: product.stock
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

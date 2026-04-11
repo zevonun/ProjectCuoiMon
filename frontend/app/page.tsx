@@ -44,7 +44,7 @@ export default function Home() {
             hòn xưa cũ...
           </p>
 
-          <a href="/ve-chung-toi" className={styles.aboutButton}>
+          <a href="/about" className={styles.aboutButton}>
             XEM THÊM
           </a>
 
@@ -74,7 +74,7 @@ export default function Home() {
     <div className={styles.resourcesLeft}>
       <h3>100% Minh bạch nguyên liệu</h3>
       <p>Sản phẩm an LÀNH - Con người chân THẬT</p>
-      <a href="/nguyen-lieu" className={styles.resourcesButton}>
+      <a href="/about" className={styles.resourcesButton}>
         XEM THÊM
       </a>
     </div>

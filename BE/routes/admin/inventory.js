@@ -11,5 +11,6 @@ router.get('/list', inventoryController.getInventoryList);
 router.get('/low-stock', inventoryController.getLowStockProducts);
 router.get('/out-of-stock', inventoryController.getOutOfStockProducts);
 router.get('/top-selling', inventoryController.getTopSellingProducts);
+router.patch('/:id/stock', inventoryController.updateStock);
 
 module.exports = router;

@@ -42,6 +42,11 @@ export default function ManageInventoryPage() {
   const [sort, setSort] = useState("name_asc");
   const [status, setStatus] = useState("all");
 
+  // Edit State
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingValue, setEditingValue] = useState<number>(0);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
   // Top Selling Chart State
   const [topSelling, setTopSelling] = useState<TopSellingProduct[]>([]);
 
@@ -78,6 +83,38 @@ export default function ManageInventoryPage() {
     };
     loadAll();
   }, [invPage, search, sort, status]);
+
+  const handleUpdateStock = async (id: string) => {
+    try {
+      setUpdatingId(id);
+      const res = await fetch(`${API}/admin/inventory/${id}/stock`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ stock: editingValue })
+      });
+      const json = await res.json();
+      if (json.success) {
+        // Update local state instead of refetching for smoothness
+        setInventory(prev => prev.map(p => p.id === id ? { ...p, stock: editingValue } : p));
+        setEditingId(null);
+      } else {
+        alert(json.message || "Cập nhật thất bại");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Lỗi kết nối server");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const handleStartEdit = (p: InventoryProduct) => {
+    setEditingId(p.id);
+    setEditingValue(p.stock);
+  };
 
   // Chart Data
   const chartData = {
@@ -118,6 +155,7 @@ export default function ManageInventoryPage() {
       <div className="inventory-card">
         <div className="card-header">
           <h2 className="card-title">Danh sách tồn kho chi tiết</h2>
+          <span className="card-subtitle">Click vào số lượng để chỉnh sửa</span>
         </div>
 
         <div className="inventory-controls">
@@ -162,14 +200,35 @@ export default function ManageInventoryPage() {
                 <th>Sản phẩm</th>
                 <th>Tồn kho</th>
                 <th>Trạng thái</th>
+                <th>Thao tác</th>
               </tr>
             </thead>
             <tbody>
               {inventory.map(p => (
-                <tr key={p.id}>
+                <tr key={p.id} className={editingId === p.id ? "editing-row" : ""}>
                   <td><img src={p.image.startsWith("http") ? p.image : `${API}${p.image}`} alt={p.name} className="img-thumbnail" /></td>
                   <td>{p.name}</td>
-                  <td style={{fontWeight: 700}}>{p.stock}</td>
+                  <td className="stock-cell">
+                    {editingId === p.id ? (
+                      <input 
+                        type="number" 
+                        autoFocus
+                        className="edit-stock-input"
+                        value={editingValue}
+                        onChange={(e) => setEditingValue(parseInt(e.target.value) || 0)}
+                        onKeyDown={(e) => e.key === "Enter" && handleUpdateStock(p.id)}
+                      />
+                    ) : (
+                      <span 
+                        className="stock-display" 
+                        onClick={() => handleStartEdit(p)}
+                        title="Click để sửa"
+                      >
+                        {p.stock}
+                        <span className="edit-icon">✏️</span>
+                      </span>
+                    )}
+                  </td>
                   <td>
                     {p.stock === 0 ? (
                       <span className="low-stock-badge" style={{background: "#ef444422", color: "#ef4444"}}>Hết hàng</span>
@@ -179,11 +238,27 @@ export default function ManageInventoryPage() {
                       <span className="stock-ok-badge">Ổn định</span>
                     )}
                   </td>
+                  <td>
+                    {editingId === p.id ? (
+                      <div className="edit-actions">
+                        <button 
+                          className="save-btn" 
+                          onClick={() => handleUpdateStock(p.id)}
+                          disabled={updatingId === p.id}
+                        >
+                          {updatingId === p.id ? "..." : "Lưu"}
+                        </button>
+                        <button className="cancel-btn" onClick={() => setEditingId(null)}>Hủy</button>
+                      </div>
+                    ) : (
+                      <button className="edit-inline-btn" onClick={() => handleStartEdit(p)}>Sửa kho</button>
+                    )}
+                  </td>
                 </tr>
               ))}
               {inventory.length === 0 && (
                 <tr>
-                  <td colSpan={4} style={{textAlign: "center", padding: "40px", color: "#64748b"}}>
+                  <td colSpan={5} style={{textAlign: "center", padding: "40px", color: "#64748b"}}>
                     Không tìm thấy sản phẩm nào phù hợp
                   </td>
                 </tr>
