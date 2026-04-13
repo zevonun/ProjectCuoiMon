@@ -6,6 +6,10 @@
   --container-width: 1100px;
 }
 
+html {
+  overflow-y: scroll;
+}
+
 body {
   color: var(--text-dark);
   overflow-x: hidden;

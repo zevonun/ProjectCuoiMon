@@ -9,6 +9,7 @@
 .checkoutContent {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 1rem;
 }
 
 /* ====== HEADER ====== */
@@ -578,7 +579,10 @@
 .checkoutButtonContainer {
   display: flex;
   justify-content: center;
+  align-items: center;
   margin-top: 2rem;
+  width: 100%;
+  position: relative;
 }
 
 .checkoutButton {
@@ -639,7 +643,11 @@
 /* ====== RESPONSIVE DESIGN ====== */
 @media (max-width: 768px) {
   .checkoutContainer {
-    padding: 1rem 0.5rem;
+    padding: 1rem;
+  }
+
+  .checkoutContent {
+    padding: 0;
   }
 
   .title {
