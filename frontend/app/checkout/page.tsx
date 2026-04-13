@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CustomerForm } from './components/CustomerForm';
 import { ProductList } from './components/ProductList';
@@ -14,6 +14,7 @@ import {
 } from './types';
 import { validateCustomerInfo } from './lib/validation';
 import { createOrder as createOrderApi } from './lib/orderApi';
+import { applyVoucherToOrder, validateVoucher, VoucherValidationResult, getAvailableVouchers } from './lib/voucherApi';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useOrder } from '../context/OrderContext';
@@ -22,15 +23,20 @@ import styles from './checkout.module.css';
 
 const SHIPPING_FEE = 30000;
 
+interface Voucher {
+  code: string;
+  type: 'percentage' | 'fixed';
+  value: number;
+  description?: string;
+  minOrderAmount?: number;
+}
+
 export default function CheckoutPage() {
   const router = useRouter();
-
-  // Use contexts
   const { cartItems, clearCart, selectedItems } = useCart();
   const { user, customerInfo: authCustomerInfo, updateCustomerInfo, isLoggedIn } = useAuth();
   const { createOrder, setIsLoading: setOrderLoading, isLoading: orderLoading, setCurrentOrder } = useOrder();
 
-  // Local states
   const [cart, setCart] = useState<CartItem[]>([]);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
     fullName: authCustomerInfo?.fullName || user?.name || '',
@@ -44,38 +50,125 @@ export default function CheckoutPage() {
   const [isLoading, setIsLoading] = useState(orderLoading);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [voucherInput, setVoucherInput] = useState('');
+  const [appliedVoucher, setAppliedVoucher] = useState<VoucherValidationResult | null>(null);
+  const [voucherLoading, setVoucherLoading] = useState(false);
+  const [voucherError, setVoucherError] = useState('');
+  const [voucherSuccess, setVoucherSuccess] = useState('');
+  const [availableVouchers, setAvailableVouchers] = useState<Voucher[]>([]);
+  const [vouchersLoading, setVouchersLoading] = useState(false);
 
-  // Sync cart from CartContext (only selected items)
   useEffect(() => {
     const checkoutCart = cartItems
-      .filter(item => selectedItems.has(item.product._id))
-      .map(item => ({
+      .filter((item) => selectedItems.has(item.product._id))
+      .map((item) => ({
         id: item.product._id,
         name: item.product.ten_sp,
-        price: item.product.gia_km && item.product.gia_km < item.product.gia 
-          ? item.product.gia_km 
-          : item.product.gia,
+        price:
+          item.product.gia_km && item.product.gia_km < item.product.gia
+            ? item.product.gia_km
+            : item.product.gia,
         quantity: item.quantity,
         image: item.product.hinh || '/img/placeholder.png',
       }));
+
     setCart(checkoutCart);
   }, [cartItems, selectedItems]);
 
-  const handleCustomerInfoChange = (
-    info: CustomerInfo
-  ) => {
+  useEffect(() => {
+    setAppliedVoucher(null);
+    setVoucherError('');
+    setVoucherSuccess('');
+    // Fetch available vouchers
+    const fetchVouchers = async () => {
+      setVouchersLoading(true);
+      try {
+        const vouchers = await getAvailableVouchers();
+        setAvailableVouchers(vouchers);
+      } catch (error) {
+        console.error('Failed to fetch vouchers:', error);
+        setAvailableVouchers([]);
+      } finally {
+        setVouchersLoading(false);
+      }
+    };
+    fetchVouchers();
+  }, [cart]);
+
+  const handleCustomerInfoChange = (info: CustomerInfo) => {
     setCustomerInfo(info);
     updateCustomerInfo(info);
-    // Clear error message when user starts editing
     if (errorMessage) setErrorMessage('');
   };
 
+  const calculateSubtotal = (): number => {
+    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
+  };
+
+  const calculateDiscount = (): number => {
+    return appliedVoucher?.discount || 0;
+  };
+
   const calculateTotal = (): number => {
-    const subtotal = cart.reduce(
-      (total, item) => total + item.price * item.quantity,
-      0
-    );
-    return subtotal + SHIPPING_FEE;
+    return Math.max(0, calculateSubtotal() - calculateDiscount()) + SHIPPING_FEE;
+  };
+
+  const handleApplyVoucher = async () => {
+    const code = voucherInput.trim().toUpperCase();
+    const subtotal = calculateSubtotal();
+
+    if (!code) {
+      setVoucherError('Vui long nhap ma voucher');
+      setVoucherSuccess('');
+      return;
+    }
+
+    if (subtotal <= 0) {
+      setVoucherError('Khong co san pham hop le de ap voucher');
+      setVoucherSuccess('');
+      return;
+    }
+
+    setVoucherLoading(true);
+    setVoucherError('');
+    setVoucherSuccess('');
+
+    try {
+      const result = await validateVoucher(code, subtotal);
+      setAppliedVoucher(result);
+      setVoucherInput(result.voucher.code);
+      setVoucherSuccess('Da ap dung voucher ' + result.voucher.code);
+    } catch (error) {
+      setAppliedVoucher(null);
+      setVoucherError(error instanceof Error ? error.message : 'Áp dụng voucher thất bại');
+    } finally {
+      setVoucherLoading(false);
+    }
+  };
+
+  const handleRemoveVoucher = () => {
+    setAppliedVoucher(null);
+    setVoucherInput('');
+    setVoucherError('');
+    setVoucherSuccess('');
+  };
+
+  const handleSelectVoucher = async (voucher: Voucher) => {
+    setVoucherInput(voucher.code);
+    setVoucherLoading(true);
+    setVoucherError('');
+    setVoucherSuccess('');
+
+    try {
+      const result = await validateVoucher(voucher.code, calculateSubtotal());
+      setAppliedVoucher(result);
+      setVoucherSuccess('✓ Đã áp dụng mã ' + result.voucher.code);
+    } catch (error) {
+      setAppliedVoucher(null);
+      setVoucherError(error instanceof Error ? error.message : 'Áp dụng voucher thất bại');
+    } finally {
+      setVoucherLoading(false);
+    }
   };
 
   const getButtonText = (): string => {
@@ -90,16 +183,15 @@ export default function CheckoutPage() {
   };
 
   const handleCheckout = async () => {
-    // Validate customer info
     const validationErrors = validateCustomerInfo(customerInfo);
     if (Object.keys(validationErrors).length > 0) {
-      setErrorMessage('Vui lòng điền đầy đủ thông tin');
+      setErrorMessage('Vui Lòng điền đầy đủ thông tin khách hàng hợp lệ');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
     if (cart.length === 0) {
-      setErrorMessage('Giỏ hàng là trống');
+      setErrorMessage('Giỏ hàng trống');
       return;
     }
 
@@ -108,7 +200,6 @@ export default function CheckoutPage() {
       return;
     }
 
-    // Create order object
     const order: Order = {
       customerInfo,
       products: cart,
@@ -116,16 +207,16 @@ export default function CheckoutPage() {
       totalPrice: calculateTotal(),
       totalProducts: cart.reduce((total, item) => total + item.quantity, 0),
       shippingFee: SHIPPING_FEE,
+      discount: calculateDiscount(),
+      voucherCode: appliedVoucher?.voucher.code,
     };
 
     setOrderLoading(true);
     setIsLoading(true);
 
     try {
-      // Save order to context
       createOrder(order);
 
-      // Send to backend API
       const apiPayload = {
         userId: user._id,
         customerInfo: {
@@ -136,7 +227,7 @@ export default function CheckoutPage() {
           province: customerInfo.province.trim(),
           notes: customerInfo.notes?.trim(),
         },
-        products: cart.map(item => ({
+        products: cart.map((item) => ({
           productId: String(item.id),
           quantity: Number(item.quantity),
           price: Number(item.price),
@@ -144,9 +235,10 @@ export default function CheckoutPage() {
         paymentMethod,
         totalPrice: Number(calculateTotal()),
         shippingFee: Number(SHIPPING_FEE),
+        notes: appliedVoucher?.voucher.code
+          ? 'Voucher: ' + appliedVoucher.voucher.code + ' | Giam: ' + calculateDiscount()
+          : undefined,
       };
-
-      console.log('📤 Sending payload to backend:', apiPayload);
 
       const response = await createOrderApi(apiPayload);
 
@@ -154,8 +246,15 @@ export default function CheckoutPage() {
         throw new Error(response.message || 'Tạo đơn hàng thất bại');
       }
 
-      // ✅ Update currentOrder with backend response data
       if (response.data) {
+        if (appliedVoucher?.voucher.code) {
+          try {
+            await applyVoucherToOrder(appliedVoucher.voucher.code, response.data._id);
+          } catch (voucherApplyError) {
+            console.error('Voucher apply tracking error:', voucherApplyError);
+          }
+        }
+
         setCurrentOrder({
           ...order,
           createdAt: new Date(),
@@ -163,94 +262,59 @@ export default function CheckoutPage() {
         });
       }
 
-      // Handle different payment methods
       switch (paymentMethod) {
-        case 'MOMO':
-          // Redirect to MoMo payment gateway
-          console.log('Redirecting to MoMo payment...');
+        case 'MOMO': {
           setSuccessMessage('Chuyển hướng đến MoMo...');
-          
-          try {
-            const orderId = response.data?._id;
-            if (!orderId) throw new Error('Không tìm thấy ID đơn hàng từ hệ thống');
+          const orderId = response.data?._id;
+          if (!orderId) throw new Error('Khong tim thay ID don hang');
 
-            console.log('🔗 Fetching MoMo URL for order:', orderId);
+          const momoResponse = await apiPost('/api/momo/create_payment', {
+            orderId,
+            amount: Number(calculateTotal()),
+            orderInfo: 'Thanh toan don hang MyBeauty ' + orderId,
+          });
 
-            const momoResponse = await apiPost('/api/momo/create_payment', {
-              orderId: orderId,
-              amount: Number(calculateTotal()),
-              orderInfo: 'Thanh toán đơn hàng MyBeauty ' + orderId,
-            });
-
-            if (!momoResponse.ok) {
-              const errorData = await momoResponse.json();
-              throw new Error(errorData.message || 'Lỗi từ phía máy chủ thanh toán MoMo');
-            }
-
-            const momoData = await momoResponse.json();
-
-            if (momoData.success && momoData.payUrl) {
-              console.log('🚀 Redirecting to MoMo:', momoData.payUrl);
-              clearCart();
-              window.location.href = momoData.payUrl;
-            } else {
-              throw new Error(momoData.message || 'Không nhận được đường dẫn thanh toán từ MoMo');
-            }
-          } catch (momoError: any) {
-            console.error('❌ MoMo redirect error:', momoError);
-            setErrorMessage(`Lỗi MoMo: ${momoError.message || 'Đã có lỗi xảy ra'}`);
-            setIsLoading(false);
-            setOrderLoading(false);
+          if (!momoResponse.ok) {
+            const errorData = await momoResponse.json();
+            throw new Error(errorData.message || 'Loi MoMo');
           }
-          break;
-        case 'VNPAY':
-          // Redirect to VNPay payment gateway
-          console.log('Redirecting to VNPay payment...');
-          setSuccessMessage('Chuyển hướng đến VNPay...');
-          
-          try {
-            // Get order ID from the created response
-            const orderId = response.data?._id;
-            if (!orderId) throw new Error('Không tìm thấy ID đơn hàng từ hệ thống');
 
-            console.log('🔗 Fetching VNPAY URL for order:', orderId);
-
-            // Call internal API to get VNPay URL using centralized apiClient
-            const vnpayResponse = await apiPost('/api/vnpay/create_payment_url', {
-              orderId: orderId,
-              amount: Number(calculateTotal()),
-              bankCode: '',
-            });
-
-            if (!vnpayResponse.ok) {
-              const errorData = await vnpayResponse.json();
-              throw new Error(errorData.message || 'Lỗi từ phía máy chủ thanh toán');
-            }
-
-            const vnpayData = await vnpayResponse.json();
-
-            if (vnpayData.success && vnpayData.paymentUrl) {
-              console.log('🚀 Redirecting to VNPAY:', vnpayData.paymentUrl);
-              // Clear cart before redirecting
-              clearCart();
-              // Redirect to VNPay
-              window.location.href = vnpayData.paymentUrl;
-            } else {
-              throw new Error(vnpayData.message || 'Không nhận được đường dẫn thanh toán từ VNPAY');
-            }
-          } catch (vnpError: any) {
-             console.error('❌ VNPay redirect error:', vnpError);
-             setErrorMessage(`Lỗi VNPAY: ${vnpError.message || 'Đã có lỗi xảy ra'}`);
-             // Reset loading state to let user try again or choose another method
-             setIsLoading(false);
-             setOrderLoading(false);
+          const momoData = await momoResponse.json();
+          if (!momoData.success || !momoData.payUrl) {
+            throw new Error(momoData.message || 'Khong nhan duoc duong dan thanh toan MoMo');
           }
+
+          clearCart();
+          window.location.href = momoData.payUrl;
           break;
+        }
+        case 'VNPAY': {
+          setSuccessMessage('Chuyen huong den VNPay...');
+          const orderId = response.data?._id;
+          if (!orderId) throw new Error('Khong tim thay ID don hang');
+
+          const vnpayResponse = await apiPost('/api/vnpay/create_payment_url', {
+            orderId,
+            amount: Number(calculateTotal()),
+            bankCode: '',
+          });
+
+          if (!vnpayResponse.ok) {
+            const errorData = await vnpayResponse.json();
+            throw new Error(errorData.message || 'Loi VNPAY');
+          }
+
+          const vnpayData = await vnpayResponse.json();
+          if (!vnpayData.success || !vnpayData.paymentUrl) {
+            throw new Error(vnpayData.message || 'Khong nhan duoc duong dan thanh toan VNPAY');
+          }
+
+          clearCart();
+          window.location.href = vnpayData.paymentUrl;
+          break;
+        }
         default:
-          // COD - order processing
           setSuccessMessage('Đặt hàng thành công! Chuyển hướng...');
-          
-          // Clear cart and redirect to order success page
           clearCart();
           setTimeout(() => {
             router.push('/order-success');
@@ -269,27 +333,24 @@ export default function CheckoutPage() {
   return (
     <div className={styles.checkoutContainer}>
       <div className={styles.checkoutContent}>
-        {/* Header */}
         <div className={styles.header}>
           <h1 className={styles.title}>Thanh toán</h1>
           <p className={styles.subtitle}>Hoàn tất đơn hàng của bạn</p>
         </div>
 
-        {/* Success Message */}
         {successMessage && (
           <div className={styles.successAlert}>
-            <span>✓</span>
+            <span>x</span>
             <div>
-              <p className={styles.alertTitle}>Thành công!</p>
+              <p className={styles.alertTitle}>Thanh toán thành công!</p>
               <p>{successMessage}</p>
             </div>
           </div>
         )}
 
-        {/* Error Message */}
         {errorMessage && (
           <div className={styles.errorAlert}>
-            <span>✕</span>
+            <span>!</span>
             <div>
               <p className={styles.alertTitle}>Lỗi!</p>
               <p>{errorMessage}</p>
@@ -298,24 +359,29 @@ export default function CheckoutPage() {
         )}
 
         <div className={styles.checkoutWrapper}>
-          {/* Main Content */}
           <div className={styles.mainContent}>
-            {/* 1. Customer Form */}
             <CustomerForm onCustomerInfoChange={handleCustomerInfoChange} />
-
-            {/* 2. Product List */}
             <ProductList products={cart} />
-
-            {/* 3. Order Summary */}
-            <OrderSummary products={cart} />
-
-            {/* 4. Payment Method */}
+            <OrderSummary
+              products={cart}
+              voucherCode={appliedVoucher?.voucher.code}
+              voucherDiscount={calculateDiscount()}
+              voucherInput={voucherInput}
+              onVoucherInputChange={setVoucherInput}
+              onApplyVoucher={handleApplyVoucher}
+              onRemoveVoucher={handleRemoveVoucher}
+              voucherLoading={voucherLoading}
+              voucherError={voucherError}
+              voucherSuccess={voucherSuccess}
+              availableVouchers={availableVouchers}
+              vouchersLoading={vouchersLoading}
+              onSelectVoucher={handleSelectVoucher}
+            />
             <PaymentMethod
               selectedMethod={paymentMethod}
               onMethodChange={setPaymentMethod}
             />
 
-            {/* Checkout Button */}
             <div className={styles.checkoutButtonContainer}>
               <button
                 type="button"
@@ -324,9 +390,7 @@ export default function CheckoutPage() {
                   handleCheckout();
                 }}
                 disabled={isLoading || cart.length === 0}
-                className={`${styles.checkoutButton} ${
-                  isLoading ? styles.loading : ''
-                }`}
+                className={`${styles.checkoutButton} ${isLoading ? styles.loading : ''}`}
               >
                 {isLoading ? (
                   <>

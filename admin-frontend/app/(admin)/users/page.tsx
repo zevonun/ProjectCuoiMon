@@ -19,6 +19,7 @@ interface User {
     manage_categories?: boolean;
     manage_vouchers?: boolean;
     manage_admins?: boolean;
+    manage_articles?: boolean;
   };
   createdAt: string;
 }
@@ -35,7 +36,8 @@ const PERMISSIONS = {
   manage_banners: "🎨 Quản lý banner",
   manage_categories: "📂 Quản lý danh mục",
   manage_vouchers: "🎟️ Quản lý voucher",
-  manage_admins: "⚙️ Quản lý admin"
+  manage_admins: "⚙️ Quản lý admin",
+  manage_articles: "Quan ly bai viet"
 };
 
 export default function AdminUsersPage() {
@@ -60,6 +62,7 @@ export default function AdminUsersPage() {
       manage_categories: false,
       manage_vouchers: false,
       manage_admins: false,
+      manage_articles: false,
     }
   });
 
@@ -169,6 +172,7 @@ export default function AdminUsersPage() {
             manage_categories: false,
             manage_vouchers: false,
             manage_admins: false,
+            manage_articles: false,
           }
         });
       } else {

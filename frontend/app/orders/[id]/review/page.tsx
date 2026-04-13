@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import styles from "./page.module.css";
-import { getOrderDetails } from "../../lib/orderApi";
+import { getOrderDetails, getOrderProductId } from "../../lib/orderApi";
 import { canReviewOrder, createReview } from "../../../lib/reviewApi";
 
 type ReviewDraft = { rating: number; comment: string; submitting: boolean; done: boolean; error?: string };
@@ -42,7 +42,9 @@ export default function OrderReviewPage() {
   }, [orderId]);
 
   const productIds = useMemo<string[]>(() => {
-    const arr = Array.isArray(order?.products) ? order.products.map((p: any) => String(p.productId)) : [];
+    const arr = Array.isArray(order?.products)
+      ? order.products.map((p: any) => getOrderProductId(p)).filter(Boolean)
+      : [];
     return arr.filter(Boolean);
   }, [order]);
 

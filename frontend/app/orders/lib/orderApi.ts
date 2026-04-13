@@ -10,8 +10,22 @@ export interface OrderCustomerInfo {
   notes?: string;
 }
 
+export interface OrderProductDetails {
+  _id: string;
+  name?: string;
+  price?: number;
+  image?: string;
+  subcategory?: string;
+  categoryId?: string;
+  sale?: number;
+  brandId?: string;
+  stock?: number;
+  updatedAt?: string;
+  __v?: number;
+}
+
 export interface OrderProduct {
-  productId: string;
+  productId: string | OrderProductDetails;
   quantity: number;
   price: number;
 }
@@ -36,6 +50,14 @@ export interface ApiResponse<T> {
   success: boolean;
   message?: string;
   data?: T;
+}
+
+export function getOrderProductId(product: OrderProduct): string {
+  return typeof product.productId === 'string' ? product.productId : product.productId?._id || '';
+}
+
+export function getOrderProductDetails(product: OrderProduct): OrderProductDetails | null {
+  return product.productId && typeof product.productId === 'object' ? product.productId : null;
 }
 
 // Helper: lấy token từ localStorage

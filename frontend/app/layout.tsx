@@ -37,7 +37,7 @@ function Footer() {
         {/* TOP */}
         <div className="footer-top">
           <div className="footer-left">
-            <img src="/img/logo.png" className="logo" />
+            <img src="/img/Logo.png" className="logo" />
             <p>MỸ PHẨM THIÊN NHIÊN LÀNH VÀ THẬT</p>
           </div>
 
@@ -109,11 +109,6 @@ function Footer() {
           <p>225 Trần Đăng Ninh, Cầu Giấy, Hà Nội</p>
         </div>
 
-        {/* BADGE */}
-        <div className="footer-badge">
-          <img src="/img/bocongthuong.png" />
-          <img src="/img/dmca.png" />
-        </div>
       </div>
 
       {/* BOTTOM */}

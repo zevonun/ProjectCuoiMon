@@ -108,6 +108,7 @@ const createAdmin = async (req, res) => {
         manage_categories: permissions?.manage_categories ?? false,
         manage_vouchers: permissions?.manage_vouchers ?? false,
         manage_admins: permissions?.manage_admins ?? false,
+        manage_articles: permissions?.manage_articles ?? false,
       },
     });
 
@@ -180,6 +181,7 @@ const updateAdmin = async (req, res) => {
         manage_categories: permissions.manage_categories ?? admin.permissions.manage_categories,
         manage_vouchers: permissions.manage_vouchers ?? admin.permissions.manage_vouchers,
         manage_admins: permissions.manage_admins ?? admin.permissions.manage_admins,
+        manage_articles: permissions.manage_articles ?? admin.permissions.manage_articles,
       };
     }
 

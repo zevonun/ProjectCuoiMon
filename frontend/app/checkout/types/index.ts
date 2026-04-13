@@ -25,6 +25,8 @@ export interface Order {
   totalPrice: number;
   totalProducts: number;
   shippingFee: number;
+  discount?: number;
+  voucherCode?: string;
 }
 
 export interface FormErrors {

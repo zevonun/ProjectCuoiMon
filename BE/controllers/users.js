@@ -60,6 +60,7 @@ const createUser = async (req, res) => {
       manage_categories: permissions?.manage_categories ?? false,
       manage_vouchers: permissions?.manage_vouchers ?? false,
       manage_admins: permissions?.manage_admins ?? false,
+      manage_articles: permissions?.manage_articles ?? false,
     };
 
     const newUser = new User({ 
@@ -108,6 +109,7 @@ const updateUser = async (req, res) => {
         manage_categories: permissions?.manage_categories ?? user.permissions?.manage_categories ?? false,
         manage_vouchers: permissions?.manage_vouchers ?? user.permissions?.manage_vouchers ?? false,
         manage_admins: permissions?.manage_admins ?? user.permissions?.manage_admins ?? false,
+        manage_articles: permissions?.manage_articles ?? user.permissions?.manage_articles ?? false,
       };
     }
 

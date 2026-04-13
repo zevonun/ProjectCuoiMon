@@ -19,6 +19,9 @@ const {
 // GET /api/vouchers - Lấy danh sách voucher còn hiệu lực
 router.get('/', getValidVouchers);
 
+// GET /api/vouchers/available - Lấy danh sách voucher có sẵn (cho checkout)
+router.get('/available', getValidVouchers);
+
 // ===== PROTECTED ROUTES (cần đăng nhập) =====
 // POST /api/vouchers/validate - Kiểm tra mã voucher
 router.post('/validate', verifyToken, validateVoucherCodeValidation, validateVoucher);

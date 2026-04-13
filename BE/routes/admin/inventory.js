@@ -4,8 +4,9 @@ const router = express.Router();
 const inventoryController = require('../../controllers/inventory');
 const { verifyToken } = require('../../middleware/authen');
 const { isAdmin } = require('../../middleware/isAdmin');
+const { requirePermission } = require('../../middleware/requirePermission');
 
-router.use(verifyToken, isAdmin);
+router.use(verifyToken, isAdmin, requirePermission('manage_products')); 
 
 router.get('/list', inventoryController.getInventoryList);
 router.get('/low-stock', inventoryController.getLowStockProducts);

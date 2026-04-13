@@ -24,14 +24,16 @@ const getRequiredPermission = (pathname: string): PermissionKey | null => {
   if (pathname.startsWith('/banners')) return 'manage_banners';
   if (pathname.startsWith('/vouchers')) return 'manage_vouchers';
   if (pathname.startsWith('/orders')) return 'manage_orders';
+  if (pathname.startsWith('/manage-inventory')) return 'manage_products';
+  if (pathname.startsWith('/brands')) return 'manage_products';
 
   // user/admin management + customer pages
   if (pathname.startsWith('/users')) return 'manage_users';
   if (pathname.startsWith('/customers')) return 'manage_users';
 
-  // Treat reviews/articles as product-management scope for now
+  // Treat reviews as product-management scope
   if (pathname.startsWith('/reviews')) return 'manage_products';
-  if (pathname.startsWith('/articles')) return 'manage_products';
+  if (pathname.startsWith('/articles')) return 'manage_articles';
 
   return null;
 };
