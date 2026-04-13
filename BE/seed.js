@@ -5,6 +5,7 @@ const Category = require('./models/category');
 const Product = require('./models/product');
 const User = require('./models/user');
 const Article = require('./models/article');
+const Banner = require('./models/banner');
 const fs = require('fs');
 const https = require('https');
 const path = require('path');
@@ -91,6 +92,30 @@ const sampleProducts = [
   { name: "Son Aura Matte Lipstick", price: 220000, sale: 195000, image: "https://down-vn.img.susercontent.com/file/vn-11134207-7r98o-lty68p29107o1c", categoryName: "Trang điểm", hot: 1, stock: 0 },
 ];
 
+const sampleBanners = [
+  { 
+    title: "Sale Hè Rực Rỡ", 
+    image: "https://down-vn.img.susercontent.com/file/vn-11134207-7r98o-ltxawe5584cxf9.webp", 
+    link: "/category/makeup", 
+    position: "home" ,
+    active: true
+  },
+  { 
+    title: "Bộ Sưu Tập Mới", 
+    image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881", 
+    link: "/new-arrivals", 
+    position: "home",
+    active: true
+  },
+  { 
+    title: "Ưu Đãi Độc Quyền", 
+    image: "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec", 
+    link: "/promo", 
+    position: "home",
+    active: true
+  }
+];
+
 async function seed() {
   await mongoose.connect('mongodb://localhost:27017/mybeauty');
 
@@ -99,6 +124,7 @@ async function seed() {
     await mongoose.connection.db.dropCollection('categories');
     await mongoose.connection.db.dropCollection('products');
     await mongoose.connection.db.dropCollection('articles');
+    await mongoose.connection.db.dropCollection('banners');
   } catch (e) {
     // Nếu collection chưa tồn tại thì bỏ qua
   }
@@ -196,6 +222,12 @@ async function seed() {
       // Fallback
       await new Article({ ...post, image: '/img/no-image.jpg' }).save();
     }
+  }
+
+  // ✅ TẠO BANNER
+  console.log('🖼️ Tạo banner...');
+  for (const b of sampleBanners) {
+    await new Banner(b).save();
   }
 
   console.log("SEED THÀNH CÔNG! ĐÃ TẠO DANH MỤC, SẢN PHẨM VÀ BÀI VIẾT THẬT");

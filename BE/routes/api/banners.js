@@ -1,16 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const Banner = require('../../models/banner');
+const bannerController = require('../../controllers/banners');
 
-// GET /api/banners
-router.get('/', async (req, res) => {
-  try {
-    const banners = await Banner.find({ active: true }).sort({ createdAt: -1 });
-    res.json({ success: true, data: banners });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
+// GET /api/banners (Public)
+router.get('/', bannerController.getBanners);
 
 // GET /api/banners/:id
 router.get('/:id', async (req, res) => {

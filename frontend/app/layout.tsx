@@ -72,7 +72,7 @@ function Footer() {
           </div>
 
           <div className="footer-contact">
-            <a href="/stores" className="store-btn">
+            <a href="/stores-list" className="store-btn">
               <i className="fas fa-store"></i>
               Hệ thống cửa hàng
             </a>

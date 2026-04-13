@@ -1,18 +1,19 @@
-// app/admin/banners/page.tsx
+// k:\DAN\ProjectCuoiMon\admin-frontend\app\(admin)\banners\page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import BannerForm from "./components/BannerForm";
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
+import "./banners.css";
 
-// Định nghĩa kiểu rõ ràng cho dữ liệu từ backend
 interface BannerFromAPI {
   _id: string;
   title: string;
   image: string;
   link?: string;
   active?: boolean;
+  position?: string;
 }
 
 interface Banner {
@@ -21,11 +22,13 @@ interface Banner {
   image: string;
   link: string;
   active: boolean;
+  position: string;
 }
 
 export default function BannerAdminPage() {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [editing, setEditing] = useState<Banner | null>(null);
+  const [isAdding, setIsAdding] = useState(false); // ✅ Trạng thái hiển thị form thêm mới
   const [loading, setLoading] = useState(true);
 
   const fetchBanners = async () => {
@@ -34,7 +37,8 @@ export default function BannerAdminPage() {
       const res = await fetchWithAuth("/admin/banners", { method: "GET" });
       if (!res.ok) throw new Error("Failed to fetch banners");
 
-      const data: BannerFromAPI[] = await res.json();
+      const json = await res.json();
+      const data: BannerFromAPI[] = json.data || (Array.isArray(json) ? json : []);
 
       const mapped: Banner[] = data.map((item) => ({
         id: item._id,
@@ -42,6 +46,7 @@ export default function BannerAdminPage() {
         image: item.image,
         link: item.link || "",
         active: item.active ?? true,
+        position: item.position || "home",
       }));
 
       setBanners(mapped);
@@ -89,7 +94,7 @@ export default function BannerAdminPage() {
     }
   };
 
-  const handleSubmit = async (payload: { title: string; image: string; link?: string }) => {
+  const handleSubmit = async (payload: { title: string; image: string; link?: string; position?: string }) => {
     try {
       if (editing) {
         const res = await fetchWithAuth(`/admin/banners/${editing.id}`, {
@@ -97,7 +102,9 @@ export default function BannerAdminPage() {
           body: JSON.stringify({ ...payload, active: editing.active }),
         });
         if (!res.ok) throw new Error("Update failed");
-        const updated: BannerFromAPI = await res.json();
+        
+        const json = await res.json();
+        const updated: BannerFromAPI = json.data || json;
 
         setBanners((prev) =>
           prev.map((b) =>
@@ -108,6 +115,7 @@ export default function BannerAdminPage() {
                   image: updated.image,
                   link: updated.link || "",
                   active: updated.active ?? true,
+                  position: updated.position || "home",
                 }
               : b
           )
@@ -119,7 +127,9 @@ export default function BannerAdminPage() {
           body: JSON.stringify({ ...payload, active: true }),
         });
         if (!res.ok) throw new Error("Create failed");
-        const newBanner: BannerFromAPI = await res.json();
+
+        const json = await res.json();
+        const newBanner: BannerFromAPI = json.data || json;
 
         setBanners((prev) => [
           ...prev,
@@ -129,102 +139,117 @@ export default function BannerAdminPage() {
             image: newBanner.image,
             link: newBanner.link || "",
             active: true,
+            position: newBanner.position || "home",
           },
         ]);
+        setIsAdding(false);
       }
-      fetchBanners(); // Reload để đồng bộ
+      fetchBanners();
     } catch (err) {
       console.error(err);
       alert("Lỗi lưu banner");
     }
   };
 
-  if (loading) {
+  if (loading && banners.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-xl">Đang tải banner...</p>
+      <div className="loading-container">
+        <p>Đang tải banner...</p>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 text-gray-800">Quản Lý Banner</h1>
-
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-10">
-          <h2 className="text-2xl font-bold mb-6">
-            {editing ? "Chỉnh sửa Banner" : "Thêm Banner Mới"}
-          </h2>
-          <BannerForm onSubmit={handleSubmit} editing={editing} />
-          {editing && (
-            <button
-              onClick={() => setEditing(null)}
-              className="mt-4 text-red-600 hover:underline text-sm"
+  // --- VIEW: FORM (CREATE / EDIT) ---
+  if (isAdding || editing) {
+    return (
+      <div className="banners-container">
+        <div className="form-container-card">
+          <div className="form-header">
+            <h2 style={{ fontSize: '24px', fontWeight: 700, margin: 0 }}>
+              {editing ? "Chỉnh sửa Banner" : "Thêm Banner Mới"}
+            </h2>
+            <button 
+              onClick={() => { setIsAdding(false); setEditing(null); }}
+              style={{ background: 'transparent', border: '1px solid #334155', color: '#94a3b8', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}
             >
-              Hủy chỉnh sửa
+              Quay lại danh sách
             </button>
-          )}
+          </div>
+          <BannerForm onSubmit={handleSubmit} editing={editing} />
         </div>
+      </div>
+    );
+  }
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {banners.length === 0 ? (
-            <p className="col-span-full text-center text-gray-500 text-xl py-20">
-              Chưa có banner nào. Thêm ngay nào!
-            </p>
-          ) : (
-            banners.map((banner) => (
-              <div
-                key={banner.id}
-                className="bg-white rounded-2xl shadow-lg overflow-hidden group hover:shadow-2xl transition-all"
-              >
-                <div className="relative aspect-video bg-gray-100">
-                  <Image
-                    src={banner.image}
-                    alt={banner.title}
-                    fill
-                    className="object-cover"
-                  />
-                  {!banner.active && (
-                    <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
-                      <span className="text-white text-3xl font-bold">ĐÃ TẮT</span>
+  // --- VIEW: TABLE LIST ---
+  return (
+    <div className="banners-container">
+      <div className="banners-header-row">
+        <h1 style={{ fontSize: '28px', fontWeight: 700, margin: 0, color: 'white' }}>Danh sách Banner</h1>
+        <button className="btn-add-new" onClick={() => setIsAdding(true)}>
+          <span style={{ fontSize: '20px' }}>+</span> Thêm Banner
+        </button>
+      </div>
+
+      <div className="banner-table-card">
+        <table className="banner-table">
+          <thead>
+            <tr>
+              <th>Hình ảnh</th>
+              <th>Tiêu đề</th>
+              <th>Vị trí</th>
+              <th>Trạng thái</th>
+              <th style={{ textAlign: 'right' }}>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            {banners.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="empty-text">Chưa có banner nào.</td>
+              </tr>
+            ) : (
+              banners.map((p) => (
+                <tr key={p.id}>
+                  <td>
+                    <img 
+                      src={p.image.startsWith('http') ? p.image : `http://localhost:5000${p.image}`} 
+                      alt={p.title} 
+                      className="img-list" 
+                    />
+                  </td>
+                  <td>
+                    <div style={{ fontWeight: 600 }}>{p.title}</div>
+                    <div style={{ fontSize: '11px', color: '#64748b' }}>{p.link || "Không có link"}</div>
+                  </td>
+                  <td>
+                    <span style={{ fontSize: '12px', background: '#3b82f61a', color: '#3b82f6', padding: '4px 8px', borderRadius: '4px', textTransform: 'uppercase', fontWeight: 600 }}>
+                      {p.position}
+                    </span>
+                  </td>
+                  <td>
+                    <span 
+                      className={`status-badge ${p.active ? 'status-on' : 'status-off'}`}
+                      onClick={() => toggleActive(p.id, p.active)}
+                      title="Click để đổi trạng thái"
+                    >
+                      {p.active ? "ĐANG BẬT" : "ĐÃ TẮT"}
+                    </span>
+                  </td>
+                  <td style={{ textAlign: 'right' }}>
+                    <div className="action-btns" style={{ justifyContent: 'flex-end' }}>
+                      <button className="btn-icon" onClick={() => setEditing(p)} title="Sửa">
+                        ✏️
+                      </button>
+                      <button className="btn-icon btn-icon-delete" onClick={() => handleDelete(p.id)} title="Xóa">
+                        🗑️
+                      </button>
                     </div>
-                  )}
-                </div>
-
-                <div className="p-5">
-                  <h3 className="font-bold text-lg line-clamp-2 mb-3">{banner.title}</h3>
-
-                  <button
-                    onClick={() => toggleActive(banner.id, banner.active)}
-                    className={`w-full py-2.5 rounded-lg font-medium transition mb-4 ${
-                      banner.active
-                        ? "bg-green-500 hover:bg-green-600 text-white"
-                        : "bg-gray-400 hover:bg-gray-500 text-white"
-                    }`}
-                  >
-                    {banner.active ? "ĐANG BẬT" : "ĐÃ TẮT"}
-                  </button>
-
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => setEditing(banner)}
-                      className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition"
-                    >
-                      Sửa
-                    </button>
-                    <button
-                      onClick={() => handleDelete(banner.id)}
-                      className="flex-1 bg-red-600 text-white py-2.5 rounded-lg hover:bg-red-700 transition"
-                    >
-                      Xóa
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );

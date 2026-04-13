@@ -310,7 +310,7 @@ export default function Header() {
         </div>
         <div className="header-top-right" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <div className="cart">
-            <Link href="/stores" className="cart-link">
+            <Link href="/stores-list" className="cart-link">
               <i className="fas fa-home"></i>
               <span>Hệ thống cửa hàng</span>
             </Link>
