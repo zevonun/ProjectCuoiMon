@@ -100,7 +100,9 @@ router.get('/', verifyToken, async (req, res) => {
       query.status = status;
     }
 
-    const orders = await Order.find(query).sort({ createdAt: -1 });
+    const orders = await Order.find(query)
+      .populate('products.productId')
+      .sort({ createdAt: -1 });
     
     res.json({
       success: true,
@@ -120,7 +122,8 @@ router.get('/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
 
-    const order = await Order.findById(id);
+    const order = await Order.findById(id)
+      .populate('products.productId');
     
     if (!order) {
       return res.status(404).json({ 

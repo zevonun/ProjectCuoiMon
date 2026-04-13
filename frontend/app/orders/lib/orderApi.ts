@@ -20,6 +20,7 @@ export interface OrderProductDetails {
   sale?: number;
   brandId?: string;
   stock?: number;
+  createdAt?: string;
   updatedAt?: string;
   __v?: number;
 }

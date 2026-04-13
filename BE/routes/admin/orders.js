@@ -27,7 +27,7 @@ router.get('/', async (req, res) => {
 
     const skip = (Number(page) - 1) * Number(limit);
     const [orders, total] = await Promise.all([
-      Order.find(filter).sort({ createdAt: -1 }).skip(skip).limit(Number(limit)).lean(),
+      Order.find(filter).populate('products.productId').sort({ createdAt: -1 }).skip(skip).limit(Number(limit)).lean(),
       Order.countDocuments(filter),
     ]);
 
@@ -40,7 +40,7 @@ router.get('/', async (req, res) => {
 // GET /admin/orders/:id — chi tiết đơn hàng
 router.get('/:id', async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id).lean();
+    const order = await Order.findById(req.params.id).populate('products.productId').lean();
     if (!order) return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
 
     // Lấy thêm thông tin user

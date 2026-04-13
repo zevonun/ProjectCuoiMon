@@ -3,10 +3,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import styles from "./OrderItem.module.css";
 import OrderStatusBadge from "./OrderStatusBadge";
 import ChangeAddressModal from "./ChangeAddressModal";
-import { Order } from "../lib/orderApi";
+import { Order, OrderProduct, getOrderProductDetails } from "../lib/orderApi";
 import { formatPrice } from "../../lib/formatPrice";
 
 interface OrderItemProps {
@@ -67,27 +68,49 @@ export default function OrderItem({
 
         {/* Products list */}
         <div className={styles.productsContainer}>
-          {order.products.map((product, idx) => (
-            <div key={idx} className={styles.productRow}>
-              {/* Placeholder ảnh sản phẩm */}
-              <div className={styles.productImage}>
-                <div className={styles.imagePlaceholder}>📦</div>
-              </div>
+          {order.products.map((product, idx) => {
+            const productDetails = getOrderProductDetails(product);
+            const productImage = productDetails?.image || '/img/da.png';
+            const productName = productDetails?.name || `Sản phẩm #${idx + 1}`;
+            
+            // Resolve image URL
+            let imageUrl = productImage;
+            if (imageUrl.startsWith('/') && !imageUrl.startsWith('http')) {
+              imageUrl = `http://localhost:5000${imageUrl}`;
+            }
 
-              {/* Product info */}
-              <div className={styles.productInfo}>
-                <div className={styles.productName}>Sản phẩm #{idx + 1}</div>
-                <div className={styles.productDetails}>
-                  x{product.quantity} | {formatPrice(product.price)}
+            return (
+              <div key={idx} className={styles.productRow}>
+                {/* Product Image */}
+                <div className={styles.productImage}>
+                  {productDetails ? (
+                    <img
+                      src={imageUrl}
+                      alt={productName}
+                      onError={(e) => {
+                        e.currentTarget.src = '/img/da.png';
+                      }}
+                    />
+                  ) : (
+                    <div className={styles.imagePlaceholder}>📦</div>
+                  )}
+                </div>
+
+                {/* Product info */}
+                <div className={styles.productInfo}>
+                  <div className={styles.productName}>{productName}</div>
+                  <div className={styles.productDetails}>
+                    x{product.quantity} | {formatPrice(product.price)}
+                  </div>
+                </div>
+
+                {/* Price per product */}
+                <div className={styles.productPrice}>
+                  {formatPrice(product.price * product.quantity)}
                 </div>
               </div>
-
-              {/* Price per product */}
-              <div className={styles.productPrice}>
-                {formatPrice(product.price * product.quantity)}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Total price section */}
