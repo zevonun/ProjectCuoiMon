@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { CustomerForm } from './components/CustomerForm';
 import { ProductList } from './components/ProductList';
 import { OrderSummary } from './components/OrderSummary';
+import { VoucherPicker } from './components/VoucherPicker';
 import { PaymentMethod } from './components/PaymentMethod';
 import {
   CartItem,
@@ -362,20 +363,22 @@ export default function CheckoutPage() {
           <div className={styles.mainContent}>
             <CustomerForm onCustomerInfoChange={handleCustomerInfoChange} />
             <ProductList products={cart} />
+            
+            {/* Voucher Picker */}
+            <VoucherPicker
+              availableVouchers={availableVouchers}
+              selectedVoucher={appliedVoucher?.voucher}
+              onSelectVoucher={handleSelectVoucher}
+              subtotal={calculateSubtotal()}
+              loading={voucherLoading}
+              error={voucherError}
+              success={voucherSuccess}
+            />
+            
             <OrderSummary
               products={cart}
               voucherCode={appliedVoucher?.voucher.code}
               voucherDiscount={calculateDiscount()}
-              voucherInput={voucherInput}
-              onVoucherInputChange={setVoucherInput}
-              onApplyVoucher={handleApplyVoucher}
-              onRemoveVoucher={handleRemoveVoucher}
-              voucherLoading={voucherLoading}
-              voucherError={voucherError}
-              voucherSuccess={voucherSuccess}
-              availableVouchers={availableVouchers}
-              vouchersLoading={vouchersLoading}
-              onSelectVoucher={handleSelectVoucher}
             />
             <PaymentMethod
               selectedMethod={paymentMethod}

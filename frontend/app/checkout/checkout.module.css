@@ -640,6 +640,354 @@
   }
 }
 
+/* ====== VOUCHER PICKER ====== */
+.voucherPickerSection {
+  margin: 1.5rem 0;
+}
+
+.openVoucherPickerBtn {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #ee4d2d 0%, #ff7f50 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(238, 77, 45, 0.2);
+}
+
+.openVoucherPickerBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(238, 77, 45, 0.3);
+}
+
+.appliedVoucherBanner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #d4edda;
+  border: 2px solid #28a745;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.appliedVoucherInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.appliedVoucherCode {
+  font-weight: 700;
+  color: #155724;
+  font-size: 1rem;
+}
+
+.appliedVoucherDiscount {
+  color: #155724;
+  font-size: 0.9rem;
+}
+
+.changeVoucherBtn {
+  padding: 0.5rem 1rem;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.changeVoucherBtn:hover {
+  background: #218838;
+}
+
+/* Voucher Modal */
+.voucherModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.voucherModalContent {
+  background: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.voucherModalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 2px solid #ee4d2d;
+  flex-shrink: 0;
+}
+
+.voucherModalHeader h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #333;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #999;
+  transition: color 0.2s ease;
+}
+
+.closeBtn:hover {
+  color: #333;
+}
+
+.voucherInputSection {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+.voucherSearchInput {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.voucherSearchInput:focus {
+  outline: none;
+  border-color: #ee4d2d;
+  box-shadow: 0 0 0 3px rgba(238, 77, 45, 0.1);
+}
+
+.applyInputBtn {
+  padding: 0.75rem 1.5rem;
+  background: #ee4d2d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.applyInputBtn:hover:not(:disabled) {
+  background: #d83a23;
+}
+
+.applyInputBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.vouchersContainer {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 0;
+}
+
+.voucherSection {
+  padding: 0 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.voucherSectionTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #ee4d2d;
+}
+
+.voucherList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.voucherCard {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.voucherCard:hover:not(.disabled) {
+  border-color: #ee4d2d;
+  background-color: #fff0f3;
+  box-shadow: 0 2px 8px rgba(238, 77, 45, 0.15);
+  transform: translateY(-2px);
+}
+
+.voucherCard.selected {
+  border-color: #ee4d2d;
+  background-color: #fff0f3;
+}
+
+.voucherCard.disabled {
+  opacity: 0.6;
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.voucherCardLeft {
+  flex-shrink: 0;
+}
+
+.voucherCardIcon {
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.voucherCardMiddle {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.voucherCardTitle {
+  font-weight: 700;
+  color: #333;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.voucherCardDesc {
+  color: #666;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.voucherCardCondition {
+  color: #999;
+  font-size: 0.8rem;
+}
+
+.voucherCardRight {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkbox {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: white;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.checkbox.checked {
+  background: #ee4d2d;
+  border-color: #ee4d2d;
+}
+
+.checkboxDisabled {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #ccc;
+}
+
+.noVouchers {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  color: #999;
+  font-size: 1rem;
+}
+
+.voucherModalFooter {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.footerInfo {
+  flex: 1;
+  color: #555;
+  font-weight: 500;
+  min-width: 250px;
+}
+
+.confirmVoucherBtn {
+  padding: 0.75rem 2rem;
+  background: #ee4d2d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.confirmVoucherBtn:hover {
+  background: #d83a23;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* ====== RESPONSIVE DESIGN ====== */
 @media (max-width: 768px) {
   .checkoutContainer {
