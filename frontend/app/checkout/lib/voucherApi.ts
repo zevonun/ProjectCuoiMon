@@ -1,5 +1,7 @@
 import { apiPost } from '../../lib/apiClient';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 export interface VoucherValidationResult {
   voucher: {
     code: string;
@@ -51,9 +53,11 @@ export async function getAvailableVouchers(): Promise<Array<{
   value: number;
   description?: string;
   minOrderAmount?: number;
+  usageLimit?: number;
+  usedCount?: number;
 }>> {
   try {
-    const response = await fetch('/api/vouchers/available');
+    const response = await fetch(`${API_URL}/api/vouchers/available`);
     if (!response.ok) {
       return [];
     }
@@ -62,9 +66,19 @@ export async function getAvailableVouchers(): Promise<Array<{
       type: 'percentage' | 'fixed';
       value: number;
       description?: string;
-      minOrderAmount?: number;
+      minOrder?: number;
+      quantity?: number;
+      used?: number;
     }>> = await response.json();
-    return data.data || [];
+    return (data.data || []).map((voucher) => ({
+      code: voucher.code,
+      type: voucher.type,
+      value: voucher.value,
+      description: voucher.description,
+      minOrderAmount: voucher.minOrder,
+      usageLimit: voucher.quantity,
+      usedCount: voucher.used,
+    }));
   } catch (error) {
     console.error('Failed to fetch available vouchers:', error);
     return [];

@@ -1,6 +1,32 @@
 const Voucher = require('../models/voucher');
 const Order = require('../models/order');
 
+function resolveVoucherStatus({
+    startDate,
+    endDate,
+    quantity,
+    used = 0,
+    requestedStatus
+}) {
+    const now = new Date();
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (requestedStatus === 'inactive') {
+        return 'inactive';
+    }
+
+    if (used >= quantity || end < now) {
+        return 'expired';
+    }
+
+    if (start <= now && end >= now) {
+        return 'active';
+    }
+
+    return 'scheduled';
+}
+
 
 // @desc    Get all vouchers (Admin)
 // @route   GET /api/admin/vouchers
@@ -115,6 +141,13 @@ exports.createVoucher = async (req, res) => {
             });
         }
 
+        const resolvedStatus = resolveVoucherStatus({
+            startDate,
+            endDate,
+            quantity: Number(quantity),
+            requestedStatus: status
+        });
+
         const voucherData = {
             code,
             type,
@@ -124,7 +157,7 @@ exports.createVoucher = async (req, res) => {
             quantity: Number(quantity),
             startDate,
             endDate,
-            status: status || 'scheduled',
+            status: resolvedStatus,
             description: description || '',
             limitPerUser: Number(limitPerUser) || 1,
             applicableProducts: applicableProducts || [],
@@ -193,6 +226,14 @@ exports.updateVoucher = async (req, res) => {
             if (req.body[field] !== undefined) {
                 voucher[field] = req.body[field];
             }
+        });
+
+        voucher.status = resolveVoucherStatus({
+            startDate: voucher.startDate,
+            endDate: voucher.endDate,
+            quantity: Number(voucher.quantity),
+            used: Number(voucher.used),
+            requestedStatus: req.body.status !== undefined ? req.body.status : voucher.status
         });
 
         voucher.updatedBy = req.user?._id || req.user?.id;
@@ -294,6 +335,8 @@ exports.getVoucherStats = async (req, res) => {
 // @access  Public
 exports.getValidVouchers = async (req, res) => {
     try {
+        await Voucher.updateStatuses();
+
         const now = new Date();
 
         const vouchers = await Voucher.find({

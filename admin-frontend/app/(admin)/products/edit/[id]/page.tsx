@@ -18,8 +18,14 @@ export default function EditProductPage() {
   useEffect(() => {
     if (!id) return;
 
-    apiFetch(`/api/product/${id}`)
-      .then(res => res.json())
+    apiFetch(`/admin/products/${id}`)
+      .then(async res => {
+        const json = await res.json().catch(() => null);
+        if (!res.ok) {
+          throw new Error(json?.message || 'Khong the tai san pham');
+        }
+        return json;
+      })
       .then(res => {
         if (res.success && res.data) {
           setProduct(res.data);
@@ -36,7 +42,7 @@ export default function EditProductPage() {
 
   const handleUpdate = async (payload: ProductPayload) => {
     try {
-      const res = await apiFetch(`/api/product/${id}`, {
+      const res = await apiFetch(`/admin/products/${id}`, {
         method: 'PUT',
         body: JSON.stringify(payload),
       });

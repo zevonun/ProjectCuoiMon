@@ -41,7 +41,13 @@ export async function createVoucher(data: VoucherFormData) {
         method: 'POST',
         body: JSON.stringify(data),
     });
-    if (!res || !res.ok) throw new Error('Failed to create voucher');
+    if (!res || !res.ok) {
+        const errorData = await res.json().catch(() => null);
+        const validationMessage = Array.isArray(errorData?.errors) && errorData.errors.length > 0
+            ? errorData.errors[0].msg
+            : null;
+        throw new Error(validationMessage || errorData?.message || 'Failed to create voucher');
+    }
     return res.json();
 }
 
@@ -50,7 +56,13 @@ export async function updateVoucher(id: string, data: Partial<VoucherFormData>) 
         method: 'PUT',
         body: JSON.stringify(data),
     });
-    if (!res || !res.ok) throw new Error('Failed to update voucher');
+    if (!res || !res.ok) {
+        const errorData = await res.json().catch(() => null);
+        const validationMessage = Array.isArray(errorData?.errors) && errorData.errors.length > 0
+            ? errorData.errors[0].msg
+            : null;
+        throw new Error(validationMessage || errorData?.message || 'Failed to update voucher');
+    }
     return res.json();
 }
 

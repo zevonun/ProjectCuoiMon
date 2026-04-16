@@ -6,7 +6,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { formatPrice } from '../lib/formatPrice';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
+const QUICK_PROMPTS = [
+  'Da dau nen dung gi?',
+  'Da kho nen dung gi?',
+  'Moi kho nen dung gi?',
+  'Da mun nen dung gi?',
+];
 
 interface Product {
   id: string;
@@ -71,6 +78,33 @@ export default function Chatbot() {
       console.error(err);
       setMessages(prev => [...prev, { role: 'bot', text: 'Lỗi server 😢' }]);
     } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleQuickPrompt = async (prompt: string) => {
+    if (loading) return;
+    setInput(prompt);
+
+    const userMsg: Message = { role: 'user', text: prompt };
+    setMessages(prev => [...prev, userMsg]);
+    setLoading(true);
+
+    try {
+      const res = await axios.post(`${API_URL}/api/chat`, { message: prompt });
+
+      const botMsg: Message = {
+        role: 'bot',
+        text: res.data?.reply?.text || 'Khong co phan hoi',
+        products: res.data?.reply?.products || []
+      };
+
+      setMessages(prev => [...prev, botMsg]);
+    } catch (err) {
+      console.error(err);
+      setMessages(prev => [...prev, { role: 'bot', text: 'Loi server' }]);
+    } finally {
+      setInput('');
       setLoading(false);
     }
   };
@@ -200,6 +234,29 @@ export default function Chatbot() {
 
         {/* MESSAGES */}
         <div style={{ flex: 1, padding: 10, overflowY: 'auto' }}>
+          {messages.length === 1 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
+              {QUICK_PROMPTS.map((prompt) => (
+                <button
+                  key={prompt}
+                  type="button"
+                  onClick={() => handleQuickPrompt(prompt)}
+                  style={{
+                    border: '1px solid #cfe0bf',
+                    background: '#fff',
+                    color: '#3f6f12',
+                    borderRadius: 999,
+                    padding: '6px 10px',
+                    fontSize: 12,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          )}
+
           {messages.map((m, i) => (
             <div key={i} style={{
               display: 'flex',

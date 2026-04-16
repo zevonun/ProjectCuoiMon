@@ -1,120 +1,270 @@
 .container {
-  max-width: 1200px;
-  margin: 40px auto;
-  padding: 0 15px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 32px 16px 64px;
   min-height: 70vh;
 }
 
-.header {
-  margin-bottom: 40px;
-  text-align: center;
+/* ===== HERO ===== */
+.hero {
+  display: grid;
+  grid-template-columns: 1.5fr 0.9fr;
+  gap: 24px;
+  margin-bottom: 32px;
 }
 
+.heroContent,
+.heroStats {
+  border-radius: 20px;
+  background: linear-gradient(180deg, #fffdf8, #fff);
+  border: 1px solid #f0e7d9;
+  box-shadow: 0 12px 30px rgba(41, 60, 41, 0.08);
+}
+
+.heroContent {
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.heroContent::after {
+  content: "";
+  position: absolute;
+  right: -60px;
+  top: -60px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 107, 53, 0.15), transparent 70%);
+}
+
+/* ===== BREADCRUMB ===== */
 .breadcrumb {
-  list-style: none;
   display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
   font-size: 14px;
-  color: #666;
-}
-
-.breadcrumb li a:hover {
-  color: #ec4899;
+  color: #6c7a67;
 }
 
 .breadcrumb li:not(:last-child)::after {
   content: "/";
-  margin-left: 10px;
-  color: #ccc;
+  margin-left: 8px;
+  color: #b2b9ab;
+}
+
+.breadcrumb a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.breadcrumb a:hover {
+  color: #ee4d2d;
 }
 
 .active {
-  color: #333;
-  font-weight: 600;
+  font-weight: 700;
+  color: #244b30;
 }
 
+/* ===== TEXT ===== */
 .title {
-  font-size: 32px;
-  font-weight: 800;
-  color: #2c5530;
-  margin-bottom: 10px;
+  margin: 12px 0;
+  font-size: clamp(28px, 4vw, 40px);
+  color: #244b30;
 }
 
 .subtitle {
-  color: #666;
-  font-size: 16px;
+  max-width: 600px;
+  color: #5f6d5b;
+  line-height: 1.6;
 }
 
+/* ===== TAG ===== */
+.heroTag,
+.emptyBadge {
+  display: inline-flex;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #fff1ea;
+  color: #ee4d2d;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* ===== STATS ===== */
+.heroStats {
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.statCard {
+  padding: 16px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid #f2e6d8;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: #7a8476;
+  text-transform: uppercase;
+}
+
+.statValue {
+  font-size: 22px;
+  font-weight: 700;
+  color: #244b30;
+}
+
+.statHint {
+  font-size: 13px;
+  color: #6f7869;
+}
+
+/* ===== SECTION ===== */
+.sectionBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  color: #244b30;
+}
+
+.sectionText {
+  font-size: 14px;
+  color: #667161;
+}
+
+.continueShopping {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid #e8dac9;
+  background: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  color: #244b30;
+  transition: 0.2s;
+}
+
+.continueShopping:hover {
+  border-color: #ee4d2d;
+  color: #ee4d2d;
+}
+
+/* ===== GRID SHOPEE STYLE ===== */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 30px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
 }
 
-.cardWrapper {
-  transition: transform 0.3s;
+/* ===== CARD ===== */
+.favoriteCard {
+  position: relative;
+  padding: 6px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  transition: 0.2s;
 }
 
-.cardWrapper:hover {
-  transform: translateY(-5px);
+.favoriteCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
 }
 
+.cardInner {
+  height: auto;
+}
+
+/* ===== REMOVE BUTTON ===== */
+.removeButton {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  color: #ee4d2d;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.removeButton:hover {
+  background: #fff1ea;
+}
+
+/* ===== LOADING ===== */
 .loading {
   text-align: center;
-  padding: 100px 0;
-  font-size: 18px;
-  color: #666;
+  padding: 100px;
+  color: #5f6d5b;
 }
 
+/* ===== EMPTY ===== */
 .empty {
   text-align: center;
-  padding: 80px 20px;
-  background: #fdfdfd;
+  padding: 50px 20px;
   border-radius: 20px;
-  border: 2px dashed #eee;
+  background: #fff;
+  border: 1px solid #f0e5d6;
 }
 
 .emptyIcon {
-  font-size: 64px;
-  margin-bottom: 20px;
+  font-size: 48px;
+  color: #ee4d2d;
 }
 
 .empty h3 {
+  margin: 10px 0;
   font-size: 24px;
-  margin-bottom: 10px;
-  color: #333;
 }
 
 .empty p {
-  color: #666;
-  margin-bottom: 30px;
+  color: #657062;
 }
 
 .shopBtn {
+  margin-top: 20px;
   display: inline-block;
-  background: #ec4899;
-  color: white;
-  padding: 14px 30px;
-  border-radius: 30px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: #ee4d2d;
+  color: #fff;
+  text-decoration: none;
   font-weight: 700;
-  transition: all 0.3s;
-  box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
 }
 
 .shopBtn:hover {
-  background: #db2777;
-  transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(236, 72, 153, 0.4);
+  opacity: 0.9;
 }
 
-@media (max-width: 768px) {
-  .title {
-    font-size: 28px;
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
   }
+}
+
+@media (max-width: 640px) {
   .grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: 1fr;
   }
 }

@@ -15,7 +15,12 @@ import {
 } from './types';
 import { validateCustomerInfo } from './lib/validation';
 import { createOrder as createOrderApi } from './lib/orderApi';
-import { applyVoucherToOrder, validateVoucher, VoucherValidationResult, getAvailableVouchers } from './lib/voucherApi';
+import {
+  applyVoucherToOrder,
+  validateVoucher,
+  VoucherValidationResult,
+  getAvailableVouchers,
+} from './lib/voucherApi';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useOrder } from '../context/OrderContext';
@@ -30,6 +35,8 @@ interface Voucher {
   value: number;
   description?: string;
   minOrderAmount?: number;
+  usageLimit?: number;
+  usedCount?: number;
 }
 
 export default function CheckoutPage() {
@@ -51,7 +58,6 @@ export default function CheckoutPage() {
   const [isLoading, setIsLoading] = useState(orderLoading);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [voucherInput, setVoucherInput] = useState('');
   const [appliedVoucher, setAppliedVoucher] = useState<VoucherValidationResult | null>(null);
   const [voucherLoading, setVoucherLoading] = useState(false);
   const [voucherError, setVoucherError] = useState('');
@@ -114,48 +120,14 @@ export default function CheckoutPage() {
     return Math.max(0, calculateSubtotal() - calculateDiscount()) + SHIPPING_FEE;
   };
 
-  const handleApplyVoucher = async () => {
-    const code = voucherInput.trim().toUpperCase();
-    const subtotal = calculateSubtotal();
-
-    if (!code) {
-      setVoucherError('Vui long nhap ma voucher');
-      setVoucherSuccess('');
-      return;
-    }
-
-    if (subtotal <= 0) {
-      setVoucherError('Khong co san pham hop le de ap voucher');
-      setVoucherSuccess('');
-      return;
-    }
-
-    setVoucherLoading(true);
-    setVoucherError('');
-    setVoucherSuccess('');
-
-    try {
-      const result = await validateVoucher(code, subtotal);
-      setAppliedVoucher(result);
-      setVoucherInput(result.voucher.code);
-      setVoucherSuccess('Da ap dung voucher ' + result.voucher.code);
-    } catch (error) {
-      setAppliedVoucher(null);
-      setVoucherError(error instanceof Error ? error.message : 'Áp dụng voucher thất bại');
-    } finally {
-      setVoucherLoading(false);
-    }
-  };
 
   const handleRemoveVoucher = () => {
     setAppliedVoucher(null);
-    setVoucherInput('');
     setVoucherError('');
     setVoucherSuccess('');
   };
 
   const handleSelectVoucher = async (voucher: Voucher) => {
-    setVoucherInput(voucher.code);
     setVoucherLoading(true);
     setVoucherError('');
     setVoucherSuccess('');
@@ -369,8 +341,10 @@ export default function CheckoutPage() {
               availableVouchers={availableVouchers}
               selectedVoucher={appliedVoucher?.voucher}
               onSelectVoucher={handleSelectVoucher}
+              onClearVoucher={handleRemoveVoucher}
               subtotal={calculateSubtotal()}
               loading={voucherLoading}
+              vouchersLoading={vouchersLoading}
               error={voucherError}
               success={voucherSuccess}
             />
@@ -411,3 +385,4 @@ export default function CheckoutPage() {
     </div>
   );
 }
+
