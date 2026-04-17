@@ -11,6 +11,7 @@ interface Props {
   products: Product[];
   total: number;
   slug: string;
+  searchTerm?: string;
   currentFilters: FilterState;
 }
 
@@ -25,6 +26,7 @@ export default function ProductsClientPage({
   products,
   total,
   slug,
+  searchTerm,
   currentFilters,
 }: Props) {
   const router   = useRouter();
@@ -33,13 +35,14 @@ export default function ProductsClientPage({
   const handleFilterChange = useCallback(
     (filters: FilterState) => {
       const params = new URLSearchParams();
+      if (searchTerm) params.set("search", searchTerm);
       if (filters.minPrice !== "") params.set("minPrice", String(filters.minPrice));
       if (filters.maxPrice !== "") params.set("maxPrice", String(filters.maxPrice));
       if (filters.sort !== "default") params.set("sort", filters.sort);
 
       router.push(`${pathname}?${params.toString()}`);
     },
-    [pathname, router]
+    [pathname, router, searchTerm]
   );
 
   return (
@@ -48,7 +51,7 @@ export default function ProductsClientPage({
       <div className={styles.breadcrumb}>
         <a href="/">Trang chủ</a>
         <span> / </span>
-        <span>{slug}</span>
+        <span>{searchTerm ? `Tìm kiếm: "${searchTerm}"` : slug}</span>
       </div>
 
       <div className={styles.mainLayout}>

@@ -21,6 +21,8 @@ export default function ArticleDetailPage() {
   const [related, setRelated] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const API_URL_BE = "http://localhost:5000";
+
   useEffect(() => {
     if (!slug) return;
     setLoading(true);
@@ -104,7 +106,7 @@ export default function ArticleDetailPage() {
           </header>
 
           <img 
-            src={article.image} 
+            src={API_URL_BE + article.image} 
             alt={article.title_vi} 
             className="article-featured-img" 
           />
