@@ -60,18 +60,18 @@ export default function Sidebar() {
   };
 
   const navItems: NavItem[] = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, type: "link", activePrefix: "/dashboard" },
-    { href: "/products", label: "Products", icon: ShoppingCart, permission: "manage_products", type: "link", activePrefix: "/products" },
-    { href: "/categories", label: "Categories", icon: Folder, permission: "manage_categories", type: "link", activePrefix: "/categories" },
-    { href: "/banners", label: "Banners", icon: Image, permission: "manage_banners", type: "link", activePrefix: "/banners" },
-    { href: "/articles", label: "Articles", icon: FileText, permission: "manage_articles", type: "link", activePrefix: "/articles" },
-    { href: "/vouchers", label: "Vouchers", icon: Ticket, permission: "manage_vouchers", type: "link", activePrefix: "/vouchers" },
-    { href: "/users", label: "Nguoi dung", icon: Users, permission: "manage_users", type: "link", activePrefix: "/users" },
-    { href: "/orders", label: "Don hang", icon: ClipboardList, permission: "manage_orders", type: "link", activePrefix: "/orders" },
-    { href: "/manage-inventory", label: "Quan ly ton kho", icon: Folder, permission: "manage_products", type: "link", activePrefix: "/manage-inventory" },
-    { href: "/reviews", label: "Danh gia", icon: Star, permission: "manage_products", type: "link", activePrefix: "/reviews" },
-    { href: "/customers", label: "Khach hang", icon: UserCheck, permission: "manage_users", type: "link", activePrefix: "/customers" },
-    { label: "Dang xuat", icon: LogOut, type: "action", onClick: signOut },
+    { href: "/dashboard", label: "Bảng điều khiển", icon: LayoutDashboard, type: "link", activePrefix: "/dashboard" },
+    { href: "/products", label: "Sản phẩm", icon: ShoppingCart, permission: "manage_products", type: "link", activePrefix: "/products" },
+    { href: "/categories", label: "Danh mục", icon: Folder, permission: "manage_categories", type: "link", activePrefix: "/categories" },
+    { href: "/banners", label: "Hình ảnh", icon: Image, permission: "manage_banners", type: "link", activePrefix: "/banners" },
+    { href: "/articles", label: "Bài viết", icon: FileText, permission: "manage_articles", type: "link", activePrefix: "/articles" },
+    { href: "/vouchers", label: "Mã giảm giá", icon: Ticket, permission: "manage_vouchers", type: "link", activePrefix: "/vouchers" },
+    { href: "/users", label: "Người dùng", icon: Users, permission: "manage_users", type: "link", activePrefix: "/users" },
+    { href: "/orders", label: "Đơn hàng", icon: ClipboardList, permission: "manage_orders", type: "link", activePrefix: "/orders" },
+    { href: "/manage-inventory", label: "Tồn kho", icon: Folder, permission: "manage_products", type: "link", activePrefix: "/manage-inventory" },
+    { href: "/reviews", label: "Đánh giá", icon: Star, permission: "manage_products", type: "link", activePrefix: "/reviews" },
+    { href: "/customers", label: "Khách hàng", icon: UserCheck, permission: "manage_users", type: "link", activePrefix: "/customers" },
+    { label: "Đăng xuất", icon: LogOut, type: "action", onClick: signOut },
   ];
 
   const visibleNavItems = navItems.filter((item) => can(item.permission));

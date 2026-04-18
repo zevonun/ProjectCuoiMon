@@ -239,7 +239,7 @@ export default function Header() {
             <span>|</span>
             <Link href="#">Dầu Gội</Link>
           </div>
-          <div className="search-box" style={{ position: 'relative' }}>
+          <form className="search-box" style={{ position: 'relative' }} onSubmit={handleSearchSubmit}>
             <input
               type="text"
               placeholder="Tìm sản phẩm, danh mục mong muốn ..."
@@ -248,7 +248,7 @@ export default function Header() {
               onFocus={() => searchQuery && setShowSearchResults(true)}
               onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
             />
-            <button onClick={handleSearchSubmit}><i className="fa fa-search"></i></button>
+            <button type="submit"><i className="fa fa-search"></i></button>
 
             {/* Search Results Dropdown */}
             {showSearchResults && searchResults.length > 0 && (
@@ -291,6 +291,7 @@ export default function Header() {
                         alt={product.ten_sp}
                         width={50}
                         height={50}
+                        unoptimized
                         style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }}
                       />
                     </div>
@@ -306,7 +307,7 @@ export default function Header() {
                 ))}
               </div>
             )}
-          </div>
+          </form>
         </div>
         <div className="header-top-right" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <div className="cart">

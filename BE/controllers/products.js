@@ -35,10 +35,14 @@ const formatProduct = (p) => ({
  */
 const getAllProducts = async (req, res) => {
   try {
-    const { category, minPrice, maxPrice, sort, limit, page } = req.query;
+    const { category, minPrice, maxPrice, sort, limit, page, search } = req.query;
 
     // ── Xây dựng filter query ──
     const filter = {};
+
+    if (search) {
+      filter.name = new RegExp(search, 'i');
+    }
 
     if (category) {
       // Nếu là ObjectId hợp lệ → dùng trực tiếp
