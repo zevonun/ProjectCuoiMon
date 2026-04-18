@@ -394,6 +394,11 @@
   background: #f0f0f0;
 }
 
+.qty-btn-cart:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .qty-input-cart {
   width: 40px;
   height: 100%;

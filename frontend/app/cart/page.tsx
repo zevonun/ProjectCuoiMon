@@ -65,6 +65,7 @@ export default function CartPage() {
 
           {cartItems.map((item) => {
             const p = item.product;
+            const stock = Math.max(0, Number(p.stock) || 0);
             const isSelected = selectedItems.has(p._id);
             return (
               <div className="cart-item" key={p._id}>
@@ -116,8 +117,11 @@ export default function CartPage() {
                       className="qty-input-cart"
                     />
                     <button
+                      type="button"
                       className="qty-btn-cart plus"
                       onClick={() => updateQuantity(p._id, item.quantity + 1)}
+                      disabled={stock <= 0 || item.quantity >= stock}
+                      title={item.quantity >= stock ? "Đã đạt số lượng tối đa trong kho" : "Tăng số lượng"}
                     >
                       +
                     </button>

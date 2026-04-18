@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useMemo, ReactNode } from "react";
+import { createContext, useContext, useState, useMemo, useEffect, ReactNode } from "react";
 import { Product } from "../lib/api";
 
 // CartItem có đầy đủ thông tin sản phẩm + số lượng
@@ -41,18 +41,35 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
-  // ĐÃ SỬA ĐÚNG: dùng product._id
+  useEffect(() => {
+    const ids = new Set(cartItems.map((c) => c.product._id));
+    setSelectedItems((prev) => {
+      const next = new Set([...prev].filter((id) => ids.has(id)));
+      if (next.size === prev.size && [...prev].every((id) => next.has(id))) {
+        return prev;
+      }
+      return next;
+    });
+  }, [cartItems]);
+
+  const maxOrderQty = (product: Product) =>
+    Math.max(0, Number(product.stock) || 0);
+
   const addToCart = (product: Product, quantity: number = 1) => {
+    const cap = maxOrderQty(product);
+    if (cap <= 0) return;
+
     setCartItems(prev => {
       const existing = prev.find(item => item.product._id === product._id);
       if (existing) {
+        const nextQty = Math.min(cap, existing.quantity + quantity);
         return prev.map(item =>
           item.product._id === product._id
-            ? { ...item, quantity: item.quantity + quantity }
+            ? { ...item, quantity: nextQty, product }
             : item
         );
       }
-      return [...prev, { product, quantity }];
+      return [...prev, { product, quantity: Math.min(cap, quantity) }];
     });
   };
 
@@ -66,15 +83,18 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(productId);
-      return;
-    }
-    setCartItems(prev =>
-      prev.map(item =>
-        item.product._id === productId ? { ...item, quantity } : item
-      )
-    );
+    setCartItems((prev) => {
+      const item = prev.find((i) => i.product._id === productId);
+      if (!item) return prev;
+      const cap = maxOrderQty(item.product);
+      const nextQty = Math.min(cap, quantity);
+      if (nextQty <= 0) {
+        return prev.filter((i) => i.product._id !== productId);
+      }
+      return prev.map((i) =>
+        i.product._id === productId ? { ...i, quantity: nextQty } : i
+      );
+    });
   };
 
   const clearCart = () => {

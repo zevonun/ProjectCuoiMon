@@ -55,7 +55,7 @@ export default function LovePage() {
   };
 
   if (loading) {
-    return <div className={styles.loading}>Dang tai danh sach yeu thich...</div>;
+    return <div className={styles.loading}>Đang tải danh sách yêu thích...</div>;
   }
 
   return (
@@ -64,28 +64,28 @@ export default function LovePage() {
         <div className={styles.heroContent}>
           <ul className={styles.breadcrumb}>
             <li>
-              <Link href="/">Trang chu</Link>
+              <Link href="/">Trang chủ</Link>
             </li>
-            <li className={styles.active}>San pham yeu thich</li>
+            <li className={styles.active}>Sản phẩm yêu thích</li>
           </ul>
 
-          <span className={styles.heroTag}>Wishlist</span>
-          <h1 className={styles.title}>San pham yeu thich</h1>
+          <span className={styles.heroTag}>Yêu thích</span>
+          <h1 className={styles.title}>Sản phẩm yêu thích</h1>
           <p className={styles.subtitle}>
-            Luu lai nhung mon ban quan tam de xem lai nhanh hon va dua ra quyet dinh mua sam de dang.
+            Lưu lại những món bạn quan tâm để xem lại nhanh hơn và đưa ra quyết định mua sắm dễ dàng.
           </p>
         </div>
 
         <div className={styles.heroStats}>
           <div className={styles.statCard}>
-            <span className={styles.statLabel}>Da luu</span>
+            <span className={styles.statLabel}>Đã lưu</span>
             <strong className={styles.statValue}>{favorites.length}</strong>
-            <span className={styles.statHint}>san pham</span>
+            <span className={styles.statHint}>sản phẩm</span>
           </div>
           <div className={styles.statCard}>
-            <span className={styles.statLabel}>Meo nho</span>
-            <strong className={styles.statValue}>Theo doi</strong>
-            <span className={styles.statHint}>bo suu tap ban muon mua sau</span>
+            <span className={styles.statLabel}>Mẹo nhỏ</span>
+            <strong className={styles.statValue}>Theo dõi</strong>
+            <span className={styles.statHint}>bộ sưu tập bạn muốn mua sau</span>
           </div>
         </div>
       </section>
@@ -94,13 +94,13 @@ export default function LovePage() {
         <>
           <section className={styles.sectionBar}>
             <div>
-              <h2 className={styles.sectionTitle}>Danh sach cua ban</h2>
+              <h2 className={styles.sectionTitle}>Danh sách của bạn</h2>
               <p className={styles.sectionText}>
-                Nhan vao san pham de xem chi tiet hoac bo khoi danh sach yeu thich ngay tai day.
+                Nhấn vào sản phẩm để xem chi tiết hoặc bỏ khỏi danh sách yêu thích ngay tại đây.
               </p>
             </div>
             <Link href="/" className={styles.continueShopping}>
-              Kham pha them
+              Khám phá thêm
             </Link>
           </section>
 
@@ -111,9 +111,9 @@ export default function LovePage() {
                   type="button"
                   className={styles.removeButton}
                   onClick={() => handleRemoveFavorite(product._id)}
-                  aria-label={`Bo ${product.ten_sp} khoi yeu thich`}
+                  aria-label={`Bỏ ${product.ten_sp} khỏi yêu thích`}
                 >
-                  x
+                  ×
                 </button>
                 <div className={styles.cardInner}>
                   <ProductCard product={product} />
@@ -124,14 +124,16 @@ export default function LovePage() {
         </>
       ) : (
         <section className={styles.empty}>
-          <span className={styles.emptyBadge}>Wishlist</span>
-          <div className={styles.emptyIcon}>LOVE</div>
-          <h3>Danh sach yeu thich con trong</h3>
+          <span className={styles.emptyBadge}>Yêu thích</span>
+          <div className={styles.emptyIcon} aria-hidden>
+            ♡
+          </div>
+          <h3>Danh sách yêu thích còn trống</h3>
           <p>
-            Hay dao quanh cua hang va luu lai nhung san pham ban muon xem lai sau.
+            Hãy dạo quanh cửa hàng và lưu lại những sản phẩm bạn muốn xem lại sau.
           </p>
           <Link href="/" className={styles.shopBtn}>
-            Kham pha san pham
+            Khám phá sản phẩm
           </Link>
         </section>
       )}

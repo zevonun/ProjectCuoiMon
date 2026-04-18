@@ -55,7 +55,7 @@ export default function ArticleDetailPage() {
 
   if (loading) {
     return (
-      <div className="article-page" style={{ textAlign: "center", padding: "100px 0" }}>
+      <div className="article-page article-loading">
         <p>Đang tải bài viết...</p>
       </div>
     );
@@ -87,7 +87,7 @@ export default function ArticleDetailPage() {
             <span className="breadcrumb-sep">/</span>
             <Link href="/about">Giới thiệu</Link>
             <span className="breadcrumb-sep">/</span>
-            <span style={{ color: "#3e6807" }}>{article.title_vi}</span>
+            <span className="breadcrumb-current">{article.title_vi}</span>
           </nav>
 
           <header className="article-header">
@@ -116,12 +116,11 @@ export default function ArticleDetailPage() {
             dangerouslySetInnerHTML={{ __html: article.content_vi }}
           />
 
-          {/* Social Share (Placeholder) */}
-          <div className="social-share" style={{ marginTop: "50px", borderTop: "1px solid #f0f0f0", paddingTop: "30px" }}>
-            <span style={{ fontWeight: 700, marginRight: "15px" }}>Chia sẻ:</span>
-            <span style={{ fontSize: "1.5rem", cursor: "pointer", marginRight: "10px" }}>📘</span>
-            <span style={{ fontSize: "1.5rem", cursor: "pointer", marginRight: "10px" }}>🐦</span>
-            <span style={{ fontSize: "1.5rem", cursor: "pointer", marginRight: "10px" }}>📨</span>
+          <div className="article-social-share">
+            <span>Chia sẻ:</span>
+            <span className="share-emoji" title="Facebook">📘</span>
+            <span className="share-emoji" title="Twitter">🐦</span>
+            <span className="share-emoji" title="Email">📨</span>
           </div>
         </main>
 
@@ -150,14 +149,12 @@ export default function ArticleDetailPage() {
 
           <div className="sidebar-widget">
             <h3 className="widget-title">Theo dõi Aura Beauty</h3>
-            <p style={{ fontSize: "0.9rem", color: "#666", lineHeight: 1.6 }}> Đăng ký nhận tin để không bỏ lỡ các bí quyết chăm sóc da hữu ích từ chuyên gia Aura.</p>
-            <div style={{ marginTop: "15px", display: "flex", gap: "10px" }}>
-              <input 
-                type="email" 
-                placeholder="Email của bạn..." 
-                style={{ flex: 1, padding: "8px 15px", borderRadius: "8px", border: "1px solid #ddd", outline: "none" }}
-              />
-              <button style={{ background: "#ec4899", color: "white", border: "none", padding: "8px 15px", borderRadius: "8px", cursor: "pointer" }}>Gửi</button>
+            <p className="widget-lead">
+              Đăng ký nhận tin để không bỏ lỡ các bí quyết chăm sóc da hữu ích từ chuyên gia Aura.
+            </p>
+            <div className="sidebar-newsletter">
+              <input type="email" placeholder="Email của bạn..." aria-label="Email nhận tin" />
+              <button type="button">Gửi</button>
             </div>
           </div>
         </aside>

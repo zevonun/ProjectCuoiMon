@@ -7,7 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import styles from "./page.module.css";
 import OrderStatusBadge from "../components/OrderStatusBadge";
-import { getOrderDetails, Order } from "../lib/orderApi";
+import { getOrderDetails, getOrderProductId, Order } from "../lib/orderApi";
 import { formatPrice } from "../../lib/formatPrice";
 
 export default function OrderDetailPage() {
@@ -84,7 +84,7 @@ export default function OrderDetailPage() {
         setOrder(data);
         
         // Lấy chi tiết sản phẩm
-        const productIds = data.products.map(p => p.productId);
+        const productIds = data.products.map(getOrderProductId).filter(Boolean);
         await fetchProductDetails(productIds);
       } catch (err) {
         console.error("Error fetching order:", err);
@@ -255,8 +255,9 @@ export default function OrderDetailPage() {
               <div className={styles.col4}>Tổng</div>
             </div>
             {order.products.map((product, idx) => {
-              const productInfo = productDetails[product.productId];
-              console.log(`Rendering product ${idx}:`, { id: product.productId, info: productInfo });
+              const pid = getOrderProductId(product);
+              const productInfo = productDetails[pid];
+              console.log(`Rendering product ${idx}:`, { id: pid, info: productInfo });
               
               return (
                 <div key={idx} className={styles.tableRow}>
@@ -284,7 +285,7 @@ export default function OrderDetailPage() {
                           {productInfo?.ten_sp || `Sản phẩm #${idx + 1}`}
                         </div>
                         <div className={styles.productId}>
-                          ID: {product.productId}
+                          ID: {pid}
                         </div>
                       </div>
                     </div>

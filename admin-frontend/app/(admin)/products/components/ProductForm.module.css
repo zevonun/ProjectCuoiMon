@@ -28,6 +28,13 @@
   color: #f87171;
 }
 
+.helperText {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #94a3b8;
+}
+
 .input,
 .textarea,
 .select {

@@ -9,10 +9,10 @@ import { formatPrice } from '../lib/formatPrice';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 const QUICK_PROMPTS = [
-  'Da dau nen dung gi?',
-  'Da kho nen dung gi?',
-  'Moi kho nen dung gi?',
-  'Da mun nen dung gi?',
+  'Da dầu nên dùng gì?',
+  'Da khô nên dùng gì?',
+  'Môi khô nên dùng gì?',
+  'Da mụn nên dùng gì?',
 ];
 
 interface Product {
@@ -95,14 +95,14 @@ export default function Chatbot() {
 
       const botMsg: Message = {
         role: 'bot',
-        text: res.data?.reply?.text || 'Khong co phan hoi',
+        text: res.data?.reply?.text || 'Không có phản hồi',
         products: res.data?.reply?.products || []
       };
 
       setMessages(prev => [...prev, botMsg]);
     } catch (err) {
       console.error(err);
-      setMessages(prev => [...prev, { role: 'bot', text: 'Loi server' }]);
+      setMessages(prev => [...prev, { role: 'bot', text: 'Lỗi server 😢' }]);
     } finally {
       setInput('');
       setLoading(false);
@@ -235,20 +235,36 @@ export default function Chatbot() {
         {/* MESSAGES */}
         <div style={{ flex: 1, padding: 10, overflowY: 'auto' }}>
           {messages.length === 1 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 8,
+                marginBottom: 10,
+                width: '100%',
+              }}
+            >
               {QUICK_PROMPTS.map((prompt) => (
                 <button
                   key={prompt}
                   type="button"
                   onClick={() => handleQuickPrompt(prompt)}
                   style={{
+                    width: '100%',
+                    boxSizing: 'border-box',
                     border: '1px solid #cfe0bf',
                     background: '#fff',
                     color: '#3f6f12',
-                    borderRadius: 999,
-                    padding: '6px 10px',
-                    fontSize: 12,
+                    borderRadius: 12,
+                    padding: '8px 10px',
+                    fontSize: 11,
+                    lineHeight: 1.35,
+                    textAlign: 'left',
                     cursor: 'pointer',
+                    minHeight: 40,
+                    display: 'flex',
+                    alignItems: 'center',
+                    transition: 'background 0.15s, border-color 0.15s',
                   }}
                 >
                   {prompt}

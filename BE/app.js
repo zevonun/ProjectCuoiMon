@@ -41,7 +41,15 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+// Dev: tắt 304/etag để ảnh static (/uploads) luôn tải lại; prod vẫn cache bình thường
+const isProd = process.env.NODE_ENV === 'production';
+app.use(express.static(path.join(__dirname, 'public'), {
+  etag: isProd,
+  lastModified: isProd,
+  setHeaders: (res) => {
+    if (!isProd) res.setHeader('Cache-Control', 'no-store');
+  },
+}));
 
 // ── CORS ──
 const allowedOrigins = process.env.CORS_ORIGIN

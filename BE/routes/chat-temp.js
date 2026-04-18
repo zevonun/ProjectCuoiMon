@@ -12,7 +12,7 @@ const ISSUE_PROFILES = [
     id: 'oily-skin',
     keywords: ['da dau', 'do dau', 'nhieu dau', 'bong dau', 'lo chan long', 'da dau mun', 'da mun'],
     advice:
-      'Voi da dau, nen uu tien lam sach diu nhe, serum mong nhe va kem duong dang gel de tranh bi tac nghen. Ban cung nen dung chong nang moi ngay.',
+      'Với da dầu, nên ưu tiên làm sạch dịu nhẹ, serum mỏng nhẹ và kem dưỡng dạng gel để tránh bị tắc nghẽn. Bạn cũng nên dùng chống nắng mỗi ngày.',
     preferredKeywords: ['tra xanh', 'tea tree', 'niacinamide', 'oil control', 'mun'],
     categoryKeywords: ['sua rua mat', 'serum', 'kem duong', 'chong nang', 'tay trang', 'toner'],
     recommendedCategories: ['sua rua mat', 'serum - tinh chat', 'kem duong da', 'chong nang', 'dau - nuoc tay trang'],
@@ -22,7 +22,7 @@ const ISSUE_PROFILES = [
     id: 'dry-skin',
     keywords: ['da kho', 'thieu am', 'bong troc', 'cang rat', 'da mat nuoc'],
     advice:
-      'Voi da kho, nen uu tien cap am va phuc hoi hang rao bao ve da. Bo doi sua rua mat diu nhe, serum cap am va kem duong am se phu hop hon.',
+      'Với da khô, nên ưu tiên cấp ẩm và phục hồi hàng rào bảo vệ da. Bộ đôi sữa rửa mặt dịu nhẹ, serum cấp ẩm và kem dưỡng ẩm sẽ phù hợp hơn.',
     preferredKeywords: ['ha', 'hyaluronic', 'hydration', 'ceramide', 'rose', 'cap am', 'duong am'],
     categoryKeywords: ['sua rua mat', 'serum', 'kem duong', 'mat na', 'toner'],
     recommendedCategories: ['sua rua mat', 'serum - tinh chat', 'kem duong da', 'mat na duong da'],
@@ -32,7 +32,7 @@ const ISSUE_PROFILES = [
     id: 'dry-lips',
     keywords: ['moi kho', 'moi nut ne', 'duong moi', 'son duong', 'lip balm'],
     advice:
-      'Neu moi kho, ban nen uu tien son duong moi, mat na moi va cac san pham moi co kha nang duong am. Nen han che son li qua kho neu moi dang nut ne.',
+      'Nếu môi khô, bạn nên ưu tiên son dưỡng môi, mặt nạ môi và các sản phẩm môi có khả năng dưỡng ẩm. Nên hạn chế son lì quá khô nếu môi đang nứt nẻ.',
     preferredKeywords: ['son duong', 'lip balm', 'duong moi', 'moi'],
     categoryKeywords: ['trang diem', 'son duong moi'],
     recommendedCategories: ['trang diem'],
@@ -43,7 +43,7 @@ const ISSUE_PROFILES = [
     id: 'acne-prone',
     keywords: ['mun', 'da mun', 'mun an', 'mun viem', 'tham mun'],
     advice:
-      'Voi da mun, nen giu quy trinh gon nhe: tay trang neu co makeup, rua mat diu nhe, serum ho tro lam diu da va kem duong mong nhe. Khong nen chong lop qua nhieu san pham.',
+      'Với da mụn, nên giữ quy trình gọn nhẹ: tẩy trang nếu có makeup, rửa mặt dịu nhẹ, serum hỗ trợ làm dịu da và kem dưỡng mỏng nhẹ. Không nên chồng lớp quá nhiều sản phẩm.',
     preferredKeywords: ['tra xanh', 'tea tree', 'rau ma', 'centella', 'lam diu'],
     categoryKeywords: ['sua rua mat', 'serum', 'tay trang', 'toner'],
     recommendedCategories: ['sua rua mat', 'serum - tinh chat', 'dau - nuoc tay trang'],
@@ -53,11 +53,10 @@ const ISSUE_PROFILES = [
 
 function normalizeText(value = '') {
   return String(value)
+    .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/d/g, 'd')
-    .replace(/�/g, 'D')
-    .toLowerCase()
+    .replace(/\u0111/g, 'd') // đ → d để khớp từ khóa
     .trim();
 }
 
@@ -168,24 +167,24 @@ function buildFallbackText(_message, matchedProducts, profiles) {
     const productNames = matchedProducts.slice(0, 3).map((product) => product.name);
 
     if (productNames.length > 0) {
-      return `${profileAdvice} Shop goi y ban tham khao: ${productNames.join(', ')}.`;
+      return `${profileAdvice} Shop gợi ý bạn tham khảo: ${productNames.join(', ')}.`;
     }
 
     if (profiles.some((profile) => profile.id === 'dry-lips')) {
-      return `${profileAdvice} Hien tai shop chua co san pham duong moi dung nghia phu hop trong catalog.`;
+      return `${profileAdvice} Hiện tại shop chưa có sản phẩm dưỡng môi đúng nghĩa phù hợp trong catalog.`;
     }
 
-    return `${profileAdvice} Hien tai shop chua tim duoc san pham that su sat nhat, ban co the noi ro hon ve van de da hoac ngan sach.`;
+    return `${profileAdvice} Hiện tại shop chưa tìm được sản phẩm thật sự sát nhất, bạn có thể nói rõ hơn về vấn đề da hoặc ngân sách.`;
   }
 
   if (matchedProducts.length > 0) {
-    return `Shop da tim thay mot so san pham lien quan voi nhu cau cua ban. Ban co the xem qua ${matchedProducts
+    return `Shop đã tìm thấy một số sản phẩm liên quan với nhu cầu của bạn. Bạn có thể xem qua ${matchedProducts
       .slice(0, 3)
       .map((product) => product.name)
-      .join(', ')}. Neu can, ban hay noi ro hon tinh trang da de shop tu van sat hon.`;
+      .join(', ')}. Nếu cần, bạn hãy nói rõ hơn tình trạng da để shop tư vấn sát hơn.`;
   }
 
-  return 'Ban hay cho shop biet tinh trang nhu da dau, da kho, moi kho, da mun hoac nhu cau nhu cap am, lam sach, chong nang de shop tu van chinh xac hon.';
+  return 'Bạn hãy cho shop biết tình trạng như da dầu, da khô, môi khô, da mụn hoặc nhu cầu như cấp ẩm, làm sạch, chống nắng để shop tư vấn chính xác hơn.';
 }
 
 async function buildAiReply(message, matchedProducts, profiles, catalogStats) {
@@ -194,7 +193,7 @@ async function buildAiReply(message, matchedProducts, profiles, catalogStats) {
   }
 
   const promptProducts = matchedProducts.slice(0, 8);
-  const promptProfiles = profiles.map((profile) => profile.id).join(', ') || 'khong xac dinh';
+  const promptProfiles = profiles.map((profile) => profile.id).join(', ') || 'không xác định';
 
   try {
     const completion = await openai.chat.completions.create({
@@ -203,19 +202,19 @@ async function buildAiReply(message, matchedProducts, profiles, catalogStats) {
         {
           role: 'system',
           content:
-            'Ban la nhan vien tu van my pham cua shop. Tra loi bang tieng Viet ngan gon, thuc te, uu tien goi y theo du lieu san pham duoc cung cap. Chi goi y nhung san pham thuc su phu hop voi nhu cau, khong chon san pham chi cung danh muc nhung sai cong dung. Khong duoc dua ra san pham ngoai du lieu.'
+            'Bạn là nhân viên tư vấn mỹ phẩm của shop. Trả lời bằng tiếng Việt ngắn gọn, thực tế, ưu tiên gợi ý theo dữ liệu sản phẩm được cung cấp. Chỉ gợi ý những sản phẩm thực sự phù hợp với nhu cầu, không chọn sản phẩm chỉ cùng danh mục nhưng sai công dụng. Không được đưa ra sản phẩm ngoài dữ liệu. Luôn viết đúng chính tả và dấu tiếng Việt.'
         },
         {
           role: 'user',
           content: [
-            `Khach hoi: ${message}`,
-            `Tinh trang nhan dien: ${promptProfiles}`,
-            `Tong so san pham trong catalog: ${catalogStats.totalProducts}`,
-            `Danh muc hien co: ${catalogStats.categoryNames.join(', ')}`,
-            'San pham da duoc loc phu hop:',
+            `Khách hỏi: ${message}`,
+            `Tình trạng nhận diện: ${promptProfiles}`,
+            `Tổng số sản phẩm trong catalog: ${catalogStats.totalProducts}`,
+            `Danh mục hiện có: ${catalogStats.categoryNames.join(', ')}`,
+            'Sản phẩm đã được lọc phù hợp:',
             ...promptProducts.map(
               (product) =>
-                `- ${product.name} | gia ${product.price} | danh muc ${product.categoryName || 'khong ro'} | nhom ${product.subcategory || 'khong ro'} | ton kho ${product.stock}`
+                `- ${product.name} | giá ${product.price} | danh mục ${product.categoryName || 'không rõ'} | nhóm ${product.subcategory || 'không rõ'} | tồn kho ${product.stock}`
             )
           ].join('\n')
         }
@@ -236,7 +235,7 @@ router.post('/', async (req, res) => {
     if (!message || !String(message).trim()) {
       return res.status(400).json({
         reply: {
-          text: 'Thieu noi dung can tu van.',
+          text: 'Thiếu nội dung cần tư vấn.',
           products: []
         }
       });
@@ -299,7 +298,7 @@ router.post('/', async (req, res) => {
     console.error(error);
     res.status(500).json({
       reply: {
-        text: 'Loi server khi tu van san pham.',
+        text: 'Lỗi server khi tư vấn sản phẩm.',
         products: []
       }
     });

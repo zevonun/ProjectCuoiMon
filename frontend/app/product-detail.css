@@ -226,27 +226,42 @@
 }
 
 .favorite-btn {
-  background: white;
-  border: 1px solid #ddd;
-  color: #ff6b35;
-  padding: 8px 12px;
-  font-size: 24px;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  color: #64748b;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s;
-  display: flex;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
+.favorite-btn i {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
 .favorite-btn:hover {
-  border-color: #ff6b35;
-  background: #fff5f2;
+  border-color: #94a3b8;
+  background: #f8fafc;
+  color: #475569;
 }
 
 .favorite-btn.active {
-  background: #fff5f2;
-  border-color: #ff6b35;
+  background: #fef2f2;
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+.favorite-btn.active:hover {
+  background: #fee2e2;
+  border-color: #b91c1c;
+  color: #b91c1c;
 }
 
 /* Ghi chú mua số lượng lớn */

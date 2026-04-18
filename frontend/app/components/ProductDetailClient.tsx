@@ -32,11 +32,20 @@ export default function ProductDetailClient({
 
   const [isFavorite, setIsFavorite] = useState(false);
 
+  const maxStock = Math.max(0, Number(product.stock) || 0);
+
   // Sync with localStorage
   useEffect(() => {
     const list = JSON.parse(localStorage.getItem("love_list") || "[]");
     setIsFavorite(list.includes(product._id));
   }, [product._id]);
+
+  useEffect(() => {
+    setQuantity((q) => {
+      if (maxStock <= 0) return 1;
+      return Math.min(Math.max(1, q), maxStock);
+    });
+  }, [product._id, maxStock]);
 
   const toggleFavorite = () => {
     const list = JSON.parse(localStorage.getItem("love_list") || "[]");
@@ -58,17 +67,17 @@ export default function ProductDetailClient({
   };
 
   const increaseQty = () => {
-    if (quantity < (product.stock || 0)) {
-      setQuantity(quantity + 1);
-    }
+    if (maxStock <= 0) return;
+    setQuantity((q) => Math.min(maxStock, q + 1));
   };
 
   const handleAddToCart = () => {
-    if ((product.stock || 0) <= 0) {
+    if (maxStock <= 0) {
       alert("Sản phẩm hiện đang hết hàng!");
       return;
     }
-    addToCart(product, quantity);
+    const qty = Math.min(quantity, maxStock);
+    addToCart(product, qty);
   };
 
   // ✅ Chuẩn hóa URL ảnh
@@ -192,8 +201,8 @@ export default function ProductDetailClient({
 
                 <div className="product-stock-status">
                   <p>Trạng thái: 
-                    <span className={(product.stock || 0) > 0 ? "stock-available" : "stock-empty"}>
-                      {(product.stock || 0) > 0 ? ` Còn hàng (${product.stock})` : " Hết hàng"}
+                    <span className={maxStock > 0 ? "stock-available" : "stock-empty"}>
+                      {maxStock > 0 ? ` Còn hàng (${maxStock})` : " Hết hàng"}
                     </span>
                   </p>
                 </div>
@@ -209,21 +218,32 @@ export default function ProductDetailClient({
                         readOnly
                         className="qty-input"
                       />
-                      <button className="qty-btn" onClick={increaseQty} disabled={quantity >= (product.stock || 0)}>+</button>
+                      <button
+                        className="qty-btn"
+                        onClick={increaseQty}
+                        disabled={maxStock <= 0 || quantity >= maxStock}
+                        type="button"
+                      >
+                        +
+                      </button>
                     </div>
                     <button 
                       className="add-to-cart-btn" 
                       onClick={handleAddToCart}
-                      disabled={(product.stock || 0) <= 0}
+                      disabled={maxStock <= 0}
+                      type="button"
                     >
-                      {(product.stock || 0) > 0 ? `Thêm vào giỏ hàng (${quantity})` : "Hết hàng"}
+                      {maxStock > 0 ? `Thêm vào giỏ hàng (${Math.min(quantity, maxStock)})` : "Hết hàng"}
                     </button>
                     <button 
-                      className={`favorite-btn ${isFavorite ? 'active' : ''}`} 
+                      type="button"
+                      className={`favorite-btn ${isFavorite ? "active" : ""}`}
                       onClick={toggleFavorite}
                       title={isFavorite ? "Bỏ yêu thích" : "Yêu thích"}
+                      aria-label={isFavorite ? "Bỏ yêu thích" : "Thêm vào yêu thích"}
+                      aria-pressed={isFavorite}
                     >
-                      {isFavorite ? "❤️" : "🤍"}
+                      <i className={isFavorite ? "fas fa-heart" : "far fa-heart"} aria-hidden />
                     </button>
                   </div>
                 </div>
